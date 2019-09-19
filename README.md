@@ -3,4 +3,4 @@ Repositorio para crear un SO para la Raspi2
 
 ## Enlaces:
 
-- Enlace principal, (Tutorial para implementar un SO en una Raspi)[https://jsandler18.github.io/]
+- [Enlace principal](https://jsandler18.github.io/): Tutorial para implementar un SO en una Raspi.
