@@ -1,2 +1,13 @@
-*.bbl
+Memoria/*.bbl
+Memoria/*.aux
+Memoria/*.blg
+Memoria/*.fdb*
+Memoria/*.fls
+Memoria/*.idx
+Memoria/*.ilg
+Memoria/*.ind
+Memoria/*.log
+Memoria/*.out
+Memoria/*.pdf
+Memoria/*.toc
 
