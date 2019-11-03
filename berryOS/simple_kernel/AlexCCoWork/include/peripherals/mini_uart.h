@@ -2,18 +2,18 @@
 #define	_P_MINI_UART_H
 
 #include "peripherals/base.h"
-//all define in page 8 and forward
-#define AUX_ENABLES     (PBASE+0x00215004)
-#define AUX_MU_IO_REG   (PBASE+0x00215040)
-#define AUX_MU_IER_REG  (PBASE+0x00215044)
-#define AUX_MU_IIR_REG  (PBASE+0x00215048)
-#define AUX_MU_LCR_REG  (PBASE+0x0021504C)
-#define AUX_MU_MCR_REG  (PBASE+0x00215050)
-#define AUX_MU_LSR_REG  (PBASE+0x00215054)
-#define AUX_MU_MSR_REG  (PBASE+0x00215058)
-#define AUX_MU_SCRATCH  (PBASE+0x0021505C)
-#define AUX_MU_CNTL_REG (PBASE+0x00215060)
-#define AUX_MU_STAT_REG (PBASE+0x00215064)
-#define AUX_MU_BAUD_REG (PBASE+0x00215068)
+//all define in page 8 of BCM2837 and forward.
+#define AUX_ENABLES     (PBASE+0x00215004) //Auxiliary functionality enable
+#define AUX_MU_IO_REG   (PBASE+0x00215040) //mini uart i/o data
+#define AUX_MU_IER_REG  (PBASE+0x00215044) //mini uart interrupt enable
+#define AUX_MU_IIR_REG  (PBASE+0x00215048) //mini uart interrupt identify
+#define AUX_MU_LCR_REG  (PBASE+0x0021504C) //mini uart line control
+#define AUX_MU_MCR_REG  (PBASE+0x00215050) //mini uart modem control
+#define AUX_MU_LSR_REG  (PBASE+0x00215054) //mini uart line status
+#define AUX_MU_MSR_REG  (PBASE+0x00215058) //mini uart modem status
+#define AUX_MU_SCRATCH  (PBASE+0x0021505C) //mini uart scratch
+#define AUX_MU_CNTL_REG (PBASE+0x00215060) //mini uart control register
+#define AUX_MU_STAT_REG (PBASE+0x00215064) //mini uart extra status
+#define AUX_MU_BAUD_REG (PBASE+0x00215068) //mini uart baudrate register
 
 #endif  /*_P_MINI_UART_H */
