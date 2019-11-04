@@ -13,7 +13,6 @@ put32:
 get32:
     stmea sp!,{lr}
 	ldr r0,[r0]
-    pop{lr}
     ldmfd sp!,{lr}
 	mov pc, lr
 
