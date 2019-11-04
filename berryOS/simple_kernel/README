@@ -1,3 +1,6 @@
 This is temporary folder, it might be deleted while developing the project.
 
 Each master developer should create it's own folder for temporary work.
+
+The compiler utilities used for this directory are aarch64-linux-gnu-. You can install
+them using the "sudo apt install gcc-aarch64-linux-gnu" command from terminal in linux.
