@@ -1,6 +1,9 @@
 This is temporary folder, it might be deleted while developing the project.
 
-Each master developer should create it's own folder for temporary work.
-
 The compiler utilities used for this directory are aarch64-linux-gnu-. You can install
 them using the "sudo apt install gcc-aarch64-linux-gnu" command from terminal in linux.
+                        ---------------------------
+This temporary folder stores every development done by AlexCCO.
+
+Please, take a look at the file LICENSE where i specify the origin of every file i didn't write and to know
+under what license is each file protected.

@@ -4,14 +4,14 @@
 
 void uart_send ( char c )
 {
-	//we have to do a wait here
+	//we have to do a wait here or somethin with AUX_MU_LSR_REG
 
 	put32(AUX_MU_IO_REG,c);
 }
 
 char uart_recv ( void )
 {
-	//we have to do a wait here
+	//we have to do a wait here or something with AUX_MU_LSR_REG
 	return(get32(AUX_MU_IO_REG)&0xFF);
 }
 
