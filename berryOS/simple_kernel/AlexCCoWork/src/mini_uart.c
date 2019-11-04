@@ -4,6 +4,7 @@
 
 void uart_send ( char c )
 {
+	delay(150);
 	while(1) {
 		if(get32(AUX_MU_LSR_REG)&0x20) 
 			break;
@@ -13,6 +14,7 @@ void uart_send ( char c )
 
 char uart_recv ( void )
 {
+	delay(150);
 	while(1) {
 		if(get32(AUX_MU_LSR_REG)&0x01) 
 			break;
