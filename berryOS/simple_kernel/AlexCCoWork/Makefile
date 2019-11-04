@@ -16,6 +16,8 @@ ASMOPS = -Iinclude
 
 BUILD_DIR = build
 SRC_DIR = src
+AARCH64 = arch/ARMv8
+AARCHARMv7-A = arch/ARMv7
 
 all : kernel8.img
 
@@ -26,7 +28,7 @@ $(BUILD_DIR)/%_c.o: $(SRC_DIR)/%.c
 	mkdir -p $(@D)
 	$(ARMGNU)-gcc $(COPS) -MMD -c $< -o $@
 
-$(BUILD_DIR)/%_s.o: $(SRC_DIR)/%.S
+$(BUILD_DIR)/%_s.o: $(SRC_DIR)/${AARCH64}%.S
 	$(ARMGNU)-gcc $(ASMOPS) -MMD -c $< -o $@
 
 C_FILES = $(wildcard $(SRC_DIR)/*.c)
