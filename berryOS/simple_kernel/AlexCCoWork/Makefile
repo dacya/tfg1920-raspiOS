@@ -34,7 +34,7 @@ $(BUILD_DIR)/%_s.o: $(SRC_DIR)/${AARCH64}/%.S
 C_FILES = $(wildcard $(SRC_DIR)/*.c)
 ASM_FILES = $(wildcard $(SRC_DIR)/${AARCH64}/*.S)
 OBJ_FILES = $(C_FILES:$(SRC_DIR)/%.c=$(BUILD_DIR)/%_c.o)
-OBJ_FILES += $(ASM_FILES:$(SRC_DIR)/%.S=$(BUILD_DIR)/%_s.o)
+OBJ_FILES += $(ASM_FILES:$(SRC_DIR)/${AARCH64}/%.S=$(BUILD_DIR)/%_s.o)
 
 DEP_FILES = $(OBJ_FILES:%.o=%.d)
 -include $(DEP_FILES)
