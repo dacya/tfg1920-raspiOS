@@ -4,14 +4,32 @@
 
 void uart_send ( char c )
 {
-	//we have to do a wait here or somethin with AUX_MU_LSR_REG
+	while(1){
+		if((get32(AUX_MU_LSR_REG)&0x40)>>6){
+			break;
+		}
+	}
 
 	put32(AUX_MU_IO_REG,c);
 }
 
+//void _uart_send_register(  );
 char uart_recv ( void )
 {
 	//we have to do a wait here or something with AUX_MU_LSR_REG
+	char error = '0';
+	unsigned int registerValue;
+	while(1){
+		registerValue = get32(AUX_MU_LSR_REG);
+		if(registerValue&0x01){
+			if(registerValue&0x02>>1){
+				error = '1';
+			}
+			break;
+		}
+	}
+
+	uart_send(error);
 	return(get32(AUX_MU_IO_REG)&0xFF);
 }
 
@@ -31,6 +49,7 @@ void uart_init ( void )
 	selector |= (2<<12);                      // set alt5 for gpio14
 	//selector &= ~(7<<15);                   // clean gpio15
 	selector |= (2<<15);                      // set alt5 for gpio15
+	
 	put32(GPFSEL1,selector);
 
 	put32(GPPUD,0);
