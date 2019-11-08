@@ -2,10 +2,10 @@
 #include "peripherals/mini_uart.h"
 #include "peripherals/gpio.h"
 
-void uart_send ( char c )
+void mini_uart_send ( char c )
 {
 	while(1){
-		if((get32(AUX_MU_LSR_REG)&0x40)>>6){
+		if(get32(AUX_MU_LSR_REG)&0x40){
 			break;
 		}
 	}
@@ -14,7 +14,7 @@ void uart_send ( char c )
 }
 
 //void _uart_send_register(  );
-char uart_recv ( void )
+char mini_uart_recv ( void )
 {
 	//we have to do a wait here or something with AUX_MU_LSR_REG
 	char error = '0';
@@ -22,7 +22,7 @@ char uart_recv ( void )
 	while(1){
 		registerValue = get32(AUX_MU_LSR_REG);
 		if(registerValue&0x01){
-			if(registerValue&0x02>>1){
+			if(registerValue&0x02){
 				error = '1';
 			}
 			break;
@@ -33,22 +33,22 @@ char uart_recv ( void )
 	return(get32(AUX_MU_IO_REG)&0xFF);
 }
 
-void uart_send_string(char* str)
+void mini_uart_send_string(char* str)
 {
 	for (int i = 0; str[i] != '\0'; i ++) {
 		uart_send((char)str[i]);
 	}
 }
 
-void uart_init ( void )
+void mini_uart_init ( void )
 {
 	unsigned int selector = 0;
 
 	selector = get32(GPFSEL1);
-	//selector &= ~(7<<12);                   // clean gpio14
-	selector |= (2<<12);                      // set alt5 for gpio14
-	//selector &= ~(7<<15);                   // clean gpio15
-	selector |= (2<<15);                      // set alt5 for gpio15
+	selector &= ~(7<<12);                   // clean gpio14
+	selector |= (2<<12);                    // set alt5 for gpio14
+	selector &= ~(7<<15);                   // clean gpio15
+	selector |= (2<<15);                    // set alt5 for gpio15
 	
 	put32(GPFSEL1,selector);
 

@@ -5,8 +5,8 @@
 void led_init( void ){
     unsigned int selector = 0;
 
-    selector |= (1<<21);
-    put32(GPFSEL2, selector); //we declare the GPIO pin 27 as output
+    selector |= (1<<17);
+    put32(GPFSEL2, selector); //we declare the GPIO pin 17 as output
 
 }
 

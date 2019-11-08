@@ -8,13 +8,13 @@ void kernel_main(void)
 	led_init();
 	led_set(LOW);
 
-	uart_send_string("Hello, world!\r\n");
+	mini_uart_send_string("Hello, world!\r\n");
 
 	while (1) {
-		uart_send('>');
+		mini_uart_send('>');
 		a = uart_recv();
-		uart_send_string("Your character is: ");
-		uart_send(a);
+		mini_uart_send_string("Your character is: ");
+		mini_uart_send(a);
 
 		if(a == 'o'){
 			uart_send_string(", and it should turn on the led\r\n");
@@ -23,6 +23,10 @@ void kernel_main(void)
 		else if (a == 'f'){
 			uart_send_string(", and it should turn off the led\r\n");
 			led_set(LOW);
+		}
+		else if (a == 'q'){
+			uart_send_string("\r\nShutting down");
+			break;
 		}
 		else{
 			uart_send_string("\r\n");
