@@ -65,7 +65,7 @@ kernel8.img: $(SRC_DIR)/${AARCH64}/linker.ld $(OBJ64_FILES)
 	$(ARMGNU)-ld -T $(SRC_DIR)/${AARCH64}/linker.ld -o $(BUILD_DIR)/kernel8.elf  $(OBJ64_FILES)
 	$(ARMGNU)-objcopy $(BUILD_DIR)/kernel8.elf -O binary kernel8.img
 
-myos.elf: $(SRC_DIR)/${AARCHARMv7}/linker.ld $(OBJ32_FILES)
+raspi2: $(SRC_DIR)/${AARCHARMv7}/linker.ld $(OBJ32_FILES)
 	${ARMGNURP2} -T ${SRC_DIR}/${AARCHARMv7}/linker.ld -o ${BUILD_DIR}/myos.elf -ffreestanding -O2 -nostdlib ${OBJ32_FILES}
 
 #arm-none-eabi-gcc -mcpu=cortex-a7 -fpic -ffreestanding -c boot.S -o boot.o
