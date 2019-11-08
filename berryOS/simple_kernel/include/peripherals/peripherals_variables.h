@@ -2,9 +2,9 @@
 #define _P_PERIPHERALS_VARIABLES_H
 
 #include <stdint.h>
-#include "./gpio.h"
-#include "./mini_uart.h"
-#include "./uart.h"
+#include "peripherals/gpio.h"
+#include "peripherals/mini_uart.h"
+#include "peripherals/uart.h"
 
 //PL011 UART
 uint32_t volatile* const UART0_FR_REG;
