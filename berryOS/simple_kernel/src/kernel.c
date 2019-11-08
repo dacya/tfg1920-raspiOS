@@ -1,5 +1,5 @@
-#include "mini_uart.h"
-#include "led.h"
+#include "../include/uart.h"
+#include "../include/led.h"
 
 void kernel_main(void)
 {	
@@ -8,13 +8,13 @@ void kernel_main(void)
 	led_init();
 	led_set(LOW);
 
-	mini_uart_send_string("Hello, world!\r\n");
+	uart_send_string("Hello, world!\r\n");
 
 	while (1) {
-		mini_uart_send('>');
+		uart_send('>');
 		a = uart_recv();
-		mini_uart_send_string("Your character is: ");
-		mini_uart_send(a);
+		uart_send_string("Your character is: ");
+		uart_send(a);
 
 		if(a == 'o'){
 			uart_send_string(", and it should turn on the led\r\n");

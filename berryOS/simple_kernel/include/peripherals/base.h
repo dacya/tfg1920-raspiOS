@@ -1,7 +1,5 @@
 #ifndef	_P_BASE_H
 #define	_P_BASE_H
-
-#include <stdint.h>
 /*                            IMPORTANT
 
  We will be using this memory base value because we'll be working directly

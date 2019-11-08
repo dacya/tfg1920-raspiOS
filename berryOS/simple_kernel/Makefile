@@ -32,13 +32,21 @@ $(BUILD_DIR)/%_s.o: $(SRC_DIR)/${AARCH64}/%.S
 	$(ARMGNU)-gcc $(ASMOPS) -MMD -c $< -o $@
 
 C_FILES = $(wildcard $(SRC_DIR)/*.c)
-ASM_FILES = $(wildcard $(SRC_DIR)/${AARCH64}/*.S)
+
+ASM64_FILES = $(wildcard $(SRC_DIR)/${AARCH64}/*.S)
+ASM32_FILES = $(wildcard $(SRC_DIR)/${AARCHARMv7}/*.S)
+
 OBJ_FILES = $(C_FILES:$(SRC_DIR)/%.c=$(BUILD_DIR)/%_c.o)
-OBJ_FILES += $(ASM_FILES:$(SRC_DIR)/${AARCH64}/%.S=$(BUILD_DIR)/%_s.o)
+
+OBJ64_FILES = ${OBJ_FILES}
+OBJ64_FILES += $(ASM64_FILES:$(SRC_DIR)/${AARCH64}/%.S=$(BUILD_DIR)/%_s.o)
+
+OBJ32_FILES = ${OBJ_FILES}
+OBJ32_FILES += $(ASM32_FILES:$(SRC_DIR)/${AARCHARMv7}/%.S=$(BUILD_DIR)/%_s.o)
 
 DEP_FILES = $(OBJ_FILES:%.o=%.d)
 -include $(DEP_FILES)
 
-kernel8.img: $(SRC_DIR)/linker.ld $(OBJ_FILES)
-	$(ARMGNU)-ld -T $(SRC_DIR)/linker.ld -o $(BUILD_DIR)/kernel8.elf  $(OBJ_FILES)
+kernel8.img: $(SRC_DIR)/${AARCH64}/linker.ld $(OBJ64_FILES)
+	$(ARMGNU)-ld -T $(SRC_DIR)/${AARCH64}/linker.ld -o $(BUILD_DIR)/kernel8.elf  $(OBJ64_FILES)
 	$(ARMGNU)-objcopy $(BUILD_DIR)/kernel8.elf -O binary kernel8.img

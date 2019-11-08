@@ -1,18 +1,21 @@
-#include "utils.h"
-#include "peripherals/gpio.h"
-#include "led.h"
+#include <stdint.h>
+#include "../include/peripherals/gpio.h"
+#include "../include/led.h"
+
+uint32_t volatile* const GPFSEL2_REG = (uint32_t*) GPFSEL2;
+uint32_t volatile* const GPSET0_REG = (uint32_t*) GPSET0;
+uint32_t volatile* const GPCLR0_REG = (uint32_t*) GPCLR0;
 
 void led_init( void ){
-    unsigned int selector = 0;
+    uint32_t selector = *(GPFSEL2_REG);
 
     selector |= (1<<17);
-    put32(GPFSEL2, selector); //we declare the GPIO pin 17 as output
-
+    *(GPFSEL2_REG) = selector; //we declare the GPIO pin 17 as output
 }
 
 void led_set(enum led_flag value){
-    unsigned int setSr = 0;
-    unsigned int clearSr = 0;
+    uint32_t setSr = 0;
+    uint32_t clearSr = 0;
 
     if(value == HIGH){
         setSr |= (1<<21);
@@ -23,6 +26,6 @@ void led_set(enum led_flag value){
         clearSr |= (1<<21);
     }
     
-    put32(GPSET0, setSr);
-    put32(GPCLR0, clearSr);
+    *(GPSET0_REG) = setSr;
+    *(GPCLR0_REG) = clearSr;
 }

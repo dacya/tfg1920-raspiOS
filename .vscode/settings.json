@@ -6,6 +6,7 @@
         "uart.h": "c",
         "stdlib.h": "c",
         "stdint.h": "c",
-        "cstdint": "c"
+        "cstdint": "c",
+        "utils.h": "c"
     }
 }

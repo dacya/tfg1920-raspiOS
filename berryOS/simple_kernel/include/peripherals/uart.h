@@ -15,7 +15,7 @@
   bit 8: Framing error
   bit 7-0: Data
 */
-uint32_t volatile * const UART0_DR = (uint32_t *)(PBASE+0x00201000);
+#define UART0_DR (PBASE+0x00201000)
 /*
   PL011 Uart receive status register/error clear register
   ------------------------
@@ -25,7 +25,7 @@ uint32_t volatile * const UART0_DR = (uint32_t *)(PBASE+0x00201000);
   bit 1: Parity error
   bit 0: Framing error
 */
-uint32_t volatile * const UART0_RSRECR = (uint32_t *)(PBASE+0x00201004);
+#define UART0_RSRECR (PBASE+0x00201004)
 /*
   PL011 Uart flag register
   ------------------------
@@ -38,25 +38,25 @@ uint32_t volatile * const UART0_RSRECR = (uint32_t *)(PBASE+0x00201004);
   bit 3: UART busy
   bit 2: Unsupported
   bit 1: Unsupported
-  bit 0: Clear To Send (complement of nUARTCTS modem statu);
+  bit 0: Clear To Send (complement of nUARTCTS modem statu)
 */
-uint32_t volatile * const UART0_FR = (uint32_t *)(PBASE+0x00201018);
+#define UART0_FR (PBASE+0x00201018)
 //DISABLE NOT USE
-uint32_t volatile * const UART0_ILPR = (uint32_t *)(PBASE+0x00201020);
+#define UART0_ILPR (PBASE+0x00201020)
 /*
   PL011 Uart integer baud rate divisor
   ------------------------
   bit 31-16: Reserved
   bit 15-0: The integer Baud rate divisor
 */
-uint32_t volatile * const UART0_IBRD = (uint32_t *)(PBASE+0x00201024);
+#define UART0_IBRD (PBASE+0x00201024)
 /*
   PL011 Uart fractional baud rate divisor
   ------------------------
   bit 31-6: Reserved
   bit 5-0: The fractional Baud rate divisor
 */
-uint32_t volatile * const UART0_FBRD = (uint32_t *)(PBASE+0x00201028);
+#define UART0_FBRD (PBASE+0x00201028)
 /*
   PL011 Uart line control register
   ------------------------
@@ -74,7 +74,7 @@ uint32_t volatile * const UART0_FBRD = (uint32_t *)(PBASE+0x00201028);
   bit 1: Parity enable
   bit 0: Send break
 */
-uint32_t volatile * const UART0_LCRH = (uint32_t *)(PBASE+0x0020102C);
+#define UART0_LCRH (PBASE+0x0020102C)
 /*
   PL011 Uart control register
   ------------------------
@@ -83,7 +83,7 @@ uint32_t volatile * const UART0_LCRH = (uint32_t *)(PBASE+0x0020102C);
   bit 14: Request To Send hardware flow control enable
   bit 13: Doesn't matter
   bit 12: Doesn't matter
-  bit 11: Request To Send (complement of nUARTRTS modem statu);
+  bit 11: Request To Send (complement of nUARTRTS modem statu)
   bit 10: Doesn't matter
   bit 9: Receive enable 
   bit 8: Transmit enable
@@ -93,12 +93,12 @@ uint32_t volatile * const UART0_LCRH = (uint32_t *)(PBASE+0x0020102C);
   bit 1: Doesn't matter
   bit 0: UART enable 
 */
-uint32_t volatile * const UART0_CR = (uint32_t *)(PBASE+0x00201030);
+#define UART0_CR (PBASE+0x00201030)
 /*
   PL011 Uart interrupt FIFO level select register
   ------------------------
 */
-uint32_t volatile * const UART0_IFLS = (uint32_t *)(PBASE+0x00201034);
+#define UART0_IFLS (PBASE+0x00201034)
 /*
   PL011 Uart interrupt mask set clear register
   ------------------------
@@ -115,17 +115,17 @@ uint32_t volatile * const UART0_IFLS = (uint32_t *)(PBASE+0x00201034);
   bit 1: nUARTCTS modem interrupt
   bit 0: Doesn't matter
 */
-uint32_t volatile * const UART0_IMSC = (uint32_t *)(PBASE+0x00201038);
+#define UART0_IMSC (PBASE+0x00201038)
 /*
   PL011 Uart raw interrupt status register
   ------------------------
 */
-uint32_t volatile * const UART0_RIS = (uint32_t *)(PBASE+0x0020103C);
+#define UART0_RIS (PBASE+0x0020103C)
 /*
   PL011 Uart masked interupt status register
   ------------------------
 */
-uint32_t volatile * const UART0_MIS = (uint32_t *)(PBASE+0x00201040);
+#define UART0_MIS (PBASE+0x00201040)
 /*
   PL011 Uart interrupt clear register
   ------------------------
@@ -142,31 +142,31 @@ uint32_t volatile * const UART0_MIS = (uint32_t *)(PBASE+0x00201040);
   bit 1: (Clear To Send) nUARTCTS modem mask interrupt status from UARTCTSINTR
   bit 0: unsupported, always zero
 */
-uint32_t volatile * const UART0_ICR = (uint32_t *)(PBASE+0x00201044);
+#define UART0_ICR (PBASE+0x00201044)
 /*
   L011 Uart DMA control register
   ------------------------
 */
-uint32_t volatile * const UART0_DMACR = (uint32_t *)(PBASE+0x00201048);
+#define UART0_DMACR (PBASE+0x00201048)
 /* 
   PL011 Uart text control register
   ------------------------
 */
-uint32_t volatile * const UART0_ITCR = (uint32_t *)(PBASE+0x00201080);
+#define UART0_ITCR (PBASE+0x00201080)
 /*
   PL011 Uart integration test input register
   ------------------------
 */
-uint32_t volatile * const UART0_ITIP = (uint32_t *)(PBASE+0x00201084);
+#define UART0_ITIP (PBASE+0x00201084)
 /*
   PL011 Uart integration test output register
   ------------------------
 */
-uint32_t volatile * const UART0_ITOP = (uint32_t *)(PBASE+0x00201088);
+#define UART0_ITOP (PBASE+0x00201088)
 /*
   PL011 Uart test data register
   ------------------------
 */
-uint32_t volatile * const UART0_TDR = (uint32_t *)(PBASE+0x0020108C);
+#define UART0_TDR (PBASE+0x0020108C)
 
 #endif
