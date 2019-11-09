@@ -30,16 +30,16 @@ clean :
 	rm -rf $(BUILD_DIR) *.img
 
 #target for .c files
-$(BUILD_DIR)/%_c.o: $(SRC_DIR)/%.c
+$(BUILD_DIR)/%_c.o: $(SRC_DIR)/%.c 
 	mkdir -p $(@D)
 	$(ARMGNU)-gcc $(COPS) -MMD -c $< -o $@
 
 #target for .s files from ARMv8 architecture
-$(BUILD_DIR)/%_s.o: $(SRC_DIR)/${AARCH64}/%.S
+$(BUILD_DIR)/%_s.o: ${AARCH64}/%.S
 	$(ARMGNU)-gcc $(ASMOPS) -MMD -c $< -o $@
 
 #target for .s file from ARMv7 architecture
-$(BUILD_DIR)/%_rp2s.o: $(SRC_DIR)/${AARCHARMv7}/%.S
+$(BUILD_DIR)/%_rp2s.o: ${AARCHARMv7}/%.S
 	$(ARMGNURP2) $(ASRP2OP) -MMD -c $< -o $@
 
 #target for .c files to compile to ARMv7 architecture
@@ -47,26 +47,28 @@ $(BUILD_DIR)/%_rp2c.o: $(SRC_DIR)/%.c
 	mkdir -p $(@D)
 	$(ARMGNURP2) $(CRP2OPS) -MMD -c $< -o $@
 
+IO_FILES = $(wildcard $(SRC_DIR)/io/*.c)
 C_FILES = $(wildcard $(SRC_DIR)/*.c)
+C_FILES += $(IO_FILES)
 
-ASM64_FILES = $(wildcard $(SRC_DIR)/${AARCH64}/*.S)
-ASM32_FILES = $(wildcard $(SRC_DIR)/${AARCHARMv7}/*.S)
+ASM64_FILES = $(wildcard ${AARCH64}/*.S)
+ASM32_FILES = $(wildcard ${AARCHARMv7}/*.S)
 
 OBJ64_FILES = $(C_FILES:$(SRC_DIR)/%.c=$(BUILD_DIR)/%_c.o)
-OBJ64_FILES += $(ASM64_FILES:$(SRC_DIR)/${AARCH64}/%.S=$(BUILD_DIR)/%_s.o)
+OBJ64_FILES += $(ASM64_FILES:${AARCH64}/%.S=$(BUILD_DIR)/%_s.o)
 
 OBJ32_FILES = $(C_FILES:$(SRC_DIR)/%.c=$(BUILD_DIR)/%_rp2c.o)
-OBJ32_FILES += $(ASM32_FILES:$(SRC_DIR)/${AARCHARMv7}/%.S=$(BUILD_DIR)/%_rp2s.o)
+OBJ32_FILES += $(ASM32_FILES:${AARCHARMv7}/%.S=$(BUILD_DIR)/%_rp2s.o)
 
 DEP_FILES = $(OBJ_FILES:%.o=%.d)
 -include $(DEP_FILES)
 
-kernel8.img: $(SRC_DIR)/${AARCH64}/linker.ld $(OBJ64_FILES)
-	$(ARMGNU)-ld -T $(SRC_DIR)/${AARCH64}/linker.ld -o $(BUILD_DIR)/kernel8.elf  $(OBJ64_FILES)
+kernel8.img: ${AARCH64}/linker.ld $(OBJ64_FILES)
+	$(ARMGNU)-ld -T ${AARCH64}/linker.ld -o $(BUILD_DIR)/kernel8.elf  $(OBJ64_FILES)
 	$(ARMGNU)-objcopy $(BUILD_DIR)/kernel8.elf -O binary kernel8.img
 
-raspi2: $(SRC_DIR)/${AARCHARMv7}/linker.ld $(OBJ32_FILES)
-	${ARMGNURP2} -T ${SRC_DIR}/${AARCHARMv7}/linker.ld -o ${BUILD_DIR}/myos.elf -ffreestanding -O2 -nostdlib ${OBJ32_FILES}
+raspi2: ${AARCHARMv7}/linker.ld $(OBJ32_FILES)
+	${ARMGNURP2} -T ${AARCHARMv7}/linker.ld -o ${BUILD_DIR}/myos.elf -ffreestanding -O2 -nostdlib ${OBJ32_FILES}
 
 #arm-none-eabi-gcc -mcpu=cortex-a7 -fpic -ffreestanding -c boot.S -o boot.o
 #arm-none-eabi-gcc -mcpu=cortex-a7 -fpic -ffreestanding -std=gnu99 -c kernel.c -o kernel.o -O2 -Wall -Wextra

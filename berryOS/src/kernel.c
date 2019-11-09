@@ -1,5 +1,5 @@
-#include "../include/uart.h"
-#include "../include/led.h"
+#include "../include/io/uart.h"
+#include "../include/io/led.h"
 
 void kernel_main(void)
 {	

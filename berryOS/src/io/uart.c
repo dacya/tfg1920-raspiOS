@@ -1,7 +1,7 @@
 #include <stdint.h> //for uint32_t
-#include "../include/peripherals/peripherals_variables.h"
-#include "../include/uart.h"
-#include "../include/utils.h"
+#include "../include/io/peripherals/peripherals_variables.h"
+#include "../include/io/uart.h"
+#include "../include/utils/utils.h"
 
 char uart_recv ( void ){
     while(*(UART0_FR_REG)&(1<<4)); //wait while RX FIFO queue is not empty
@@ -14,7 +14,7 @@ void uart_send ( char c ){
 }
 
 void uart_send_string(char* str){
-    for(int i = 0; *str != '\0'; i++){
+    for(int i = 0; *(str) != '\0'; i++){
         uart_send(str[i]);
     }
 }
@@ -89,3 +89,19 @@ void uart_init ( void ){
 
     *(UART0_CR_REG) = selector;
 }
+
+/**
+ * 
+ * 
+ * // Loop <delay> times in a way that the compiler won't optimize away
+static inline void delay(int32_t count)
+{
+    asm volatile("__delay_%=: subs %[count], %[count], #1; bne __delay_%=\n"
+            : "=r"(count): [count]"0"(count) : "cc");
+}
+
+static inline void mmio_write(uint32_t reg, uint32_t data);
+
+static inline uint32_t mmio_read(uint32_t reg);
+
+*/

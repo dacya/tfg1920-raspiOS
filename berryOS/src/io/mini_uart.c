@@ -1,7 +1,7 @@
 #include <stdint.h>
-#include "../include/mini_uart.h"
-#include "../include/peripherals/peripherals_variables.h"
-#include "../include/utils.h"
+#include "../include/io/mini_uart.h"
+#include "../include/io/peripherals/peripherals_variables.h"
+#include "../include/utils/utils.h"
 
 void mini_uart_send ( char c )
 {

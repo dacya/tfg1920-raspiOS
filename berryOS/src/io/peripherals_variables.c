@@ -1,4 +1,4 @@
-#include "../include/peripherals/peripherals_variables.h"
+#include "../include/io/peripherals/peripherals_variables.h"
 
 //                      PL011 UART
 uint32_t volatile* const UART0_FR_REG = (uint32_t*)UART0_FR;

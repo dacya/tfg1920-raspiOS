@@ -6,7 +6,7 @@ enum led_flag {
     LOW
 };
 
-void led_init( void ); //the function takes no parameters
+void led_init( void );
 void led_set(enum led_flag value);
 
 #endif

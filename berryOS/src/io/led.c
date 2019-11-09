@@ -1,6 +1,6 @@
 #include <stdint.h>
-#include "../include/peripherals/peripherals_variables.h"
-#include "../include/led.h"
+#include "../include/io/peripherals/peripherals_variables.h"
+#include "../include/io/led.h"
 
 void led_init( void ){
     uint32_t selector = *(GPFSEL2_REG);
