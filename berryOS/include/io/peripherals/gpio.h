@@ -1,7 +1,7 @@
 #ifndef	_P_GPIO_H
 #define	_P_GPIO_H
 
-#include "base.h"
+#include <io/peripherals/base.h>
 //all defined in page 89 and forward
 
 //GPIO function select (registers 0 to 9)

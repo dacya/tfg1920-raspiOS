@@ -1,4 +1,4 @@
-#include "../include/io/peripherals/peripherals_variables.h"
+/*#include "../include/io/peripherals/peripherals_variables.h"
 
 //                      PL011 UART
 uint32_t volatile* const UART0_FR_REG = (uint32_t*)UART0_FR;
@@ -57,7 +57,9 @@ uint32_t volatile* const GPPUDCLK1_REG = (uint32_t*)GPPUDCLK1;
 
 
 //                      MINI_UART
+uint32_t volatile* const AUX_IRQ_REG = (uint32_t*)AUX_IRQ;
 uint32_t volatile* const AUX_ENABLES_REG = (uint32_t*)AUX_ENABLES;
+
 uint32_t volatile* const AUX_MU_IO_REG = (uint32_t*)AUX_MU_IO;
 uint32_t volatile* const AUX_MU_IER_REG = (uint32_t*)AUX_MU_IER;
 uint32_t volatile* const AUX_MU_IIR_REG = (uint32_t*)AUX_MU_IIR;
@@ -69,4 +71,17 @@ uint32_t volatile* const AUX_MU_SCRATCH_REG = (uint32_t*)AUX_MU_SCRATCH;
 uint32_t volatile* const AUX_MU_CNTL_REG = (uint32_t*)AUX_MU_CNTL;
 uint32_t volatile* const AUX_MU_STAT_REG = (uint32_t*)AUX_MU_STAT;
 uint32_t volatile* const AUX_MU_BAUD_REG = (uint32_t*)AUX_MU_BAUD;
+
+uint32_t volatile* const AUX_SPI1_CNTL0_REG = (uint32_t*)AUX_SPI1_CNTL0;
+uint32_t volatile* const AUX_SPI1_CNTL1_REG = (uint32_t*)AUX_SPI1_CNTL1;
+uint32_t volatile* const AUX_SPI1_STAT_REG = (uint32_t*)AUX_SPI1_STAT;
+uint32_t volatile* const AUX_SPI1_IO_REG = (uint32_t*)AUX_SPI1_IO;
+uint32_t volatile* const AUX_SPI1_PEEK_REG = (uint32_t*)AUX_SPI1_PEEK;
+
+uint32_t volatile* const AUX_SPI2_CNTL0_REG = (uint32_t*)AUX_SPI2_CNTL0;
+uint32_t volatile* const AUX_SPI2_CNTL1_REG = (uint32_t*)AUX_SPI2_CNTL1;
+uint32_t volatile* const AUX_SPI2_STAT_REG = (uint32_t*)AUX_SPI2_STAT;
+uint32_t volatile* const AUX_SPI2_IO_REG = (uint32_t*)AUX_SPI2_IO;
+uint32_t volatile* const AUX_SPI2_PEEK_REG = (uint32_t*)AUX_SPI2_PEEK;
 //----------------------FIN MINI_UART------------------------------
+*/

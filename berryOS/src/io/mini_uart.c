@@ -1,25 +1,37 @@
 #include <stdint.h>
-#include "../include/io/mini_uart.h"
-#include "../include/io/peripherals/peripherals_variables.h"
-#include "../include/utils/utils.h"
+#include <io/mini_uart.h>
+#include <io/peripherals/peripherals_variables.h>
+#include <utils/utils.h>
+
+void mini_uart_transmit_reg( void ){
+	uint32_t aux_mu_stat_register = *(AUX_MU_STAT_REG);
+	char transmitAndReceiveFIFOfill = (aux_mu_stat_register>>16)&0xF; //receive status
+	transmitAndReceiveFIFOfill |= (((aux_mu_stat_register>>24)&0xF)<<4); //tx status
+	char firstByte = aux_mu_stat_register&0xFF;
+	char secondByte = (aux_mu_stat_register&0x0300)>>8;
+
+	*(AUX_MU_IO_REG) = transmitAndReceiveFIFOfill;
+	*(AUX_MU_IO_REG) = firstByte;
+	*(AUX_MU_IO_REG) = secondByte;
+}
 
 void mini_uart_send ( char c )
-{
+{	
 	while(1){
 		if(*(AUX_MU_LSR_REG)&0x40){
 			break;
 		}
 	}
 
-	*(AUX_MU_IO_REG) = c;
+	*(AUX_MU_IO_REG) = c;	
 }
 
 //void _uart_send_register(  );
 char mini_uart_recv ( void )
 {
 	//we have to do a wait here or something with AUX_MU_LSR_REG
-	char error = '0';
-	unsigned int registerValue;
+	uint8_t error = '0';
+	uint32_t registerValue;
 	while(1){
 		registerValue = *(AUX_MU_LSR_REG);
 		if(registerValue&0x01){
@@ -39,11 +51,13 @@ void mini_uart_send_string(char* str)
 	for (int i = 0; str[i] != '\0'; i ++) {
 		mini_uart_send((char)str[i]);
 	}
+
+	mini_uart_transmit_reg();
 }
 
 void mini_uart_init ( void )
 {
-	unsigned int selector = 0;
+	uint32_t selector = 0;
 
 	selector = *(GPFSEL1_REG);
 	selector &= ~(7<<12);                   // clean gpio14

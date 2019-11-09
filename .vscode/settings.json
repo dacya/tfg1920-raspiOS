@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "peripherals_variables.h": "c",
+        "mini_uart.h": "c",
+        "gpio.h": "c",
+        "uart.h": "c",
+        "utils.h": "c",
+        "base.h": "c"
+    }
+}

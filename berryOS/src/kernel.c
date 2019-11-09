@@ -1,5 +1,6 @@
-#include "../include/io/uart.h"
-#include "../include/io/led.h"
+#include <io/uart.h>
+//#include "../include/io/mini_uart.h"
+#include <io/led.h>
 
 void kernel_main(void)
 {	
@@ -12,6 +13,7 @@ void kernel_main(void)
 
 	while (1) {
 		uart_send('>');
+		//uart_transmit_reg();
 		a = uart_recv();
 		uart_send_string("Your character is: ");
 		uart_send(a);

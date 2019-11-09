@@ -1,9 +1,11 @@
 #ifndef	_P_MINI_UART_H
 #define	_P_MINI_UART_H
 
-#include "base.h"
+#include <io/peripherals/base.h>
 //all define in page 8 of BCM2837 and forward.
 
+//Auxiliary interrupt status
+#define AUX_IRQ (PBASE+0x00215000)
 //Auxiliary functionality enable
 #define AUX_ENABLES (PBASE+0x00215004) 
 //mini uart i/o data
@@ -28,5 +30,25 @@
 #define AUX_MU_STAT (PBASE+0x00215064) 
 //mini uart baudrate register
 #define AUX_MU_BAUD (PBASE+0x00215068) 
+// SPI 1 Control register 0
+#define AUX_SPI1_CNTL0 (PBASE+0x00215080)
+// SPI 1 Control register 1
+#define AUX_SPI1_CNTL1 (PBASE+0x00215084)
+//SPI 1 status
+#define AUX_SPI1_STAT (PBASE+0x00215088)
+//SPI 1 data 
+#define AUX_SPI1_IO (PBASE+0x00215090)
+//SPI 1 Peek
+#define AUX_SPI1_PEEK (PBASE+0x00215094)
+//SPI 2 Control register 0   
+#define AUX_SPI2_CNTL0 (PBASE+0x002150C0)
+//SPI 2 Control register 
+#define AUX_SPI2_CNTL1 (PBASE+0x002150C4)
+//SPI 2 status
+#define AUX_SPI2_STAT (PBASE+0x002150C8)
+//SPI 2 data
+#define AUX_SPI2_IO (PBASE+0x002150D0)
+//SPI 2 Peek
+#define AUX_SPI2_PEEK (PBASE+0x002150D4)
 
 #endif  /*_P_MINI_UART_H */

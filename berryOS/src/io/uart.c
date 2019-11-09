@@ -1,7 +1,7 @@
 #include <stdint.h> //for uint32_t
-#include "../include/io/peripherals/peripherals_variables.h"
-#include "../include/io/uart.h"
-#include "../include/utils/utils.h"
+#include <io/peripherals/peripherals_variables.h>
+#include <io/uart.h>
+#include <utils/utils.h>
 
 char uart_recv ( void ){
     while(*(UART0_FR_REG)&(1<<4)); //wait while RX FIFO queue is not empty
@@ -45,6 +45,9 @@ void uart_init ( void ){
     *(GPPUD_REG) = 0;
     *(GPPUDCLK0_REG) = 0;
     *(GPPUDCLK1_REG) = 0;
+
+    *(UART0_ICR_REG) = 0x7FF; //we clear every pending interrupt
+    
     /*
       now whe should set the IBRD and FBRD registers.
       The integer baud rate register uses the result of INTEGER= UART_CLK / (16*baud)
@@ -63,10 +66,8 @@ void uart_init ( void ){
     *(UART0_FBRD_REG) = 40;
 
     selector = 0;
-    selector = (1<<4) | (1<<5) | (1<<6); //8 bits each word and FIFO enable
+    selector = (7<<4); //8 bits each word and FIFO enable
     *(UART0_LCRH_REG) = selector;
-
-    *(UART0_ICR_REG) = 0x7FF; //we clear every pending interrupt
 
     selector = 0;
     selector |= (1<<1); //CTS modem interrupt mask set
@@ -81,8 +82,8 @@ void uart_init ( void ){
     *(UART0_IMSC_REG) = selector;
 
     selector = 0;
-    selector |= (1<<15); //Clear To Send Hardware flow control enable
-    selector |= (1<<14); //Request To Send Hardware flow control enable
+    //selector |= (1<<15); //Clear To Send Hardware flow control enable
+    //selector |= (1<<14); //Request To Send Hardware flow control enable
     selector |= (1<<9); //receive enable
     selector |= (1<<8); //transmit enable
     selector |= 1; //uart enable
