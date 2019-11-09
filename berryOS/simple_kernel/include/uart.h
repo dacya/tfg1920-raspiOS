@@ -1,7 +1,7 @@
 #ifndef	_PL011_UART_H
 #define	_PL011_UART_H
 
-#include "./peripherals/uart.h"
+#include "peripherals/uart.h"
 
 void uart_init ( void );
 char uart_recv ( void );

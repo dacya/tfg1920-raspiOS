@@ -1,10 +1,6 @@
 #include <stdint.h>
-#include "../include/peripherals/gpio.h"
+#include "../include/peripherals/peripherals_variables.h"
 #include "../include/led.h"
-
-uint32_t volatile* const GPFSEL2_REG = (uint32_t*) GPFSEL2;
-uint32_t volatile* const GPSET0_REG = (uint32_t*) GPSET0;
-uint32_t volatile* const GPCLR0_REG = (uint32_t*) GPCLR0;
 
 void led_init( void ){
     uint32_t selector = *(GPFSEL2_REG);

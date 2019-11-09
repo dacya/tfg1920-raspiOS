@@ -23,7 +23,7 @@ void uart_init ( void ){
     uint32_t selector;
 
     *(UART0_CR_REG) = 0; //we disable UART
-
+    /*
     selector = *(GPFSEL1_REG);  //we obtaine the GPFSEL1_REG register
 
 	selector &= ~(7<<12); // clean gpio14
@@ -32,7 +32,7 @@ void uart_init ( void ){
 	selector |= (4<<15);  // set alt0 for gpio15
 	
 	*(GPFSEL1_REG) = selector;
-
+    */
     /*
       this method of changing the pull-ups and timers is defined in page 101
       of documentation from BCM2837
@@ -63,14 +63,26 @@ void uart_init ( void ){
     *(UART0_FBRD_REG) = 40;
 
     selector = 0;
-    selector = (1<<4) | (0b11<<5); //8 bits each word and FIFO enable
+    selector = (1<<4) | (1<<5) | (1<<6); //8 bits each word and FIFO enable
     *(UART0_LCRH_REG) = selector;
 
-    *(UART0_ICR_REG) = 0; //we clear every pending interrupt
+    *(UART0_ICR_REG) = 0x7FF; //we clear every pending interrupt
 
     selector = 0;
-    //selector |= (1<<15); //Clear To Send Hardware flow control enable
-    //selector |= (1<<14); //Request To Send Hardware flow control enable
+    selector |= (1<<1); //CTS modem interrupt mask set
+    selector |= (1<<4); //Receive interrupt mask set
+    selector |= (1<<5); //TX interrupt mask set
+    selector |= (1<<6); //Receive timeout interrupt mask set
+    selector |= (1<<7); //Framing error interrupt mask set
+    selector |= (1<<8); //Parity error interrupt mask set
+    selector |= (1<<9); //Break error interrupt mask set
+    selector |= (1<<10); //Overrun error interrupt mask set
+
+    *(UART0_IMSC_REG) = selector;
+
+    selector = 0;
+    selector |= (1<<15); //Clear To Send Hardware flow control enable
+    selector |= (1<<14); //Request To Send Hardware flow control enable
     selector |= (1<<9); //receive enable
     selector |= (1<<8); //transmit enable
     selector |= 1; //uart enable

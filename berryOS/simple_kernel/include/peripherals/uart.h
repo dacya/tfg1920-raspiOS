@@ -141,6 +141,7 @@
   bit 2: unsupported, always zero
   bit 1: (Clear To Send) nUARTCTS modem mask interrupt status from UARTCTSINTR
   bit 0: unsupported, always zero
+  NOTE: putting an 1 to clear and a 0 to do nothing.
 */
 #define UART0_ICR (PBASE+0x00201044)
 /*
