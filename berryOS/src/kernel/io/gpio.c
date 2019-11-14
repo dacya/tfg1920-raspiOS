@@ -1,14 +1,13 @@
 #include <io/gpio.h>
 
-void set_pin_function(unsigned int pin, unsigned int fun_sel) {
+void pin_set_function(unsigned int pin, unsigned int fun_sel) {
     if (pin > 53 || fun_sel > 0b111) {
         return;
     }
 
     volatile unsigned* reg_obj;
 
-    int reg_num = pin / 10;
-    switch (reg_num) {
+    switch (pin / 10) {
         case 0:
             reg_obj = GPFSEL0;
             break;
@@ -29,18 +28,17 @@ void set_pin_function(unsigned int pin, unsigned int fun_sel) {
             break;
     }
 
-    *reg_obj |= fun_sel << ((pin % 10) * 3)    
+    *reg_obj |= fun_sel << ((pin % 10) * 3);
 }
 
-void set_pin_as_output(unsigned int pin) {
+void pin_set_as_output(unsigned int pin) {
     if (pin > 53) {
         return;
     }
 
     volatile unsigned* reg_set;
 
-    int reg_num = pin / 32;
-    switch (reg_num) {
+    switch (pin / 32) {
         case 0:
             reg_set = GPSET0;
             break;
@@ -50,5 +48,83 @@ void set_pin_as_output(unsigned int pin) {
     }
 
     *reg_set |= 1 << (pin % 32);
-
 }
+
+void pin_clear_output(unsigned int pin) {
+    if (pin > 53)
+        return;
+
+    volatile unsigned* reg;
+
+    switch (pin / 32) {
+        case 0:
+            reg = GPCLR0;
+            break;
+        case 1:
+            reg = GPCLR1;
+            break;
+    }
+
+    *reg |= 1 << (pin % 32);
+}
+
+unsigned int pin_get_level(unsigned int pin) {
+    if (pin > 53)
+        return;
+    
+    volatile unsigned* reg;
+
+    switch (pin / 32) {
+        case 0:
+            reg = GPLEV0;
+            break;
+        case 1:
+            reg = GPLEV1;
+            break;
+    }
+
+    return ((*reg) >> (pin % 32)) & 1;
+}
+
+unsigned int pin_get_event_status_flag(unsigned int pin, int clear) {
+    if (pin > 53)
+        return 0;
+    
+    volatile unsigned* reg;
+
+    switch (pin / 32) {
+        case 0:
+            reg = GPEDS0;
+            break;
+        case 1:
+            reg = GPEDS1;
+            break;
+    }
+
+    unsigned int flag = ((*reg) >> (pin % 32)) & 1;
+
+    if (clear)
+        *reg |= 1 << (pin % 32);
+
+    return flag;
+}
+
+void pin_clear_event_status_flag(unsigned int pin) {
+    if (pin > 53)
+        return ;
+    
+    volatile unsigned* reg;
+
+    switch (pin / 32) {
+        case 0:
+            reg = GPEDS0;
+            break;
+        case 1:
+            reg = GPEDS1;
+            break;
+
+    }
+    
+    *reg |= 1 << (pin % 32);
+}
+
