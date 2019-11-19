@@ -2,7 +2,7 @@
 
 void pin_set_function(unsigned int pin, unsigned int fun_sel) {
     if (pin > 53 || fun_sel > 0b111) {
-        return;
+        return ;
     }
 
     volatile unsigned* reg_obj;
@@ -33,7 +33,7 @@ void pin_set_function(unsigned int pin, unsigned int fun_sel) {
 
 void pin_set_as_output(unsigned int pin) {
     if (pin > 53) {
-        return;
+        return ;
     }
 
     volatile unsigned* reg_set;
@@ -128,3 +128,40 @@ void pin_clear_event_status_flag(unsigned int pin) {
     *reg |= 1 << (pin % 32);
 }
 
+void pin_enable_rising_edge_event(unsigned int pin) {
+    if (pin > 53)
+        return ;
+    
+    volatile unsigned* reg;
+
+    switch (pin / 32) {
+        case 0:
+            reg = GPREN0;
+            break;
+        case 1:
+            reg = GPREN1;
+            break;
+
+    }
+    
+    *reg |= 1 << (pin % 32);
+}
+
+void pin_enable_falling_edge_event(unsigned int pin) {
+    if (pin > 53)
+        return ;
+    
+    volatile unsigned* reg;
+
+    switch (pin / 32) {
+        case 0:
+            reg = GPFEN0;
+            break;
+        case 1:
+            reg = GPFEN1;
+            break;
+
+    }
+    
+    *reg |= 1 << (pin % 32);
+}
