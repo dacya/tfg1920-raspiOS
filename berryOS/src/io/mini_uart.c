@@ -5,17 +5,19 @@
 
 void mini_uart_transmit_reg( void ){
 	uint32_t aux_mu_stat_register = *(AUX_MU_STAT_REG);
-	char transmitAndReceiveFIFOfill = (aux_mu_stat_register>>16)&0xF; //receive status
+
+	uint8_t transmitAndReceiveFIFOfill = (aux_mu_stat_register>>16)&0xF; //receive status
 	transmitAndReceiveFIFOfill |= (((aux_mu_stat_register>>24)&0xF)<<4); //tx status
 	char firstByte = aux_mu_stat_register&0xFF;
 	char secondByte = (aux_mu_stat_register&0x0300)>>8;
 
-	*(AUX_MU_IO_REG) = transmitAndReceiveFIFOfill;
-	*(AUX_MU_IO_REG) = firstByte;
-	*(AUX_MU_IO_REG) = secondByte;
+	//*(AUX_MU_IO_REG) = transmitAndReceiveFIFOfill;
+	//*(AUX_MU_IO_REG) = firstByte;
+	//*(AUX_MU_IO_REG) = secondByte;
+	mini_uart_send(transmitAndReceiveFIFOfill);
 }
 
-void mini_uart_send ( char c )
+void mini_uart_send ( uint8_t c )
 {	
 	while(1){
 		if(*(AUX_MU_LSR_REG)&0x40){
@@ -27,7 +29,7 @@ void mini_uart_send ( char c )
 }
 
 //void _uart_send_register(  );
-char mini_uart_recv ( void )
+uint8_t mini_uart_recv ( void )
 {
 	//we have to do a wait here or something with AUX_MU_LSR_REG
 	uint8_t error = '0';
@@ -49,10 +51,8 @@ char mini_uart_recv ( void )
 void mini_uart_send_string(char* str)
 {
 	for (int i = 0; str[i] != '\0'; i ++) {
-		mini_uart_send((char)str[i]);
+		mini_uart_send((uint8_t)str[i]);
 	}
-
-	mini_uart_transmit_reg();
 }
 
 void mini_uart_init ( void )

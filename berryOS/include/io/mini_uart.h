@@ -4,8 +4,8 @@
 #include <io/peripherals/mini_uart.h>
 
 void mini_uart_init ( void );
-char mini_uart_recv ( void );
-void mini_uart_send ( char c );
+uint8_t mini_uart_recv ( void );
+void mini_uart_send ( uint8_t c );
 void mini_uart_send_string(char* str);
 void mini_uart_transmit_reg( void );
 
