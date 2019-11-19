@@ -1,10 +1,10 @@
 #ifndef _P_UART_H
 #define _P_UART_H
 
-#include <io/peripherals/base.h>
+#include <base.h>
 //Everything is documented in section 13 of BCM2837, BCM2836 & BCM2835
 
-
+#define UART_BASE  (PHYSICAL_PBASE +0x00201000))
 /*
   PL011 Uart data register
   ------------------------
@@ -15,7 +15,7 @@
   bit 8: Framing error
   bit 7-0: Data
 */
-#define UART0_DR (PBASE+0x00201000)
+#define UART0_DR ((volatile unsigned *)(UART_BASE+0x000))
 /*
   PL011 Uart receive status register/error clear register
   ------------------------
@@ -25,7 +25,7 @@
   bit 1: Parity error
   bit 0: Framing error
 */
-#define UART0_RSRECR (PBASE+0x00201004)
+#define UART0_RSRECR ((volatile unsigned *)(UART_BASE+0x004))
 /*
   PL011 Uart flag register
   ------------------------
@@ -40,23 +40,23 @@
   bit 1: Unsupported
   bit 0: Clear To Send (complement of nUARTCTS modem statu)
 */
-#define UART0_FR (PBASE+0x00201018)
+#define UART0_FR ((volatile unsigned *)(UART_BASE+0x018))
 //DISABLE NOT USE
-#define UART0_ILPR (PBASE+0x00201020)
+#define UART0_ILPR ((volatile unsigned *)(UART_BASE+0x020))
 /*
   PL011 Uart integer baud rate divisor
   ------------------------
   bit 31-16: Reserved
   bit 15-0: The integer Baud rate divisor
 */
-#define UART0_IBRD (PBASE+0x00201024)
+#define UART0_IBRD ((volatile unsigned *)(UART_BASE+0x024))
 /*
   PL011 Uart fractional baud rate divisor
   ------------------------
   bit 31-6: Reserved
   bit 5-0: The fractional Baud rate divisor
 */
-#define UART0_FBRD (PBASE+0x00201028)
+#define UART0_FBRD ((volatile unsigned *)(UART_BASE+0x028))
 /*
   PL011 Uart line control register
   ------------------------
@@ -74,7 +74,7 @@
   bit 1: Parity enable
   bit 0: Send break
 */
-#define UART0_LCRH (PBASE+0x0020102C)
+#define UART0_LCRH ((volatile unsigned *)(UART_BASE+0x02C))
 /*
   PL011 Uart control register
   ------------------------
@@ -93,12 +93,12 @@
   bit 1: Doesn't matter
   bit 0: UART enable 
 */
-#define UART0_CR (PBASE+0x00201030)
+#define UART0_CR ((volatile unsigned *)(UART_BASE+0x030))
 /*
   PL011 Uart interrupt FIFO level select register
   ------------------------
 */
-#define UART0_IFLS (PBASE+0x00201034)
+#define UART0_IFLS ((volatile unsigned *)(UART_BASE+0x034))
 /*
   PL011 Uart interrupt mask set clear register
   ------------------------
@@ -115,17 +115,17 @@
   bit 1: nUARTCTS modem interrupt
   bit 0: Doesn't matter
 */
-#define UART0_IMSC (PBASE+0x00201038)
+#define UART0_IMSC ((volatile unsigned *)(UART_BASE+0x038))
 /*
   PL011 Uart raw interrupt status register
   ------------------------
 */
-#define UART0_RIS (PBASE+0x0020103C)
+#define UART0_RIS ((volatile unsigned *)(UART_BASE+0x03C))
 /*
   PL011 Uart masked interupt status register
   ------------------------
 */
-#define UART0_MIS (PBASE+0x00201040)
+#define UART0_MIS ((volatile unsigned *)(UART_BASE+0x040))
 /*
   PL011 Uart interrupt clear register
   ------------------------
@@ -143,31 +143,37 @@
   bit 0: unsupported, always zero
   NOTE: putting an 1 to clear and a 0 to do nothing.
 */
-#define UART0_ICR (PBASE+0x00201044)
+#define UART0_ICR ((volatile unsigned *)(UART_BASE+0x044))
 /*
   L011 Uart DMA control register
   ------------------------
 */
-#define UART0_DMACR (PBASE+0x00201048)
+#define UART0_DMACR ((volatile unsigned *)(UART_BASE+0x048))
 /* 
   PL011 Uart text control register
   ------------------------
 */
-#define UART0_ITCR (PBASE+0x00201080)
+#define UART0_ITCR ((volatile unsigned *)(UART_BASE+0x080))
 /*
   PL011 Uart integration test input register
   ------------------------
 */
-#define UART0_ITIP (PBASE+0x00201084)
+#define UART0_ITIP ((volatile unsigned *)(UART_BASE+0x084))
 /*
   PL011 Uart integration test output register
   ------------------------
 */
-#define UART0_ITOP (PBASE+0x00201088)
+#define UART0_ITOP ((volatile unsigned *)(UART_BASE+0x088))
 /*
   PL011 Uart test data register
   ------------------------
 */
-#define UART0_TDR (PBASE+0x0020108C)
+#define UART0_TDR ((volatile unsigned *)(UART_BASE+0x08C))
+
+
+void uart_init ( void );
+char uart_recv ( void );
+void uart_send ( char c );
+void uart_send_string(char* str);
 
 #endif

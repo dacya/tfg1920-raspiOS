@@ -7,6 +7,7 @@
  peripherals documentation for more info)
 
 */
-#define PBASE 0x3F000000
+#define PHYSICAL_PBASE (0x3F000000)
+#define VIRTUAL_PBASE  (0x7E000000)
 
 #endif  /*_P_BASE_H */

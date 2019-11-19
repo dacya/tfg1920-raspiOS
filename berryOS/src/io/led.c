@@ -1,12 +1,12 @@
 #include <stdint.h>
-#include <io/peripherals/peripherals_variables.h>
+#include <io/peripherals/gpio.h>
 #include <io/led.h>
 
 void led_init( void ){
-    uint32_t selector = *(GPFSEL2_REG);
+    uint32_t selector = *(GPFSEL2);
 
     selector |= (1<<17);
-    *(GPFSEL2_REG) = selector; //we declare the GPIO pin 17 as output
+    *(GPFSEL2) = selector; //we declare the GPIO pin 17 as output
 }
 
 void led_set(enum led_flag value){
@@ -22,6 +22,6 @@ void led_set(enum led_flag value){
         clearSr |= (1<<21);
     }
     
-    *(GPSET0_REG) = setSr;
-    *(GPCLR0_REG) = clearSr;
+    *(GPSET0) = setSr;
+    *(GPCLR0) = clearSr;
 }
