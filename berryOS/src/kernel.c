@@ -1,6 +1,6 @@
-//#include <io/uart.h>
+//#include <io/peripherals/uart.h>
 #include <stdint.h>
-#include <io/mini_uart.h>
+#include <io/peripherals/mini_uart.h>
 #include <io/led.h>
 
 void kernel_main(void)

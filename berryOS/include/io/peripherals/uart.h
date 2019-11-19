@@ -4,7 +4,7 @@
 #include <base.h>
 //Everything is documented in section 13 of BCM2837, BCM2836 & BCM2835
 
-#define UART_BASE  (PHYSICAL_PBASE +0x00201000))
+#define UART_BASE  (PHYSICAL_PBASE +0x00201000)
 /*
   PL011 Uart data register
   ------------------------

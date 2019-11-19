@@ -3,7 +3,7 @@
 
 #include <base.h>
 //all define in page 8 of BCM2837 and forward.
-#define MINI_UART_BASE (PHYSICAL_PBASE + 0x00215000))
+#define MINI_UART_BASE (PHYSICAL_PBASE + 0x00215000)
 
 //Auxiliary interrupt status
 #define AUX_IRQ ((volatile unsigned *)(MINI_UART_BASE+0x000))

@@ -15,7 +15,7 @@
  * Base address for the gpio registers, currently supports pi2 and pi3.
  * For future devices this address may change.
  */
-#define GPIO_BASE   (PHYSICAL_PBASE + 0x00200000))
+#define GPIO_BASE   (PHYSICAL_PBASE + 0x00200000)
 
 //GPIO function select (registers 0 to 9)
 #define GPFSEL0     ((volatile unsigned *)(GPIO_BASE + 0x000))

@@ -1,4 +1,4 @@
-#include <io/gpio.h>
+#include <io/peripherals/gpio.h>
 
 void pin_set_function(unsigned int pin, unsigned int fun_sel) {
     if (pin > 53 || fun_sel > 0b111) {
