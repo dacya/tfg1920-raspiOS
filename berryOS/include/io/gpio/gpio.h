@@ -103,26 +103,27 @@ unsigned int pin_get_event_status_flag(unsigned int pin, int clear);
 void pin_clear_event_status_flag(unsigned int pin);
 
 /**
- * Enables the event of a rising edge signal (0 to 1)
+ * Switches the event of a rising edge signal (0 to 1)
  * over a pin. To know if the event has been
  * triggered use pin_get_event_status_flag function.
  * 
  * @param pin 1 out of the 54 pins {0 - 53}
+ * @param enable 0 to disable otherwise to enable
  * @return void
  * @see pin_get_event_status_flag
  */
-void pin_enable_rising_edge_event(unsigned int pin);
+void pin_switch_rising_edge_event(unsigned int pin, int enable);
 
 /**
- * Enables the event of a falling edge signal (1 to 0)
+ * Switches the event of a falling edge signal (1 to 0)
  * over a pin. To know if the event has been
  * triggered use pin_get_event_status_flag function.
  * 
  * @param pin 1 out of the 54 pins {0 - 53}
+ * @param enable 0 to disable otherwise to enable
  * @return void
  * @see pin_get_event_status_flag
  */
-void pin_enable_falling_edge_event(unsigned int pin);
-
+void pin_switch_falling_edge_event(unsigned int pin, int enable);
 
 #endif /* _GPIO_H */

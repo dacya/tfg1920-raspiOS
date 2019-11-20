@@ -122,13 +122,12 @@ void pin_clear_event_status_flag(unsigned int pin) {
         case 1:
             reg = GPEDS1;
             break;
-
     }
     
     *reg |= 1 << (pin % 32);
 }
 
-void pin_enable_rising_edge_event(unsigned int pin) {
+void pin_switch_rising_edge_event(unsigned int pin, int enable) {
     if (pin > 53)
         return ;
     
@@ -141,13 +140,16 @@ void pin_enable_rising_edge_event(unsigned int pin) {
         case 1:
             reg = GPREN1;
             break;
-
     }
     
-    *reg |= 1 << (pin % 32);
+    if (enable) {
+        *reg |= 1 << (pin % 32);
+    } else {
+        *reg &= ~(1 << (pin % 32));
+    }
 }
 
-void pin_enable_falling_edge_event(unsigned int pin) {
+void pin_switch_falling_edge_event(unsigned int pin, int enable) {
     if (pin > 53)
         return ;
     
@@ -160,8 +162,11 @@ void pin_enable_falling_edge_event(unsigned int pin) {
         case 1:
             reg = GPFEN1;
             break;
-
     }
     
-    *reg |= 1 << (pin % 32);
+    if (enable) {
+        *reg |= 1 << (pin % 32);
+    } else {
+        *reg &= ~(1 << (pin % 32));
+    }
 }
