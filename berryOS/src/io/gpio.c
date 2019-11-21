@@ -146,6 +146,7 @@ void pin_switch_rising_edge_event(unsigned int pin, int enable) {
         *reg |= 1 << (pin % 32);
     } else {
         *reg &= ~(1 << (pin % 32));
+        pin_clear_event_status_flag(pin);
     }
 }
 
@@ -168,5 +169,52 @@ void pin_switch_falling_edge_event(unsigned int pin, int enable) {
         *reg |= 1 << (pin % 32);
     } else {
         *reg &= ~(1 << (pin % 32));
+        pin_clear_event_status_flag(pin);
+    }
+}
+
+void pin_switch_high_event(unsigned int pin, int enable) {
+    if (pin > 53)
+        return ;
+    
+    volatile unsigned* reg;
+
+    switch (pin / 32) {
+        case 0:
+            reg = GPHEN0;
+            break;
+        case 1:
+            reg = GPHEN1;
+            break;
+    }
+    
+    if (enable) {
+        *reg |= 1 << (pin % 32);
+    } else {
+        *reg &= ~(1 << (pin % 32));
+        pin_clear_event_status_flag(pin);
+    }
+}
+
+void pin_switch_low_event(unsigned int pin, int enable) {
+    if (pin > 53)
+        return ;
+    
+    volatile unsigned* reg;
+
+    switch (pin / 32) {
+        case 0:
+            reg = GPLEN0;
+            break;
+        case 1:
+            reg = GPLEN1;
+            break;
+    }
+    
+    if (enable) {
+        *reg |= 1 << (pin % 32);
+    } else {
+        *reg &= ~(1 << (pin % 32));
+        pin_clear_event_status_flag(pin);
     }
 }

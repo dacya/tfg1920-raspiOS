@@ -106,6 +106,8 @@ void pin_clear_event_status_flag(unsigned int pin);
  * Switches the event of a rising edge signal (0 to 1)
  * over a pin. To know if the event has been
  * triggered use pin_get_event_status_flag function.
+ * Disabling this event will clear the flag if
+ * the event has been fired.
  * 
  * @param pin 1 out of the 54 pins {0 - 53}
  * @param enable 0 to disable otherwise to enable
@@ -118,6 +120,8 @@ void pin_switch_rising_edge_event(unsigned int pin, int enable);
  * Switches the event of a falling edge signal (1 to 0)
  * over a pin. To know if the event has been
  * triggered use pin_get_event_status_flag function.
+ * Disabling this event will clear the flag if
+ * the event has been fired.
  * 
  * @param pin 1 out of the 54 pins {0 - 53}
  * @param enable 0 to disable otherwise to enable
@@ -125,5 +129,33 @@ void pin_switch_rising_edge_event(unsigned int pin, int enable);
  * @see pin_get_event_status_flag
  */
 void pin_switch_falling_edge_event(unsigned int pin, int enable);
+
+/**
+ * Switches the detection of a high event (1)
+ * over a pin. To know if the event has been
+ * triggered use pin_get_event_status_flag function.
+ * Disabling this event will clear the flag if
+ * the event has been fired.
+ * 
+ * @param pin 1 out of the 54 pins {0 - 53}
+ * @param enable 0 to disable otherwise to enable the event
+ * @return void
+ * @see pin_get_event_status_flag
+ */
+void pin_switch_high_event(unsigned int pin, int enable);
+
+/**
+ * Switches the detection of a low event (0)
+ * over a pin. To know if the event has been
+ * triggered use pin_get_event_status_flag function.
+ * Disabling this event will clear the flag if
+ * the event has been fired.
+ * 
+ * @param pin 1 out of the 54 pins {0 - 53}
+ * @param enable 0 to disable otherwise to enable the event
+ * @return void
+ * @see pin_get_event_status_flag
+ */
+void pin_switch_low_event(unsigned int pin, int enable);
 
 #endif /* _GPIO_H */
