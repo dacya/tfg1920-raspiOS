@@ -218,3 +218,49 @@ void pin_switch_low_event(unsigned int pin, int enable) {
         pin_clear_event_status_flag(pin);
     }
 }
+
+void pin_switch_async_rising_event(unsigned int pin, int enable) {
+    if (pin > 53)
+        return ;
+    
+    volatile unsigned* reg;
+
+    switch (pin / 32) {
+        case 0:
+            reg = GPAREN0;
+            break;
+        case 1:
+            reg = GPAREN1;
+            break;
+    }
+    
+    if (enable) {
+        *reg |= 1 << (pin % 32);
+    } else {
+        *reg &= ~(1 << (pin % 32));
+        pin_clear_event_status_flag(pin);
+    }
+}
+
+void pin_switch_async_falling_event(unsigned int pin, int enable) {
+    if (pin > 53)
+        return ;
+    
+    volatile unsigned* reg;
+
+    switch (pin / 32) {
+        case 0:
+            reg = GPAFEN0;
+            break;
+        case 1:
+            reg = GPAFEN1;
+            break;
+    }
+    
+    if (enable) {
+        *reg |= 1 << (pin % 32);
+    } else {
+        *reg &= ~(1 << (pin % 32));
+        pin_clear_event_status_flag(pin);
+    }
+}

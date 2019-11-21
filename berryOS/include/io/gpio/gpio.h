@@ -41,8 +41,8 @@
 #define GPLEN1      ((volatile unsigned *)(GPIO_BASE + 0x074)) // GPIO pin low detect enable (GPIO pin 32-53)
 #define GPAREN0     ((volatile unsigned *)(GPIO_BASE + 0x07C)) // GPIO Pin Async. rising edge detect (GPIO pin 0-31)
 #define GPAREN1     ((volatile unsigned *)(GPIO_BASE + 0x080)) // GPIO Pin Async. rising edge detect (GPIO pin 32-53)
-#define GPALEN0     ((volatile unsigned *)(GPIO_BASE + 0x088)) // GPIO Pin Async.falling edge detect (GPIO pin 0-31)
-#define GPALEN1     ((volatile unsigned *)(GPIO_BASE + 0x08C)) // GPIO Pin Async.falling edge detect (GPIO pin 32-53)
+#define GPAFEN0     ((volatile unsigned *)(GPIO_BASE + 0x088)) // GPIO Pin Async.falling edge detect (GPIO pin 0-31)
+#define GPAFEN1     ((volatile unsigned *)(GPIO_BASE + 0x08C)) // GPIO Pin Async.falling edge detect (GPIO pin 32-53)
 #define GPPUD       ((volatile unsigned *)(GPIO_BASE + 0x094)) // GPIO pin pull-up/down register
 #define GPPUDCLK0   ((volatile unsigned *)(GPIO_BASE + 0x098)) // GPIO pin pull-up/down enable clock (GPIO pin 0-31)
 #define GPPUDCLK1   ((volatile unsigned *)(GPIO_BASE + 0x09C)) // GPIO pin pull-up/down enable clock (GPIO pin 32-53)
@@ -157,5 +157,35 @@ void pin_switch_high_event(unsigned int pin, int enable);
  * @see pin_get_event_status_flag
  */
 void pin_switch_low_event(unsigned int pin, int enable);
+
+/**
+ * Switches the detection of a rising event (0 to 1)
+ * over a pin. Async means that the signal is not sampled
+ * with the system clock. To know if the event has been
+ * triggered use pin_get_event_status_flag function.
+ * Disabling this event will clear the flag if
+ * the event has been fired.
+ * 
+ * @param pin 1 out of the 54 pins {0 - 53}
+ * @param enable 0 to disable otherwise to enable the event
+ * @return void
+ * @see pin_get_event_status_flag
+ */
+void pin_switch_async_rising_event(unsigned int pin, int enable);
+
+/**
+ * Switches the detection of a falling event (1 to 0)
+ * over a pin. Async means that the signal is not sampled
+ * with the system clock. To know if the event has been
+ * triggered use pin_get_event_status_flag function.
+ * Disabling this event will clear the flag if
+ * the event has been fired.
+ * 
+ * @param pin 1 out of the 54 pins {0 - 53}
+ * @param enable 0 to disable otherwise to enable the event
+ * @return void
+ * @see pin_get_event_status_flag
+ */
+void pin_switch_async_falling_event(unsigned int pin, int enable);
 
 #endif /* _GPIO_H */
