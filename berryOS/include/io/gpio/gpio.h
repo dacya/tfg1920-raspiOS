@@ -49,6 +49,16 @@
 #define GPPUDCLK0   ((volatile unsigned *)(GPIO_BASE + 0x098)) // GPIO pin pull-up/down enable clock (GPIO pin 0-31)
 #define GPPUDCLK1   ((volatile unsigned *)(GPIO_BASE + 0x09C)) // GPIO pin pull-up/down enable clock (GPIO pin 32-53)
 
+typedef enum {
+    INPUT  = 0b000,
+    OUTPUT = 0b001,
+    ALT0   = 0b100,
+    ALT1   = 0b101,
+    ALT2   = 0b110,
+    ALT3   = 0b111,
+    ALT4   = 0b011,
+    ALT5   = 0b010
+} pin_alt_funct;
 
 /**
  * Defines the operation for a GPIO pin. 
@@ -59,7 +69,7 @@
  * the Alternative Function Assignments Table provided in the ARM Peripherals documentation.
  * @return void
  */
-void pin_set_function(unsigned int pin, unsigned int fun_sel);
+void pin_set_function(unsigned int pin, pin_alt_funct fun_sel);
 
 /**
  * Sets the desired pin as output.

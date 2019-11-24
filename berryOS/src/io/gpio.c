@@ -1,7 +1,7 @@
 #include <io/gpio/gpio.h>
 
-void pin_set_function(unsigned int pin, unsigned int fun_sel) {
-    if (pin > 53 || fun_sel > 0b111) {
+void pin_set_function(unsigned int pin, pin_alt_funct fun_sel) {
+    if (pin > 53) {
         return ;
     }
 

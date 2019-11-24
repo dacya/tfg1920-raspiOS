@@ -1,6 +1,6 @@
 #include <stdint.h>
 #include <io/peripherals/mini_uart.h>
-#include <io/peripherals/gpio.h>
+#include <io/gpio/gpio.h>
 #include <utils/utils.h>
 
 void mini_uart_transmit_reg( void ){
@@ -57,24 +57,30 @@ void mini_uart_send_string(char* str)
 
 void mini_uart_init ( void )
 {
-	uint32_t selector = 0;
+	// uint32_t selector = 0;
 
-	selector = *(GPFSEL1);
-	selector &= ~(7<<12);                   // clean gpio14
-	selector |= (2<<12);                    // set alt5 for gpio14
-	selector &= ~(7<<15);                   // clean gpio15
-	selector |= (2<<15);                    // set alt5 for gpio15
+	// selector = *(GPFSEL1);
+	// selector &= ~(7<<12);                   // clean gpio14
+	// selector |= (2<<12);                    // set alt5 for gpio14
+	// selector &= ~(7<<15);                   // clean gpio15
+	// selector |= (2<<15);                    // set alt5 for gpio15
+
+	pin_set_function(14, ALT5);
+	pin_set_function(15, ALT5);
 	
-	*(GPFSEL1) = selector;
+	// *(GPFSEL1) = selector;
 
-	*(GPPUD) = 0;
-	delay(150);
-	*(GPPUDCLK0) = (1<<14)|(1<<15);
-	*(GPPUDCLK1) = 0;
-	delay(150);
-	*(GPPUD) = 0;
-	*(GPPUDCLK0) = 0;
-	*(GPPUDCLK1) = 0;
+	// *(GPPUD) = 0;
+	// delay(150);
+	// *(GPPUDCLK0) = (1<<14)|(1<<15);
+	// *(GPPUDCLK1) = 0;
+	// delay(150);
+	// *(GPPUD) = 0;
+	// *(GPPUDCLK0) = 0;
+	// *(GPPUDCLK1) = 0;
+
+	pin_switch_pud(14, 0b00);
+	pin_switch_pud(15, 0b00);
 
 	/*maybe i should be using AUX_MU_IIR register?
 		on read just set bit 2:1 to 00
