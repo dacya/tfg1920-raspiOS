@@ -145,8 +145,8 @@ void pin_switch_rising_edge_event(unsigned int pin, int enable) {
     if (enable) {
         *reg |= 1 << (pin % 32);
     } else {
-        *reg &= ~(1 << (pin % 32));
         pin_clear_event_status_flag(pin);
+        *reg &= ~(1 << (pin % 32));
     }
 }
 
@@ -168,8 +168,8 @@ void pin_switch_falling_edge_event(unsigned int pin, int enable) {
     if (enable) {
         *reg |= 1 << (pin % 32);
     } else {
-        *reg &= ~(1 << (pin % 32));
         pin_clear_event_status_flag(pin);
+        *reg &= ~(1 << (pin % 32));
     }
 }
 
@@ -191,8 +191,8 @@ void pin_switch_high_event(unsigned int pin, int enable) {
     if (enable) {
         *reg |= 1 << (pin % 32);
     } else {
-        *reg &= ~(1 << (pin % 32));
         pin_clear_event_status_flag(pin);
+        *reg &= ~(1 << (pin % 32));
     }
 }
 
@@ -214,8 +214,8 @@ void pin_switch_low_event(unsigned int pin, int enable) {
     if (enable) {
         *reg |= 1 << (pin % 32);
     } else {
-        *reg &= ~(1 << (pin % 32));
         pin_clear_event_status_flag(pin);
+        *reg &= ~(1 << (pin % 32));
     }
 }
 
@@ -237,8 +237,8 @@ void pin_switch_async_rising_event(unsigned int pin, int enable) {
     if (enable) {
         *reg |= 1 << (pin % 32);
     } else {
-        *reg &= ~(1 << (pin % 32));
         pin_clear_event_status_flag(pin);
+        *reg &= ~(1 << (pin % 32));
     }
 }
 
@@ -260,7 +260,42 @@ void pin_switch_async_falling_event(unsigned int pin, int enable) {
     if (enable) {
         *reg |= 1 << (pin % 32);
     } else {
-        *reg &= ~(1 << (pin % 32));
         pin_clear_event_status_flag(pin);
+        *reg &= ~(1 << (pin % 32));
     }
 }
+
+static void switch_pud_control(unsigned int state) {
+    *GPPUD &= ~0b11;
+    *GPPUD |= state;
+}
+
+void pin_switch_pud(unsigned int pin, unsigned int state) {
+    if (pin > 53 || state > 0b10)
+        return ;
+    
+    // 1 - sets the control signal
+    switch_pud_control(state);
+
+    // 2 - 150 cycles for set-up
+    delay(150);
+
+    // 3 - enables the pin pud
+    volatile unsigned* reg;
+    switch (pin / 32) {
+        case 0: reg = GPPUDCLK0; break;
+        case 1: reg = GPPUDCLK1; break;
+    }
+    
+    *reg |= 1 << (pin % 32);
+
+    // 4 - 150 cycles for set-up
+    delay(150);
+
+    // 5 - disables the pud control line
+    switch_pud_control(0b00);
+
+    // 5 - removes the flag for the pud clock wait (?)
+    *reg &= ~(1 << (pin % 32));
+}
+

@@ -8,7 +8,9 @@
 #ifndef _GPIO_H
 #define _GPIO_H
 
+#include <utils/utils.h>
 #include <base.h>
+
 /**
  * @dependency
  *
@@ -187,5 +189,34 @@ void pin_switch_async_rising_event(unsigned int pin, int enable);
  * @see pin_get_event_status_flag
  */
 void pin_switch_async_falling_event(unsigned int pin, int enable);
+
+/**
+ * Switches the actuation of the internal pull-up/down (pud)
+ * to all GPIO pins. This function is used in conjuction with
+ * the GPPUDCLKn register.
+ * 
+ * NOTE: the state is preserved even in power-down (core off) mode
+ *       and can't be read.
+ * NOTE: changes require 150 cycles to set-up
+ * 
+ * @param state { 0b00 = Off – disable pull-up/down | 0b01 = Enable Pull Down control |
+ *                0b10 = Enable Pull Up control }
+ * @return void
+ * @see pin_switch_pud
+ */
+static void switch_pud_control(unsigned int state);
+
+/**
+ * Set the state of the pull-up/down resistor to a pin.
+ * This function will commit all the required events in order
+ * to set-up the resistors state (including a 300 cycles delay). 
+ * 
+ * 
+ * @param pins pin
+ * @param state { 0b00 = Off – disable pull-up/down | 0b01 = Enable Pull Down control |
+ *                0b10 = Enable Pull Up control }
+ * @return void
+ */
+void pin_switch_pud(unsigned int pin, unsigned int state);
 
 #endif /* _GPIO_H */
