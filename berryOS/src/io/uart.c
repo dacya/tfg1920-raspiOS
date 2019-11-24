@@ -1,6 +1,6 @@
 #include <stdint.h> //for uint32_t
 #include <io/peripherals/uart.h>
-#include <io/peripherals/gpio.h>
+#include <io/gpio/gpio.h>
 #include <utils/utils.h>
 
 char uart_recv ( void ){

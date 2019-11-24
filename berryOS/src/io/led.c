@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include <io/peripherals/gpio.h>
+#include <io/gpio/gpio.h>
 #include <io/led.h>
 
 void led_init( void ){
