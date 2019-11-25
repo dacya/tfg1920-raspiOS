@@ -1,7 +1,13 @@
 ENTRY(_start)
- 
-SECTIONS
+
+/*Every loadable or allocatable section have two addresses, the VMA (Virtual 
+Memory address) and the LMA (Load Memory Address). In most cases they are 
+the same*/
+
+/*Used to describe the memory layout of the output file*/
+SECTIONS 
 {
+    /* . (location counter) always start at value 0*/
     /* Starts at LOADER_ADDR. */
     . = 0x8000;
     __start = .;
