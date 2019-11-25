@@ -1,5 +1,6 @@
 #include <stdint.h> //for uint32_t
 #include <io/peripherals/uart.h>
+#include <io/gpio/gpio.h>
 #include <utils/utils.h>
 
 uint8_t uart_recv ( void ){
@@ -68,16 +69,18 @@ void uart_init (unsigned char gpio_pin, enum pin_function function){
       this method of changing the pull-ups and timers is defined in page 101
       of documentation from BCM2837
     */
-   /*
-    *(GPPUD) = 0; //we disable the Pull-up/pull down resistors
-	delay(150);
-    *(GPPUDCLK0) = (1<<14)|(1<<15); //we attach the timer 0 to GPIO pin 14 and 15
-	*(GPPUDCLK1) = 0; //it does nothing
-	delay(150);
-    *(GPPUD) = 0;
-    *(GPPUDCLK0) = 0;
-    *(GPPUDCLK1) = 0;
-    */
+
+    // *(GPPUD) = 0; //we disable the Pull-up/pull down resistors
+	// delay(150);
+    // *(GPPUDCLK0) = (1<<14)|(1<<15); //we attach the timer 0 to GPIO pin 14 and 15
+	// *(GPPUDCLK1) = 0; //it does nothing
+	// delay(150);
+    // *(GPPUD) = 0;
+    // *(GPPUDCLK0) = 0;
+    // *(GPPUDCLK1) = 0;
+
+    pin_switch_pud(14, 0b00);
+	pin_switch_pud(15, 0b00);
 
     *(UART0_ICR) = 0x7FF; //we clear every pending interrupt
     
