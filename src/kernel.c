@@ -54,8 +54,13 @@ void uart_init()
 void uart_putc(unsigned char c)
 {
     // Wait for UART to become ready to transmit.
-    while ( *(UART0_FR) & (1 << 5) ) { }
-    *(UART0_DR) = c;
+    while ( *(UART0_FR) & (1 << 5) );
+    /* this doesn't work and i don't know why
+    *(UART0_DR) &= (~0xFF);
+    *(UART0_DR) |= (uint8_t)c;
+    */
+
+   *(UART0_DR) = c;
 }
 
 unsigned char uart_getc()
@@ -71,6 +76,11 @@ void uart_puts(const char* str)
         uart_putc((unsigned char)str[i]);
 }
 
+void clean_buf(char *buf, int size){
+    for(int i = 0; i < size; i++){
+        buf[i] = 0;
+    }
+}
 #if defined(__cplusplus)
 extern "C" /* Use C linkage for kernel_main. */
 #endif
@@ -83,13 +93,28 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
 
     uart_init();
     uart_puts("Hello, kernel World!\r\n");
-    char a;
-
+    char c;
+    //char buf[20];
+    //unsigned int i;
     while (1) {
         uart_putc('>');
-        while ((a = uart_getc()) != '\r' ){
-            uart_putc(a);
+        while ((c = uart_getc()) != '\r' ){
+            uart_putc(c);
         }
         uart_putc('\n');
+        /*
+        i = 0;
+
+        while((c = uart_getc()) != '\r' && i < 19){
+            uart_putc(c);
+            buf[i] = c;
+            i++;
+        }
+        
+        buf[i++] = '\r';
+        uart_putc('\n');
+        clean_buf(buf, 20);
+        uart_puts((const char *) &buf);
+        */
     }
 }
