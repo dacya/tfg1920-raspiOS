@@ -1,16 +1,16 @@
 #include <stdint.h> //for uint32_t
 #include <io/peripherals/uart.h>
-#include <io/peripherals/gpio.h>
 #include <utils/utils.h>
 
-char uart_recv ( void ){
-    while(*(UART0_FR)&(1<<4)); //wait while RX FIFO queue is not empty
+uint8_t uart_recv ( void ){
+    while(*(UART0_FR)&(1<<4)); //wait while RX FIFO queue is not empty   
     return *(UART0_DR);
 }
-void uart_send ( char c ){
+void uart_send (uint8_t c){
     while(*(UART0_FR)&(1<<5)); //wait while FIFO queue is full
-
-    *(UART0_DR) = c;
+    
+    *(UART0_DR) &= (~0xFF);
+    *(UART0_DR) |= c;
 }
 
 void uart_send_string(char* str){
@@ -19,24 +19,56 @@ void uart_send_string(char* str){
     }
 }
 
-void uart_init ( void ){
-    uint32_t selector;
+void uart_init (unsigned char gpio_pin, enum pin_function function){
 
-    *(UART0_CR) = 0; //we disable UART
+    if (gpio_pin == 14 || gpio_pin == 15 || gpio_pin == 16 || gpio_pin == 17 ||
+        gpio_pin == 30 || gpio_pin == 31 || gpio_pin == 32 || gpio_pin == 33 ||
+        gpio_pin == 36 || gpio_pin == 37 || gpio_pin == 38 || gpio_pin == 39){}
+    else {
+        return ;
+    }
     /*
-    selector = *(GPFSEL1);  //we obtaine the GPFSEL1 register
+    Which one could be faster?
+	switch (gpio_pin){
+        case 14:;
+        case 15:;
+        case 16:;
+        case 17:;
+        case 30:;
+        case 31:;
+        case 32:;
+        case 33:;
+        case 36:;
+        case 37:;
+        case 38:;
+        case 39: break;
+        default: return;
+    }*/
+    
+	volatile unsigned* reg_obj;
 
-	selector &= ~(7<<12); // clean gpio14
-	selector |= (4<<12);  // set alt0 for gpio14
-	selector &= ~(7<<15); // clean gpio15
-	selector |= (4<<15);  // set alt0 for gpio15
+    switch (gpio_pin / 10){
+		case 1:	reg_obj = GPFSEL1; break;
+		default: reg_obj = GPFSEL3; break;
+    }
+
+	uint8_t shift = (gpio_pin % 10)*3;
+    uint32_t selector = 0;
+
+    *(UART0_CR) = selector; //we disable UART
+
+    selector = *(reg_obj);  //we obtaine the GPFSELn register
+
+	selector &= ~(0b111 << shift); // clean gpio_pin
+	selector |= (function << shift);  // set gpio_pin method of work for gpio14
 	
-	*(GPFSEL1) = selector;
-    */
+	*(reg_obj) = selector;
+
     /*
       this method of changing the pull-ups and timers is defined in page 101
       of documentation from BCM2837
     */
+   /*
     *(GPPUD) = 0; //we disable the Pull-up/pull down resistors
 	delay(150);
     *(GPPUDCLK0) = (1<<14)|(1<<15); //we attach the timer 0 to GPIO pin 14 and 15
@@ -45,6 +77,7 @@ void uart_init ( void ){
     *(GPPUD) = 0;
     *(GPPUDCLK0) = 0;
     *(GPPUDCLK1) = 0;
+    */
 
     *(UART0_ICR) = 0x7FF; //we clear every pending interrupt
     

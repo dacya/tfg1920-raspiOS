@@ -3,20 +3,6 @@
 #include <io/peripherals/gpio.h>
 #include <utils/utils.h>
 
-void mini_uart_transmit_reg( void ){
-	uint32_t aux_mu_stat_register = *(AUX_MU_STAT);
-
-	uint8_t transmitAndReceiveFIFOfill = (aux_mu_stat_register>>16)&0xF; //receive status
-	transmitAndReceiveFIFOfill |= (((aux_mu_stat_register>>24)&0xF)<<4); //tx status
-	char firstByte = aux_mu_stat_register&0xFF;
-	char secondByte = (aux_mu_stat_register&0x0300)>>8;
-
-	//*(AUX_MU_IO) = transmitAndReceiveFIFOfill;
-	//*(AUX_MU_IO) = firstByte;
-	//*(AUX_MU_IO) = secondByte;
-	mini_uart_send(transmitAndReceiveFIFOfill);
-}
-
 void mini_uart_send ( uint8_t c )
 {	
 	while(1){
@@ -24,8 +10,8 @@ void mini_uart_send ( uint8_t c )
 			break;
 		}
 	}
-
-	*(AUX_MU_IO) = c;	
+	*(AUX_MU_IO) &= (~0xFF);
+	*(AUX_MU_IO) |= c;	
 }
 
 //void _uart_send_register(  );
@@ -55,17 +41,31 @@ void mini_uart_send_string(char* str)
 	}
 }
 
-void mini_uart_init ( void )
+void mini_uart_init (unsigned char gpio_pin)
 {
-	uint32_t selector = 0;
 
-	selector = *(GPFSEL1);
-	selector &= ~(7<<12);                   // clean gpio14
-	selector |= (2<<12);                    // set alt5 for gpio14
-	selector &= ~(7<<15);                   // clean gpio15
-	selector |= (2<<15);                    // set alt5 for gpio15
+	if(gpio_pin != 14 && gpio_pin != 15 && gpio_pin != 32 && gpio_pin != 33 &&
+	   gpio_pin != 40 && gpio_pin != 41)
+		return;
 	
-	*(GPFSEL1) = selector;
+	volatile unsigned* reg_obj;
+	
+	switch (gpio_pin / 10){
+		case 1:	reg_obj = GPFSEL1; break;
+		case 3: reg_obj = GPFSEL3; break;
+		default: reg_obj = GPFSEL4; break;
+    }
+
+	uint32_t selector = 0;
+	uint8_t shift = (gpio_pin % 10)*3;
+
+	selector = *(reg_obj);
+	selector &= ~(7<<shift);                   // clean gpio14
+	selector |= (2<<shift);                    // set alt5 for gpio14
+	selector &= ~(7<<shift);                   // clean gpio15
+	selector |= (2<<shift);                    // set alt5 for gpio15
+	
+	*(reg_obj) = selector;
 
 	*(GPPUD) = 0;
 	delay(150);

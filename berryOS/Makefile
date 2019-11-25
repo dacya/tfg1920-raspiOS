@@ -1,5 +1,5 @@
 ARMGNU ?= aarch64-linux-gnu
-COPS = -Wall -nostdlib -nostartfiles -ffreestanding -Iinclude -mgeneral-regs-only
+COPS = -Wall -nostdlib -nostartfiles -ffreestanding -I include/  -mgeneral-regs-only
 
 ARMGNURP2 ?= arm-none-eabi-gcc
 CRP2OPS = -mcpu=cortex-a7 -Iinclude -fpic -ffreestanding -std=gnu99 -O2 -Wall -Wextra
@@ -17,7 +17,7 @@ ASRP2OP = -mcpu=cortex-a7 -fpic -ffreestanding
 # -Iinclude search for headers file in the include folder
 # -mgeneral-regs-only only use general purpose registers. This is because ARM
 #   processors also have NEON registers (something about the gpu i think)
-ASMOPS = -Iinclude
+ASMOPS = -I include/
 
 BUILD_DIR = build
 SRC_DIR = src

@@ -1,7 +1,8 @@
 #ifndef _P_UART_H
 #define _P_UART_H
 
-#include <base.h>
+#include <io/peripherals/base.h>
+#include <io/peripherals/gpio.h>
 //Everything is documented in section 13 of BCM2837, BCM2836 & BCM2835
 
 #define UART_BASE  (PHYSICAL_PBASE +0x00201000)
@@ -170,10 +171,37 @@
 */
 #define UART0_TDR ((volatile unsigned *)(UART_BASE+0x08C))
 
+/**
+ * Initialize the gpio_pin to alt 5 function which belongs to mini_uart
+ * 
+ * @param gpio_pin the pin to work with, it can only be 14, 15, 32 or 35
+ * @param function the working pin's function 
+ * @return void
+ */
+void uart_init (unsigned char gpio_pin, enum pin_function function);
 
-void uart_init ( void );
-char uart_recv ( void );
-void uart_send ( char c );
+/**
+ * Receive from RXD pin
+ * 
+ * @param void
+ * @return the byte read
+ */
+uint8_t uart_recv ( void );
+
+/**
+ * Send a byte through TXD pin
+ * 
+ * @param c the byte it wants to be send
+ * @return void
+ */
+void uart_send (uint8_t c);
+
+/**
+ * Send a string to TXD pin
+ * 
+ * @param str the string it wants to be send
+ * @return void
+ */
 void uart_send_string(char* str);
 
 #endif

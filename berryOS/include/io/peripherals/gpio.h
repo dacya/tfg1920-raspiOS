@@ -8,7 +8,7 @@
 #ifndef _GPIO_H
 #define _GPIO_H
 
-#include <base.h>
+#include <io/peripherals/base.h>
 /**
  * @dependency
  *
@@ -76,7 +76,16 @@
 //GPIO pin pull-up/down enable clock (GPIO pin 32-53)
 #define GPPUDCLK1   ((volatile unsigned *)(GPIO_BASE + 0x09C))
 
-
+enum pin_function {
+    GP_INPUT  = 0b000,
+    GP_OUTPUT = 0b001,
+    GP_ALT0   = 0b100,
+    GP_ALT1   = 0b101,
+    GP_ALT2   = 0b110,
+    GP_ALT3   = 0b111,
+    GP_ALT4   = 0b011,
+    GP_ALT5   = 0b010
+};
 /**
  * Defines the operation for a GPIO pin. 
  *
@@ -86,7 +95,7 @@
  * the Alternative Function Assignments Table provided in the ARM Peripherals documentation.
  * @return void
  */
-void pin_set_function(unsigned int pin, unsigned int fun_sel);
+void pin_set_function(unsigned int pin, enum pin_function fun_sel);
 
 /**
  * Sets the desired pin as output.

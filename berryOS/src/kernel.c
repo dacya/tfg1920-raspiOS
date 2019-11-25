@@ -6,13 +6,13 @@
 void kernel_main(void)
 {	
 	uint8_t a;
-	mini_uart_init();
+	mini_uart_init(14);
+	mini_uart_init(15);
 	//led_init();
 	//led_set(LOW);
 
 	mini_uart_send_string("Hello, world!\r\n");
 	while (1) {
-		mini_uart_transmit_reg();
 		mini_uart_send('>');
 		a = mini_uart_recv();
 		mini_uart_send_string("Your character is: ");
