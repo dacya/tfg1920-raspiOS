@@ -68,9 +68,9 @@ void pin_clear_output(unsigned int pin) {
     *reg |= 1 << (pin % 32);
 }
 
-unsigned int pin_get_level(unsigned int pin) {
+int pin_get_level(unsigned int pin) {
     if (pin > 53)
-        return;
+        return -1;
     
     volatile unsigned* reg;
 
@@ -265,7 +265,7 @@ void pin_switch_async_falling_event(unsigned int pin, int enable) {
     }
 }
 
-static void switch_pud_control(unsigned int state) {
+void switch_pud_control(unsigned int state) {
     *GPPUD &= ~0b11;
     *GPPUD |= state;
 }

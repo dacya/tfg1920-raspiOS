@@ -1,7 +1,7 @@
 #ifndef _P_UART_H
 #define _P_UART_H
 
-#include <base.h>
+#include <io/peripherals/base.h>
 //Everything is documented in section 13 of BCM2837, BCM2836 & BCM2835
 
 #define UART_BASE  (PHYSICAL_PBASE +0x00201000)

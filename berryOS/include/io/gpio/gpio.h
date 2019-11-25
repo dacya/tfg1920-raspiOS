@@ -9,7 +9,7 @@
 #define _GPIO_H
 
 #include <utils/utils.h>
-#include <base.h>
+#include <io/peripherals/base.h>
 
 /**
  * @dependency
@@ -91,9 +91,9 @@ void pin_clear_output(unsigned int pin);
  * Get the current pin level
  * 
  * @param pin 1 out of the 54 pins {0 - 53}
- * @return 0 if low 1 if high
+ * @return 0 if low 1 if high and -1 if the pin is wrong
  */
-unsigned int pin_get_level(unsigned int pin);
+int pin_get_level(unsigned int pin);
 
 /**
  * Get the current status for the programmed event in the given pin
@@ -214,7 +214,7 @@ void pin_switch_async_falling_event(unsigned int pin, int enable);
  * @return void
  * @see pin_switch_pud
  */
-static void switch_pud_control(unsigned int state);
+void switch_pud_control(unsigned int state);
 
 /**
  * Set the state of the pull-up/down resistor to a pin.

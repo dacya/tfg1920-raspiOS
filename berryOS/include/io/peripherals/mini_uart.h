@@ -1,7 +1,8 @@
 #ifndef	_P_MINI_UART_H
 #define	_P_MINI_UART_H
 
-#include <base.h>
+#include <io/peripherals/base.h>
+
 //all define in page 8 of BCM2837 and forward.
 #define MINI_UART_BASE (PHYSICAL_PBASE + 0x00215000)
 

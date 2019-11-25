@@ -1,7 +1,7 @@
 ARMGNU ?= aarch64-linux-gnu
 COPS = -Wall -nostdlib -nostartfiles -ffreestanding -Iinclude -mgeneral-regs-only
 
-ARMGNURP2 ?= arm-none-eabi-gcc
+ARMGNURP2 ?= ./gcc-arm-none-eabi-9-2019-q4-major/bin/arm-none-eabi-gcc
 CRP2OPS = -mcpu=cortex-a7 -Iinclude -fpic -ffreestanding -std=gnu99 -O2 -Wall -Wextra
 ASRP2OP = -mcpu=cortex-a7 -fpic -ffreestanding
 
