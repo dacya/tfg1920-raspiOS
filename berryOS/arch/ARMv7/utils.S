@@ -4,22 +4,22 @@
 
 .globl put32
 put32:
-    stmea sp!,{lr}
+    stmed sp!,{lr}
 	str r1,[r0]
-    ldmfd sp!,{lr}
+    ldmfa sp!,{lr}
 	mov pc, lr
 
 .globl get32
 get32:
-    stmea sp!,{lr}
+    stmed sp!,{lr}
 	ldr r0,[r0]
-    ldmfd sp!,{lr}
+    ldmfa sp!,{lr}
 	mov pc, lr
 
 .globl delay
 delay:
-    stmea sp!,{lr}
+    stmed sp!,{lr}
 	subs r0, r0, #1
 	bne delay
-    ldmfd sp!,{lr}
+    ldmfa sp!,{lr}
 	mov pc, lr
