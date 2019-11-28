@@ -33,6 +33,9 @@ void uart_init ( void ){
 	
 	*(GPFSEL1) = selector;
     */
+    pin_set_function(12, ALT5);
+	pin_set_function(15, ALT5);
+
     /*
       this method of changing the pull-ups and timers is defined in page 101
       of documentation from BCM2837

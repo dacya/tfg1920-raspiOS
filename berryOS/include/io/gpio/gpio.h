@@ -50,6 +50,9 @@
 #define GPPUDCLK0 ((volatile uint32_t *)(GPIO_BASE + 0x098)) // GPIO pin pull-up/down enable clock (GPIO pin 0-31)
 #define GPPUDCLK1 ((volatile uint32_t *)(GPIO_BASE + 0x09C)) // GPIO pin pull-up/down enable clock (GPIO pin 32-53)
 
+/*
+ * alternative pin functions type
+ */
 typedef enum {
     INPUT  = 0b000,
     OUTPUT = 0b001,

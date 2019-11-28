@@ -5,7 +5,7 @@ void pin_set_function(unsigned int pin, pin_alt_funct fun_sel) {
         return ;
     }
 
-    volatile unsigned* reg_obj;
+    volatile uint32_t* reg_obj;
 
     switch (pin / 10) {
         case 0:
@@ -36,7 +36,7 @@ void pin_set_as_output(unsigned int pin) {
         return ;
     }
 
-    volatile unsigned* reg_set;
+    volatile uint32_t* reg_set;
 
     switch (pin / 32) {
         case 0:
@@ -54,7 +54,7 @@ void pin_clear_output(unsigned int pin) {
     if (pin > 53)
         return;
 
-    volatile unsigned* reg;
+    volatile uint32_t* reg;
 
     switch (pin / 32) {
         case 0:
@@ -72,7 +72,7 @@ int pin_get_level(unsigned int pin) {
     if (pin > 53)
         return -1;
     
-    volatile unsigned* reg;
+    volatile uint32_t* reg;
 
     switch (pin / 32) {
         case 0:
@@ -90,7 +90,7 @@ unsigned int pin_get_event_status_flag(unsigned int pin, int clear) {
     if (pin > 53)
         return 0;
     
-    volatile unsigned* reg;
+    volatile uint32_t* reg;
 
     switch (pin / 32) {
         case 0:
@@ -113,7 +113,7 @@ void pin_clear_event_status_flag(unsigned int pin) {
     if (pin > 53)
         return ;
     
-    volatile unsigned* reg;
+    volatile uint32_t* reg;
 
     switch (pin / 32) {
         case 0:
@@ -131,7 +131,7 @@ void pin_switch_rising_edge_event(unsigned int pin, int enable) {
     if (pin > 53)
         return ;
     
-    volatile unsigned* reg;
+    volatile uint32_t* reg;
 
     switch (pin / 32) {
         case 0:
@@ -154,7 +154,7 @@ void pin_switch_falling_edge_event(unsigned int pin, int enable) {
     if (pin > 53)
         return ;
     
-    volatile unsigned* reg;
+    volatile uint32_t* reg;
 
     switch (pin / 32) {
         case 0:
@@ -177,7 +177,7 @@ void pin_switch_high_event(unsigned int pin, int enable) {
     if (pin > 53)
         return ;
     
-    volatile unsigned* reg;
+    volatile uint32_t* reg;
 
     switch (pin / 32) {
         case 0:
@@ -200,7 +200,7 @@ void pin_switch_low_event(unsigned int pin, int enable) {
     if (pin > 53)
         return ;
     
-    volatile unsigned* reg;
+    volatile uint32_t* reg;
 
     switch (pin / 32) {
         case 0:
@@ -223,7 +223,7 @@ void pin_switch_async_rising_event(unsigned int pin, int enable) {
     if (pin > 53)
         return ;
     
-    volatile unsigned* reg;
+    volatile uint32_t* reg;
 
     switch (pin / 32) {
         case 0:
@@ -246,7 +246,7 @@ void pin_switch_async_falling_event(unsigned int pin, int enable) {
     if (pin > 53)
         return ;
     
-    volatile unsigned* reg;
+    volatile uint32_t* reg;
 
     switch (pin / 32) {
         case 0:
@@ -281,7 +281,7 @@ void pin_switch_pud(unsigned int pin, unsigned int state) {
     delay(150);
 
     // 3 - enables the pin pud
-    volatile unsigned* reg;
+    volatile uint32_t* reg;
     switch (pin / 32) {
         case 0: reg = GPPUDCLK0; break;
         case 1: reg = GPPUDCLK1; break;

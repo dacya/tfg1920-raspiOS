@@ -65,7 +65,7 @@ void mini_uart_init ( void )
 	// selector &= ~(7<<15);                   // clean gpio15
 	// selector |= (2<<15);                    // set alt5 for gpio15
 
-	pin_set_function(14, ALT5);
+	pin_set_function(12, ALT5);
 	pin_set_function(15, ALT5);
 	
 	// *(GPFSEL1) = selector;
