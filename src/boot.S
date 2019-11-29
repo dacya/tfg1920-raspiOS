@@ -49,6 +49,9 @@ _start:
     blo 1b
 
     // Call kernel_main
+    ldr r3, =str_vector_table
+    blx r3
+    mv r0, #0x41
     ldr r3, =kernel_main
     blx r3
 
@@ -56,3 +59,34 @@ _start:
 halt:
     wfe
     b halt
+
+//we define the vector table
+vector_table:
+    ldr pc, reset_exception_addr
+    ldr pc, undefined_instruction_exception_addr
+    ldr pc, software_interrupt_exception_addr
+    ldr pc, prefetch_abort_exception_addr
+    ldr pc, data_abort_exception_addr
+    nop // This one is reserved for hypervisor mode
+    ldr pc, irq_handler_abs_addr
+    ldr pc, fast_irq_handler_abs_addr
+
+
+reset_exception_addr:                 .word reset_c_handler 
+undefined_instruction_exception_addr: .word undefined_instruction_c_handler
+software_interrupt_exception_addr:    .word software_interrupt_c_handler
+prefetch_abort_exception_addr:        .word prefetch_abort_c_handler
+data_abort_exception_addr:            .word data_abort_c_handler
+irq_handler_abs_addr:                 .word irq_c_handler
+fast_irq_handler_abs_addr:            .word fast_irq_c_handler
+
+// asm function to store the vector table into the default memory area
+str_vector_table:
+    push    {r4, r5, r6, r7, r8, r9}
+    ldr     r0, =vector_table 
+    mov     r1, #0x0000
+    ldmia   r0!,{r2, r3, r4, r5, r6, r7, r8, r9}
+    stmia   r1!,{r2, r3, r4, r5, r6, r7, r8, r9}
+    //missing something
+    pop     {r4, r5, r6, r7, r8, r9}
+    blx     lr

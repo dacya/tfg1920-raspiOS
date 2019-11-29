@@ -81,17 +81,47 @@ void clean_buf(char *buf, int size){
         buf[i] = 0;
     }
 }
+
+/**
+ * this function is going to be called by the processor.  Needs to check pending interrupts and execute handlers if one is registered
+ */
+
+void __attribute__ ((interrupt ("ABORT"))) reset_c_handler(void) {
+    uart_puts("RESET Catched!\n");    
+}
+void __attribute__ ((interrupt ("UNDEF"))) undefined_instruction_c_handler(void) {
+    uart_puts("UNDEFINED_INSTRUCTION Catched!\n");    
+}
+void __attribute__ ((interrupt ("SWI"))) software_interrupt_c_handler(void) {
+    uart_puts("SWI Catched!\n");    
+}
+void __attribute__ ((interrupt ("ABORT"))) prefetch_abort_c_handler(void) {
+    uart_puts("PREFETCH_ABORT Catched!\n");    
+}
+void __attribute__ ((interrupt ("ABORT"))) data_abort_c_handler(void) {
+    uart_puts("DATA_ABORT Catched!\n");    
+}
+void __attribute__ ((interrupt ("IRQ"))) irq_c_handler(void) {
+    uart_puts("IRQ Catched!\n");
+}
+void __attribute__ ((interrupt ("FIQ"))) fast_irq_c_handler(void) {
+    uart_puts("FIQ Catched!\n");    
+}
+
 #if defined(__cplusplus)
 extern "C" /* Use C linkage for kernel_main. */
 #endif
 void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
 {
     // Declare as unused
-    (void) r0;
+    //(void) r0;
     (void) r1;
     (void) atags;
 
     uart_init();
+    uart_puts("R0 value is: ");
+    uart_putc(r0);
+    uart_puts("\r\n");
     uart_puts("Hello, kernel World!\r\n");
     char c;
     //char buf[20];
