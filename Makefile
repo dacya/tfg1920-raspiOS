@@ -2,6 +2,7 @@ CC = compiler/bin/arm-none-eabi
 C_OPT = -mcpu=cortex-a7 -O2 -Wall -Wextra -fpic -ffreestanding -std=gnu99 -nostdlib -I include 
 L_OPT = -ffreestanding -O2 -nostdlib
 
+#-fpic position independent code
 SRC_DIR = src
 BUILD_DIR = build
 

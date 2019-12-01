@@ -3,7 +3,6 @@
 
 // Make _start global.
 .globl _start
-
 // Entry point for the kernel.
 // r15 -> should begin execution at 0x8000(32K). [r15 is PC register]
 // r0 -> 0x00000000
@@ -51,7 +50,8 @@ _start:
     // Call kernel_main
     ldr r3, =str_vector_table
     blx r3
-    mv r0, #0x41
+    ldr r0, =undefined_instruction_exception_addr
+    //to debug only
     ldr r3, =kernel_main
     blx r3
 
@@ -77,7 +77,7 @@ undefined_instruction_exception_addr: .word undefined_instruction_c_handler
 software_interrupt_exception_addr:    .word software_interrupt_c_handler
 prefetch_abort_exception_addr:        .word prefetch_abort_c_handler
 data_abort_exception_addr:            .word data_abort_c_handler
-irq_handler_abs_addr:                 .word irq_c_handler
+irq_handler_abs_addr:                 .word irq_s_handler
 fast_irq_handler_abs_addr:            .word fast_irq_c_handler
 
 // asm function to store the vector table into the default memory area
@@ -87,6 +87,55 @@ str_vector_table:
     mov     r1, #0x0000
     ldmia   r0!,{r2, r3, r4, r5, r6, r7, r8, r9}
     stmia   r1!,{r2, r3, r4, r5, r6, r7, r8, r9}
-    //missing something
+    //i still don't understand this lines
+    ldmia   r0!,{r2, r3, r4, r5, r6, r7, r8}
+    stmia   r1!,{r2, r3, r4, r5, r6, r7, r8}
+    //-----
     pop     {r4, r5, r6, r7, r8, r9}
-    blx     lr
+    blx     lr //copies the addres of the next instruction
+
+
+undefined_instruction_s_handler:
+    //nothing to adjust (Cortex-A PG)
+    srsdb sp!, #0x1B
+    bl undefined_instruction_c_handler
+    //I need to something more here
+    rfeia sp! //we do the inverse operation of srsdb
+
+
+software_interrupt_s_handler:
+    //nothing to adjust (Cortex-A PG)
+    srsdb sp!, #0x13
+    bl software_interrupt_c_handler
+    //I need to something more here
+    rfeia sp! //we do the inverse operation of srsdb
+
+
+prefetch_abort_s_handler:
+    subs lr, lr, #4 //we adjust the appropiate value considered by Cortex-A PG
+    srsdb sp!, #0x17
+    bl prefetch_abort_c_handler
+    //I need to something more here
+    rfeia sp! //we do the inverse operation of srsdb
+
+
+data_abort_s_handler:
+    subs lr, lr, #8 //we adjust the appropiate value considered by Cortex-A PG
+    srsdb sp!, #0x17
+    bl data_abort_c_handler
+    rfeia sp! //we do the inverse operation of srsdb
+
+
+irq_s_handler:
+    subs lr, lr, #4 //we adjust the appropiate value considered by Cortex-A PG
+    srsdb sp!, #0x12 //we stores the spsr and lr at the address contained in sp of the mode irq
+    bl irq_c_handler
+    rfeia sp! //we do the inverse operation of srsdb
+
+
+fast_irq_s_handler:
+    subs lr, lr, #4 //we adjust the appropiate value considered by Cortex-A PG
+    srsdb sp!, #0x11
+    bl fast_irq_c_handler
+    //I need to something more here
+    rfeia sp! //we do the inverse operation of srsdb

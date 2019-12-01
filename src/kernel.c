@@ -108,6 +108,21 @@ void __attribute__ ((interrupt ("FIQ"))) fast_irq_c_handler(void) {
     uart_puts("FIQ Catched!\n");    
 }
 
+void convert_to_str(uint32_t value, char *buff, int size){
+    //16 positions in hexadecimal for a 32 bits number
+    char reminder;
+    while(value != 0){
+        reminder = value & 0xF;
+        value = value >> 4;
+        if(reminder < 10){
+            buff[--size] = 48 + reminder;
+        }
+        else {
+            buff[--size] = 55 + reminder;
+        }
+    }
+}
+
 #if defined(__cplusplus)
 extern "C" /* Use C linkage for kernel_main. */
 #endif
@@ -120,9 +135,13 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
 
     uart_init();
     uart_puts("R0 value is: ");
-    uart_putc(r0);
+     //if not, it does a data abort
+    char str_argument[8] = {'0','0','0','0','0','0','0','0'};
+    convert_to_str(r0, str_argument, 8);
+    uart_puts("0x");
+    uart_puts(str_argument);
     uart_puts("\r\n");
-    uart_puts("Hello, kernel World!\r\n");
+    uart_puts("Hello, World!\r\n");
     char c;
     //char buf[20];
     //unsigned int i;
