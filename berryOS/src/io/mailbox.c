@@ -1,7 +1,7 @@
 #include <io/mailbox.h>
 
-int send_messages(property_message_tag_t * tags) {
-    property_message_buffer_t * msg;
+int send_messages(property_message_tag_t* tags) {
+    property_message_buffer_t* msg;
     mail_message_t mail;
     uint32_t bufsize = 0, i, len, bufpos;
    
@@ -13,8 +13,8 @@ int send_messages(property_message_tag_t * tags) {
     // Add the buffer size, buffer request/response code and buffer end tag sizes
     bufsize += 3*sizeof(uint32_t); 
 
-    // buffer size must be 16 byte aligned
-    bufsize += (bufsize % 16) ? 16 - (bufsize % 16) : 0;
+    // buffer size must be 16 byte aligned (padding)
+    bufsize += 16 - (bufsize % 16);
 
     // kmalloc returns a 16 byte aligned address
     msg = kmalloc(bufsize);
@@ -37,7 +37,7 @@ int send_messages(property_message_tag_t * tags) {
     msg->tags[bufpos] = 0;
 
     // Send the message
-    mail.data = ((uint32_t)msg) >>4;
+    mail.data = ((uint32_t)msg) >> 4;
     
     mailbox_send(mail, PROPERTY_CHANNEL);
     mail = mailbox_read(PROPERTY_CHANNEL);
@@ -46,7 +46,7 @@ int send_messages(property_message_tag_t * tags) {
     if (msg->req_res_code == REQUEST) {
         kfree(msg);
         return 1;
-    } else if (msg->req_res_code == RESPONSE_ERROR) {
+    } else if (msg->req_res_code == MAILBOX_RESPONSE_ERROR) {
         kfree(msg);
         return 2;
     }

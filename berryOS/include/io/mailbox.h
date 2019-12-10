@@ -9,6 +9,27 @@
 
 #include <stdint.h>
 
+#define MAILBOX_RESPONSE_SUCCESS ((uint32_t) 0x80000000)
+#define MAILBOX_RESPONSE_ERROR   ((uint32_t) 0x80000001)
+
+typedef struct {
+    uint8_t channel: 4;
+    uint32_t data: 28;
+} mail_message_t;
+
+typedef struct {
+    uint32_t reserved: 30;
+    uint8_t empty: 1;
+    uint8_t full:1;
+} mail_status_t;
+
+typedef struct {
+    uint32_t size;
+    uint32_t req_res_code;
+    property_message_tag_t tags[];
+} property_message_buffer_t;
+
+
 typedef enum {
     NULL_TAG = 0,
     FB_ALLOCATE_BUFFER = 0x00040001,
