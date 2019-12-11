@@ -1,8 +1,51 @@
 #include <io/mailbox.h>
 
-int send_messages(property_message_tag_t* tags) {
+/**
+ * Get the size for a mailbox message tag as
+ * defined in the protocol.
+ * 
+ * @param tag the tag to get the size of
+ * @return bytes of a mailbox message type
+ */
+static uint32_t get_value_buffer_len(property_message_tag_t* tag) {
+    switch(tag->proptag) {
+        case FB_ALLOCATE_BUFFER: 
+        case FB_GET_PHYSICAL_DIMENSIONS:
+        case FB_SET_PHYSICAL_DIMENSIONS:
+        case FB_GET_VIRTUAL_DIMENSIONS:
+        case FB_SET_VIRTUAL_DIMENSIONS:
+            return 8;
+        case FB_GET_BITS_PER_PIXEL:
+        case FB_SET_BITS_PER_PIXEL:
+        case FB_GET_BYTES_PER_ROW:
+            return 4;
+        case FB_RELESE_BUFFER:
+        default:
+            return 0;
+    }
+}
+
+static mailbox_message_t mailbox_read(mailbox_channel_t channel) {
+    mailbox_status_t stat;
+    mailbox_message_t res;
+
+    // Make sure that the message is from the right channel
+    do {
+        // Make sure there is mail to recieve
+        do {
+            stat = *MAIL0_STATUS;
+        } while (stat.empty);
+
+        // Get the message
+        res = *MAIL0_READ;
+    } while (res.channel != channel);
+
+    return res;
+}
+
+int ask(property_message_tag_t* tags, mailbox_channel_t channel) {
     property_message_buffer_t* msg;
-    mail_message_t mail;
+    mailbox_message_t mail;
     uint32_t bufsize = 0, i, len, bufpos;
    
     // Calculate the sizes of each tag
@@ -39,8 +82,8 @@ int send_messages(property_message_tag_t* tags) {
     // Send the message
     mail.data = ((uint32_t)msg) >> 4;
     
-    mailbox_send(mail, PROPERTY_CHANNEL);
-    mail = mailbox_read(PROPERTY_CHANNEL);
+    mailbox_send(mail, channel);
+    mail = mailbox_read(channel);
 
 
     if (msg->req_res_code == REQUEST) {

@@ -12,21 +12,27 @@
 #define MAILBOX_RESPONSE_SUCCESS ((uint32_t) 0x80000000)
 #define MAILBOX_RESPONSE_ERROR   ((uint32_t) 0x80000001)
 
+// Channel types (there are more tho)
+typedef enum {
+    MAILBOX_PROPERTY_CHANNEL = 8,
+    MAILBOX_FRAMEBUFFER_CHANNEL = 1
+} mailbox_channel_t;
+
 typedef struct {
     uint8_t channel: 4;
     uint32_t data: 28;
-} mail_message_t;
+} mailbox_message_t;
 
 typedef struct {
     uint32_t reserved: 30;
     uint8_t empty: 1;
-    uint8_t full:1;
-} mail_status_t;
+    uint8_t full: 1;
+} mailbox_status_t;
 
 typedef struct {
     uint32_t size;
     uint32_t req_res_code;
-    property_message_tag_t tags[];
+    uint32_t tags[1]; /* just the padding, it will be filled with kmalloc */
 } property_message_buffer_t;
 
 
@@ -73,33 +79,8 @@ typedef struct {
 } property_message_tag_t;
 
 /**
- * Get the size for a mailbox message type as
- * defined in the protocol.
- * 
- * @param tag the tag to get the size of
- * @return bytes of a mailbox message type
- * @see propery_message_tag_t
- */
-static uint32_t get_value_buffer_len(property_message_tag_t* tag) {
-    switch(tag->proptag) {
-        case FB_ALLOCATE_BUFFER: 
-        case FB_GET_PHYSICAL_DIMENSIONS:
-        case FB_SET_PHYSICAL_DIMENSIONS:
-        case FB_GET_VIRTUAL_DIMENSIONS:
-        case FB_SET_VIRTUAL_DIMENSIONS:
-            return 8;
-        case FB_GET_BITS_PER_PIXEL:
-        case FB_SET_BITS_PER_PIXEL:
-        case FB_GET_BYTES_PER_ROW:
-            return 4;
-        case FB_RELESE_BUFFER:
-        default:
-            return 0;
-    }
-}
-
-/**
- * Sends a message through the property mailbox channel
+ * Sends a message through a mailbox channel
+ * and overrides the message with the response.
  * 
  * @param tags null ended array of tags
  * @return 0 if the message has been sent succesfully.
@@ -107,7 +88,6 @@ static uint32_t get_value_buffer_len(property_message_tag_t* tag) {
  *         1 if ?
  *         2 if the 
  */
-int send_messages(property_message_tag_t * tags);
-
+int ask(property_message_tag_t * tags, uint32_t channel);
 
 #endif /* _MAILBOX_H */
