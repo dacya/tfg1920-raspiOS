@@ -1,84 +1,100 @@
 #include <stddef.h>
 #include <stdint.h>
-#include <io/peripherals/uart.h>
-#include <io/peripherals/gpio.h>
+#include <peripherals/uart.h>
+#include <interrupts.h>
 
-// Loop <delay> times in a way that the compiler won't optimize away
-static inline void delay(int32_t count)
-{
-    asm volatile("__delay_%=: subs %[count], %[count], #1; bne __delay_%=\n"
-            : "=r"(count): [count]"0"(count) : "cc");
+static interrupt_registers_t* interrupt_regs;
+
+// array of pointers to handlers functions
+static interrupt_handler_f_ptr handlers[NUM_IRQS];
+// array of pointer to clearers functions
+static interrupt_clearer_f_ptr clearers[NUM_IRQS];
+
+void bzero(void * dest, int bytes) {
+    char * d = dest;
+    while (bytes--) {
+        *d++ = 0;
+    }
 }
 
-void uart_init()
+void interrupts_init(void)
 {
-    // Disable UART0.
-    *(UART0_CR) = 0x00000000;
-    // Setup the GPIO pin 14 && 15.
-
-    // Disable pull up/down for all GPIO pins & delay for 150 cycles.
-    *(GPPUD) = 0x00000000;
-    delay(150);
-
-    // Disable pull up/down for pin 14,15 & delay for 150 cycles.
-    *(GPPUDCLK0) = (1 << 14) | (1 << 15);
-    delay(150);
-
-    // Write 0 to GPPUDCLK0 to make it take effect.
-    *(GPPUDCLK0) = 0x00000000;
-
-    // Clear pending interrupts.
-    *(UART0_ICR) = 0x7FF;
-
-    // Set integer & fractional part of baud rate.
-    // Divider = UART_CLOCK/(16 * Baud)
-    // Fraction part register = (Fractional part * 64) + 0.5
-    // UART_CLOCK = 3000000; Baud = 115200.
-
-    // Divider = 3000000 / (16 * 115200) = 1.627 = ~1.
-    *(UART0_IBRD) = 1;
-    // Fractional part register = (.627 * 64) + 0.5 = 40.6 = ~40.
-    *(UART0_FBRD) = 40;
-
-    // Enable FIFO & 8 bit data transmissio (1 stop bit, no parity).
-    *(UART0_LCRH) = (1 << 4) | (1 << 5) | (1 << 6);
-
-    // Mask all interrupts.
-    *(UART0_IMSC) = (1 << 1) | (1 << 4) | (1 << 5) | (1 << 6) |
-            (1 << 7) | (1 << 8) | (1 << 9) | (1 << 10);
-
-    // Enable UART0, receive & transfer part of UART.
-    *(UART0_CR) = (1 << 0) | (1 << 8) | (1 << 9);
-}
-
-void uart_putc(unsigned char c)
-{
-    // Wait for UART to become ready to transmit.
-    while ( *(UART0_FR) & (1 << 5) );
-    /* this doesn't work and i don't know why
-    *(UART0_DR) &= (~0xFF);
-    *(UART0_DR) |= (uint8_t)c;
+    interrupt_regs = (interrupt_registers_t *)INTERRUPTS_PENDING;
+	bzero(handlers, sizeof(interrupt_handler_f_ptr) * NUM_IRQS);
+	bzero(clearers, sizeof(interrupt_clearer_f_ptr) * NUM_IRQS);
+    // disable all interrupts
+	interrupt_regs->irq_base_int_disable = 0xffffffff; 
+	interrupt_regs->irq_disable1 = 0xffffffff;
+	interrupt_regs->irq_disable2 = 0xffffffff;
+    /*
+    it should create the vector table and enable interrupts.
+    We are doing it in boot.S
     */
-
-   *(UART0_DR) = c;
 }
-
-unsigned char uart_getc()
+void register_irq_handler(irq_number_t irq_num, 
+                          interrupt_handler_f_ptr handler_to_register, 
+                          interrupt_clearer_f_ptr clearer_to_register)
 {
-    // Wait for UART to have received something.
-    while ( *(UART0_FR) & (1 << 4) ) { }
-    return *(UART0_DR);
+    uint32_t pos;
+    if(IRQ_IS_BASIC(irq_num))
+    {
+        pos = irq_num - 64; //to get a number between 0 and 7
+        handlers[irq_num] = handler_to_register;
+        clearers[irq_num] = clearer_to_register;
+        interrupt_regs->irq_base_int_disable &= ~(1 << pos);
+        interrupt_regs->irq_base_int_enable |= (1 << pos);
+    }
+    else if (IRQ_IS_GPU2(irq_num))
+    {
+        pos = irq_num - 32; // to get a number between 0 and 31
+        handlers[irq_num] = handler_to_register;
+        clearers[irq_num] = clearer_to_register;
+        interrupt_regs->irq_disable2 &= ~(1 << pos);
+        interrupt_regs->irq_enable2 |= (1 << pos);
+    }
+    else if (IRQ_IS_GPU1(irq_num))
+    {
+        handlers[irq_num] = handler_to_register;
+        clearers[irq_num] = clearer_to_register;
+        interrupt_regs->irq_disable1 &= ~(1 << irq_num);
+        interrupt_regs->irq_enable1 |= (1 << irq_num);
+    }
+    else
+    {
+        uart_puts("HANDLER ERROR: Couldn't register the handler & clearer!\n");
+    }
+    
 }
 
-void uart_puts(const char* str)
+void unregister_irq_isr(irq_number_t irq_num)
 {
-    for (size_t i = 0; str[i] != '\0'; i ++)
-        uart_putc((unsigned char)str[i]);
-}
-
-void clean_buf(char *buf, int size){
-    for(int i = 0; i < size; i++){
-        buf[i] = 0;
+    uint32_t pos;
+    if(IRQ_IS_BASIC(irq_num))
+    {
+        pos = irq_num - 64; //to get a number between 0 and 7
+        handlers[irq_num] = NULL;
+        clearers[irq_num] = NULL;
+        interrupt_regs->irq_base_int_enable &= ~(1 << pos);
+        interrupt_regs->irq_base_int_disable |= (1 << pos);
+    }
+    else if (IRQ_IS_GPU1(irq_num))
+    {
+        pos = irq_num - 32; // to get a number between 0 and 31
+        handlers[irq_num] = NULL;
+        clearers[irq_num] = NULL;
+        interrupt_regs->irq_base_int_enable &= ~(1 << pos);
+        interrupt_regs->irq_base_int_disable |= (1 << pos);
+    }
+    else if (IRQ_IS_GPU2(irq_num))
+    {
+        handlers[irq_num] = NULL;
+        clearers[irq_num] = NULL;
+        interrupt_regs->irq_base_int_enable &= ~(1 << pos);
+        interrupt_regs->irq_base_int_disable |= (1 << pos);
+    }
+    else
+    {
+        uart_puts("HANDLER ERROR: Couldn't remove the handler and clearer!\n");
     }
 }
 
@@ -101,7 +117,8 @@ void __attribute__ ((interrupt ("ABORT"))) prefetch_abort_c_handler(void) {
 void __attribute__ ((interrupt ("ABORT"))) data_abort_c_handler(void) {
     uart_puts("DATA_ABORT Catched!\n");    
 }
-void __attribute__ ((interrupt ("IRQ"))) irq_c_handler(void) {
+//because we have a custom handler
+void irq_c_handler(void) {
     uart_puts("IRQ Catched!\n");
 }
 void __attribute__ ((interrupt ("FIQ"))) fast_irq_c_handler(void) {
@@ -109,7 +126,6 @@ void __attribute__ ((interrupt ("FIQ"))) fast_irq_c_handler(void) {
 }
 
 void convert_to_str(uint32_t value, char *buff, int size){
-    //16 positions in hexadecimal for a 32 bits number
     char reminder;
     while(value != 0){
         reminder = value & 0xF;
@@ -126,21 +142,23 @@ void convert_to_str(uint32_t value, char *buff, int size){
 #if defined(__cplusplus)
 extern "C" /* Use C linkage for kernel_main. */
 #endif
+
 void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
 {
     // Declare as unused
-    //(void) r0;
+    (void) r0;
     (void) r1;
     (void) atags;
 
     uart_init();
-    uart_puts("R0 value is: ");
+    interrupts_init();
+    //uart_puts("R0 value is: ");
      //if not, it does a data abort
-    char str_argument[8] = {'0','0','0','0','0','0','0','0'};
-    convert_to_str(r0, str_argument, 8);
-    uart_puts("0x");
-    uart_puts(str_argument);
-    uart_puts("\r\n");
+    //char str_argument[8] = {'0','0','0','0','0','0','0','0'};
+    //convert_to_str(r0, str_argument, 8);
+    //uart_puts("0x");
+    //uart_puts(str_argument);
+    //uart_puts("\r\n");
     uart_puts("Hello, World!\r\n");
     char c;
     //char buf[20];

@@ -12,7 +12,7 @@
 #define _GPIO_H
 
 #include <stdint.h>
-#include <io/peripherals/base.h>
+#include <peripherals/base.h>
 
 /**
  * @dependency

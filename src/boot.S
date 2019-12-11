@@ -47,11 +47,17 @@ _start:
     cmp r4, r9
     blo 1b
 
-    // Call kernel_main
+    // create the vector table
     ldr r3, =str_vector_table
     blx r3
+    //enable interrupts
+    cpsie i //i'm not sure it is necessary
+    /*
     ldr r0, =undefined_instruction_exception_addr
+    //mrs r0, CPSR
     //to debug only
+    */
+    // Call kernel_main
     ldr r3, =kernel_main
     blx r3
 
@@ -60,9 +66,11 @@ halt:
     wfe
     b halt
 
-//we define the vector table
+//we define the vector table and we will be using ldr instrunctions because a
+//branch instruction have a limited range of 32 MB and our c handler routine
+//may be far from that
 vector_table:
-    ldr pc, reset_exception_addr
+    ldr pc, reset_exception_addr 
     ldr pc, undefined_instruction_exception_addr
     ldr pc, software_interrupt_exception_addr
     ldr pc, prefetch_abort_exception_addr
@@ -87,7 +95,8 @@ str_vector_table:
     mov     r1, #0x0000
     ldmia   r0!,{r2, r3, r4, r5, r6, r7, r8, r9}
     stmia   r1!,{r2, r3, r4, r5, r6, r7, r8, r9}
-    //i still don't understand this lines
+    //These lines are necessary to keep the references of #offset from
+    //ldr pc, [pc + #offset] relatives
     ldmia   r0!,{r2, r3, r4, r5, r6, r7, r8}
     stmia   r1!,{r2, r3, r4, r5, r6, r7, r8}
     //-----
@@ -98,6 +107,10 @@ str_vector_table:
 undefined_instruction_s_handler:
     //nothing to adjust (Cortex-A PG)
     srsdb sp!, #0x1B
+    /*
+    It is necessary to switch to supervisor mode and store some registers
+    into it's stack for having support for nested exceptions
+     */
     bl undefined_instruction_c_handler
     //I need to something more here
     rfeia sp! //we do the inverse operation of srsdb
@@ -105,37 +118,53 @@ undefined_instruction_s_handler:
 
 software_interrupt_s_handler:
     //nothing to adjust (Cortex-A PG)
-    srsdb sp!, #0x13
+    srsdb sp!, #0x13 //Supervisor mode
     bl software_interrupt_c_handler
     //I need to something more here
     rfeia sp! //we do the inverse operation of srsdb
 
 
 prefetch_abort_s_handler:
-    subs lr, lr, #4 //we adjust the appropiate value considered by Cortex-A PG
-    srsdb sp!, #0x17
+    sub lr, lr, #4 //we adjust the appropiate value considered by Cortex-A PG
+    srsdb sp!, #0x17 //abort mode
+    /*
+    It is necessary to switch to supervisor mode and store some registers
+    into it's stack for having support for nested exceptions
+     */
     bl prefetch_abort_c_handler
     //I need to something more here
     rfeia sp! //we do the inverse operation of srsdb
 
 
 data_abort_s_handler:
-    subs lr, lr, #8 //we adjust the appropiate value considered by Cortex-A PG
-    srsdb sp!, #0x17
+    sub lr, lr, #8 //we adjust the appropiate value considered by Cortex-A PG
+    srsdb sp!, #0x17 //abort mode
+    /*
+    It is necessary to switch to supervisor mode and store some registers
+    into it's stack for having support for nested exceptions
+     */
     bl data_abort_c_handler
     rfeia sp! //we do the inverse operation of srsdb
 
-
+//Simple version with no nested interrupts support
 irq_s_handler:
-    subs lr, lr, #4 //we adjust the appropiate value considered by Cortex-A PG
+    sub lr, lr, #4 //we adjust the appropiate value considered by Cortex-A PG
     srsdb sp!, #0x12 //we stores the spsr and lr at the address contained in sp of the mode irq
+    /*
+    It is necessary to switch to supervisor mode and store some registers
+    into it's stack for having support for nested exceptions
+     */
     bl irq_c_handler
     rfeia sp! //we do the inverse operation of srsdb
 
 
 fast_irq_s_handler:
-    subs lr, lr, #4 //we adjust the appropiate value considered by Cortex-A PG
-    srsdb sp!, #0x11
+    sub lr, lr, #4 //we adjust the appropiate value considered by Cortex-A PG
+    srsdb sp!, #0x11 //fiq mode
+    /*
+    It is necessary to switch to supervisor mode and store some registers
+    into it's stack for having support for nested exceptions
+     */
     bl fast_irq_c_handler
     //I need to something more here
     rfeia sp! //we do the inverse operation of srsdb

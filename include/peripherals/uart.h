@@ -1,8 +1,17 @@
+/**
+ * The purpose of this library is to create a friendly approach to use
+ * the PL011 UART0 incorporated inside Raspberry Pi 2.
+ * 
+ * Alejandro Cancelo Correia
+ * 
+ * Nov, 26, 2019
+*/
+
 #ifndef _PL011_UART_H
 #define _PL011_UART_H
 
 #include <stdint.h>
-#include <io/peripherals/base.h>
+#include <peripherals/base.h>
 /*
 // The GPIO registers base address.
 #define GPIO_BASE 0x3F200000 // for raspi2 & 3, 0x20200000 for raspi1
@@ -37,5 +46,18 @@
 #define UART0_ITIP   ((volatile uint32_t *) (UART0_BASE + 0x84))
 #define UART0_ITOP   ((volatile uint32_t *) (UART0_BASE + 0x88))
 #define UART0_TDR    ((volatile uint32_t *) (UART0_BASE + 0x8C))
+
+void uart_init();
+void uart_putc(unsigned char c);
+unsigned char uart_getc();
+void uart_puts(const char* str);
+void clean_buf(char *buf, int size);
+
+// Loop <delay> times in a way that the compiler won't optimize away
+static inline void delay(int32_t count)
+{
+    asm volatile("__delay_%=: subs %[count], %[count], #1; bne __delay_%=\n"
+            : "=r"(count): [count]"0"(count) : "cc");
+}
 
 #endif
