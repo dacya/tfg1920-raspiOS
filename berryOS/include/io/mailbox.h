@@ -9,6 +9,7 @@
 
 #include <stdint.h>
 #include <io/peripherals/base.h>
+#include <io/framebuffer.h>
 
 #define MAILBOX_BASE PHYSICAL_PBASE + MAILBOX_OFFSET
 #define MAIL0_READ (((mailbox_message_t *)(0x00 + MAILBOX_BASE)))
@@ -57,29 +58,8 @@ typedef enum {
     FB_GET_BYTES_PER_ROW = 0x00040008
 } property_tag_t;
 
-typedef struct {
-    void * fb_addr;
-    uint32_t fb_size;
-} fb_allocate_res_t;
-
-typedef struct {
-    uint32_t width;
-    uint32_t height;
-} fb_screen_size_t;
-
 /*
- * The value buffer can be any one of these types
- */
-typedef union {
-    uint32_t fb_allocate_align;
-    fb_allocate_res_t fb_allocate_res;
-    fb_screen_size_t fb_screen_size;
-    uint32_t fb_bits_per_pixel;
-    uint32_t fb_bytes_per_row;
-} value_buffer_t;
-
-/*
- * A message_buffer can contain any number of these
+ * A message can contain any number of these.
  */
 typedef struct {
     property_tag_t proptag;
