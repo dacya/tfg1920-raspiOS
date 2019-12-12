@@ -8,7 +8,15 @@
 #define _MAILBOX_H
 
 #include <stdint.h>
+#include <io/peripherals/base.h>
 
+#define MAILBOX_BASE PHYSICAL_PBASE + MAILBOX_OFFSET
+#define MAIL0_READ (((mailbox_message_t *)(0x00 + MAILBOX_BASE)))
+#define MAIL0_STATUS (((mailbox_status_t *)(0x18 + MAILBOX_BASE)))
+#define MAIL0_WRITE (((mailbox_message_t *)(0x20 + MAILBOX_BASE)))
+
+// When sending a message the request code must be 0
+#define MAILBOX_REQUEST_CODE ((uint32_t) 0)
 #define MAILBOX_RESPONSE_SUCCESS ((uint32_t) 0x80000000)
 #define MAILBOX_RESPONSE_ERROR   ((uint32_t) 0x80000001)
 
@@ -82,12 +90,15 @@ typedef struct {
  * Sends a message through a mailbox channel
  * and overrides the message with the response.
  * 
- * @param tags null ended array of tags
- * @return 0 if the message has been sent succesfully.
+ * @param msg null ended array of tags
+ * @param channel the channel number where the message will be sent through
+ * @return  0 if the message has been sent succesfully and the response is filled in the @param msg
  *         -1 if kmalloc failed to reserve 16 aligned bytes
- *         1 if ?
- *         2 if the 
+ *         -2 if the message hasn't been send correctly and was cancelled
+ *         -3 if a RESPONSE_ERROR has ocurred 
+ * @see property_message_tag_t
+ * @see mailbox_channel_t
  */
-int ask(property_message_tag_t * tags, uint32_t channel);
+int send_message(property_message_tag_t * msg, mailbox_channel_t channel);
 
 #endif /* _MAILBOX_H */

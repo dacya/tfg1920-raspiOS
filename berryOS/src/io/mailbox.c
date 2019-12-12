@@ -1,7 +1,7 @@
 #include <io/mailbox.h>
 
 /**
- * Get the size for a mailbox message tag as
+ * Returns the size for a mailbox message tag as
  * defined in the protocol.
  * 
  * @param tag the tag to get the size of
@@ -43,7 +43,7 @@ static mailbox_message_t mailbox_read(mailbox_channel_t channel) {
     return res;
 }
 
-int ask(property_message_tag_t* tags, mailbox_channel_t channel) {
+int send_message(property_message_tag_t* tags, mailbox_channel_t channel) {
     property_message_buffer_t* msg;
     mailbox_message_t mail;
     uint32_t bufsize = 0, i, len, bufpos;
@@ -65,7 +65,7 @@ int ask(property_message_tag_t* tags, mailbox_channel_t channel) {
         return -1;
 
     msg->size = bufsize;
-    msg->req_res_code = REQUEST;
+    msg->req_res_code = MAILBOX_REQUEST_CODE;
 
     // Copy the messages into the buffer
     for (i = 0, bufpos = 0; tags[i].proptag != NULL_TAG; i++) {
@@ -86,12 +86,12 @@ int ask(property_message_tag_t* tags, mailbox_channel_t channel) {
     mail = mailbox_read(channel);
 
 
-    if (msg->req_res_code == REQUEST) {
+    if (msg->req_res_code == MAILBOX_REQUEST_CODE) {
         kfree(msg);
-        return 1;
+        return -2;
     } else if (msg->req_res_code == MAILBOX_RESPONSE_ERROR) {
         kfree(msg);
-        return 2;
+        return -3;
     }
 
     
