@@ -10,5 +10,5 @@ Memoria/*.log
 Memoria/*.out
 Memoria/*.pdf
 Memoria/*.toc
-.vscode
-
+./berryOS/vscode
+./berryOS/compiler

@@ -24,10 +24,15 @@ SRC_DIR = src
 AARCH64 = arch/ARMv8
 AARCHARMv7 = arch/ARMv7
 
+COMP = compiler.zip
+
 all : kernel8.img
 
 clean :
 	rm -rf $(BUILD_DIR) *.img
+
+# unzips compiler
+unzip $(COMP) -o
 
 #target for .c files
 $(BUILD_DIR)/%_c.o: $(SRC_DIR)/%.c 
