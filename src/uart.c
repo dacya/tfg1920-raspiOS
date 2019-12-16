@@ -76,6 +76,29 @@ void uart_puts(const char* str)
         uart_putc((unsigned char)str[i]);
 }
 
+void convert_to_str(uint32_t value, char *buff, int size){
+    char reminder;
+    while(value != 0){
+        reminder = value & 0xF;
+        value = value >> 4;
+        if(reminder < 10){
+            buff[--size] = 48 + reminder;
+        }
+        else {
+            buff[--size] = 55 + reminder;
+        }
+    }
+}
+
+void uart_hex_puts(uint32_t value)
+{
+    char str_argument[8] = {'0','0','0','0','0','0','0','0'};
+    convert_to_str(value, str_argument, 8);
+    uart_puts("0x");
+    uart_puts(str_argument);
+    uart_puts("\r\n");
+}
+
 void clean_buf(char *buf, int size)
 {
     for(int i = 0; i < size; i++)

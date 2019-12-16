@@ -47,23 +47,22 @@ _start:
     cmp r4, r9
     blo 1b
 
+    /*INTERRUPT INITIALIZATION */
     // create the vector table
     ldr r3, =str_vector_table
     blx r3
     //enable interrupts
-    cpsie i //i'm not sure it is necessary
-    /*
-    ldr r0, =undefined_instruction_exception_addr
-    //mrs r0, CPSR
-    //to debug only
-    */
+    cpsie i
+    /*-------------------------*/
+
     // Call kernel_main
     ldr r3, =kernel_main
     blx r3
 
 // halt
 halt:
-    wfe
+    //wfe //wait for event
+    wfi
     b halt
 
 //we define the vector table and we will be using ldr instrunctions because a
@@ -75,7 +74,7 @@ vector_table:
     ldr pc, software_interrupt_exception_addr
     ldr pc, prefetch_abort_exception_addr
     ldr pc, data_abort_exception_addr
-    nop // This one is reserved for hypervisor mode
+    ldr pc, reserved_exception_addr // This one is reserved for hypervisor mode
     ldr pc, irq_handler_abs_addr
     ldr pc, fast_irq_handler_abs_addr
 
@@ -85,6 +84,7 @@ undefined_instruction_exception_addr: .word undefined_instruction_c_handler
 software_interrupt_exception_addr:    .word software_interrupt_c_handler
 prefetch_abort_exception_addr:        .word prefetch_abort_c_handler
 data_abort_exception_addr:            .word data_abort_c_handler
+reserved_exception_addr:              .word halt
 irq_handler_abs_addr:                 .word irq_s_handler
 fast_irq_handler_abs_addr:            .word fast_irq_c_handler
 
@@ -148,14 +148,17 @@ data_abort_s_handler:
 
 //Simple version with no nested interrupts support
 irq_s_handler:
-    sub lr, lr, #4 //we adjust the appropiate value considered by Cortex-A PG
-    srsdb sp!, #0x12 //we stores the spsr and lr at the address contained in sp of the mode irq
+    //srsdb sp!, #0x12 //we stores the spsr and lr at the address contained in sp of the mode irq
     /*
     It is necessary to switch to supervisor mode and store some registers
     into it's stack for having support for nested exceptions
      */
+    push {r0-r12, lr}
     bl irq_c_handler
-    rfeia sp! //we do the inverse operation of srsdb
+    pop {r0-r12, lr}
+    //rfeia sp! //we do the inverse operation of srsdb
+    sub pc, lr, #4 //we adjust the appropiate value considered by Cortex-A PG
+
 
 
 fast_irq_s_handler:
@@ -168,3 +171,35 @@ fast_irq_s_handler:
     bl fast_irq_c_handler
     //I need to something more here
     rfeia sp! //we do the inverse operation of srsdb
+
+.globl io_halt
+io_halt:
+    wfi
+    bx lr
+
+
+.globl _local_timer_init
+/**
+     * THIS STEPS APPLIES IN A SYSTEM WHERE THERE IS NOT VIRTUALIZATION SUPPORT
+     * 
+     * 1. Look into CNTKCTL register if you need
+     * 2. Look into CNTP_CTL or CNTH_CTL or CNTV_CTL to enable or disable
+     *    the corresponding timer (bit 0)
+     * 3. You have to set the compare value for the corresponding timer
+     *    CNTP_CVAL, CNTH_CVAL, CNTV_CVAL if needed
+     * 4. It should be in boot.S but you have to initialize the counter 
+     *    frequency register, CNTFRQ
+     * 5. Putting the corresponding TVAL register to a right value
+     * 6. Routing the IRQ and enabling IRQ of the corresponding core
+    */
+_local_timer_init:
+    // ENABLING TIMER
+    //mrc p15, #0, r0, c14, c3, #1 //we obtain CNTV_CTL register value
+    //orr r1, r1, #1 //we enable virtual timer
+    mov r0, #1
+    mcr p15, #0, r0, c14, c3, #1
+    // SETTING FREQUENCY TIMER
+    //we don't need this right now
+    // SETTING TVAL REGISTER (virtual)
+    mrc p15, #0, r0, c14, c0, #0 //we obtain CNTFRQ
+    mcr p15, #0, r0, c14, c3, #0 //1 irq per second

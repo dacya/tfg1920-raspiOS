@@ -51,6 +51,7 @@ void uart_init();
 void uart_putc(unsigned char c);
 unsigned char uart_getc();
 void uart_puts(const char* str);
+void uart_hex_puts(uint32_t value);
 void clean_buf(char *buf, int size);
 
 // Loop <delay> times in a way that the compiler won't optimize away
