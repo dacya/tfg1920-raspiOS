@@ -1,1 +1,0 @@
-This is the gcc-arm-none-eabi-8-2019-q3-update form developer.arm
