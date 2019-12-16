@@ -3,13 +3,13 @@
  * 
  * Tomás Golomb Durán - Dec. 05, 2019
  */
-
+/*
 #ifndef _MAILBOX_H
 #define _MAILBOX_H
 
 #include <stdint.h>
-#include <io/peripherals/base.h>
-#include <io/framebuffer.h>
+#include <peripherals/base.h>
+//#include <framebuffer.h>
 
 #define MAILBOX_BASE PHYSICAL_PBASE + MAILBOX_OFFSET
 #define MAIL0_READ (((mailbox_message_t *)(0x00 + MAILBOX_BASE)))
@@ -40,10 +40,10 @@ typedef struct {
 
 typedef struct {
     uint32_t size;
-    uint32_t req_res_code;
-    uint32_t tags[1]; /* just the padding, it will be filled with kmalloc */
-} property_message_buffer_t;
-
+    uint32_t req_res_code;*/
+//    uint32_t tags[1]; /* just the padding, it will be filled with kmalloc */
+//} property_message_buffer_t;
+/*
 
 typedef enum {
     NULL_TAG = 0,
@@ -57,15 +57,15 @@ typedef enum {
     FB_SET_BITS_PER_PIXEL = 0x00048005,
     FB_GET_BYTES_PER_ROW = 0x00040008
 } property_tag_t;
-
+*/
 /*
  * A message can contain any number of these.
- */
+ *//*
 typedef struct {
     property_tag_t proptag;
-    value_buffer_t value_buffer;
+    //value_buffer_t value_buffer;
 } property_message_tag_t;
-
+*/
 /**
  * Sends a message through a mailbox channel
  * and overrides the message with the response.
@@ -79,6 +79,6 @@ typedef struct {
  * @see property_message_tag_t
  * @see mailbox_channel_t
  */
-int send_message(property_message_tag_t * msg, mailbox_channel_t channel);
+//int send_message(property_message_tag_t * msg, mailbox_channel_t channel);
 
-#endif /* _MAILBOX_H */
+//#endif /* _MAILBOX_H */

@@ -12,3 +12,6 @@ Memoria/*.pdf
 Memoria/*.toc
 ./berryOS/vscode
 ./berryOS/compiler
+build/
+.vscode/
+

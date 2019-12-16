@@ -1,4 +1,4 @@
-#include <io/gpio/gpio.h>
+#include <peripherals/gpio.h>
 
 void pin_set_function(unsigned int pin, pin_alt_funct fun_sel) {
     if (pin > 53) {
@@ -250,10 +250,10 @@ void pin_switch_async_falling_event(unsigned int pin, int enable) {
 
     switch (pin / 32) {
         case 0:
-            reg = GPAFEN0;
+            reg = GPFEN0;
             break;
         case 1:
-            reg = GPAFEN1;
+            reg = GPFEN1;
             break;
     }
     

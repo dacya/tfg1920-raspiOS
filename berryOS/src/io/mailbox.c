@@ -1,5 +1,4 @@
-#include <io/mailbox.h>
-
+//#include <io/mailbox.h>
 /**
  * Returns the size for a mailbox message tag as
  * defined in the protocol.
@@ -7,6 +6,7 @@
  * @param tag the tag to get the size of
  * @return bytes of a mailbox message type
  */
+/*
 static uint32_t get_value_buffer_len(property_message_tag_t* tag) {
     switch(tag->proptag) {
         case FB_ALLOCATE_BUFFER: 
@@ -73,7 +73,7 @@ int send_message(property_message_tag_t* tags, mailbox_channel_t channel) {
         msg->tags[bufpos++] = tags[i].proptag;
         msg->tags[bufpos++] = len;
         msg->tags[bufpos++] = 0;
-        memcpy(msg->tags+bufpos, &tags[i].value_buffer, len);
+       // memcpy(msg->tags+bufpos, &tags[i].value_buffer, len);
         bufpos += len/4;
     }
 
@@ -99,10 +99,10 @@ int send_message(property_message_tag_t* tags, mailbox_channel_t channel) {
     for (i = 0, bufpos = 0; tags[i].proptag != NULL_TAG; i++) {
         len = get_value_buffer_len(&tags[i]);
         bufpos += 3; //skip over the tag bookkepping info
-        memcpy(&tags[i].value_buffer, msg->tags+bufpos,len);
+     //   memcpy(&tags[i].value_buffer, msg->tags+bufpos,len);
         bufpos += len/4;
     }
 
     kfree(msg);
     return 0;
-}
+}*/

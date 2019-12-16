@@ -1,5 +1,5 @@
-#include <stdint.h>
-#include <io/gpio/gpio.h>
+/*#include <stdint.h>
+#include <peripherals/gpio.h>
 #include <io/led.h>
 
 void led_init( void ){
@@ -24,4 +24,4 @@ void led_set(enum led_flag value){
     
     *(GPSET0) = setSr;
     *(GPCLR0) = clearSr;
-}
+}*/
