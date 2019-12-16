@@ -1,0 +1,118 @@
+\documentclass[a4paper,11pt]{book}
+\usepackage[spanish, activeacute]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage{times}
+\usepackage{graphicx}
+\graphicspath{{fig/}}
+\usepackage{multirow}
+\usepackage{color}
+\definecolor{gray97}{gray}{.97}
+\definecolor{gray75}{gray}{.75}
+\definecolor{gray45}{gray}{.45}
+\usepackage[colorlinks=true, linkcolor=black, urlcolor=blue, filecolor=blue]{hyperref}
+\usepackage{amsfonts}
+\usepackage{anysize} 
+\marginsize{3cm}{3cm}{2cm}{2cm}
+
+\usepackage{listings}
+\lstset{ frame=Ltb,
+framerule=0pt,
+aboveskip=0.5cm,
+framextopmargin=3pt,
+framexbottommargin=3pt,
+framexleftmargin=0.4cm,
+framesep=0pt,
+rulesep=.4pt,
+backgroundcolor=\color{gray97},
+rulesepcolor=\color{black},
+%
+stringstyle=\ttfamily,
+showstringspaces = false,
+basicstyle=\small\ttfamily,
+commentstyle=\color{gray45},
+keywordstyle=\bfseries,
+%
+numbers=left,
+numbersep=15pt,
+numberstyle=\tiny,
+numberfirstline = false,
+breaklines=true,
+%
+tabsize=4
+}
+
+\newcommand\mytitleTFG{Ya mejoraremos el título}
+\newcommand\myauthor{Autor 1}
+\newcommand\myadvisor{José L. Risco Martín}
+\newcommand\mydegree{Grado en Ingeniería Informática}
+\newcommand\myyear{2020}
+\newcommand\mycourse{2019/2020}
+
+\title{\mytitleTFG}
+\author{\myauthor}
+\date{\today}
+\makeindex
+
+\begin{document}
+\baselineskip 1.5em     % 2em doble espacio, 1em espacio sencillo.
+
+%%% PORTADA %%%
+\titlepage{}
+\setlength{\unitlength}{1 cm} %Especificar unidad de trabajo
+
+\begin{center}
+\textbf{\LARGE \mytitleTFG}\\[1.25cm]
+\LARGE{\myauthor}\\[1.25cm]
+\textbf{{\LARGE Máster en Ingeniería Informática, Facultad de Informática, Universidad Complutense de Madrid}\\[0.5cm]}
+\begin{figure}[!ht]
+\begin{center}
+\includegraphics[height=5cm,]{fig/logoucm.png}\\[0.5cm]
+\end{center}
+\end{figure}
+
+{\LARGE Trabajo Fin de Máster}\\[0.5cm]
+{\Large Junio de \myyear}\\[3cm]
+\end{center}
+\hfill \textbf{\Large Director:}\\
+
+\hfill {\Large José Luis Risco Martín}
+
+
+%%% ÍNDICE %%%
+\tableofcontents
+
+%%%Resumen y palabras clave %%%
+\chapter*{Palabras clave}
+\addcontentsline{toc}{chapter}{Palabras clave}
+\markboth{Palabras clave}{Palabras clave}
+
+\section*{Palabras clave en Español}
+\begin{itemize}
+\item Modelado y simulación
+\item Sistemas de eventos discretos
+\item Formalismo DEVS y xDEVS
+\item Raspberry Pi
+\item Módulos del kernel de Linux
+\item Circuitos lógicos y secuenciales
+\end{itemize}
+
+\section*{Keywords in English}
+\begin{itemize}
+\item Modeling and simulation
+\item Discrete events system
+\item DEVS formalism and xDEVS
+\item Raspberry Pi
+\item Linux kernel Modules
+\item Logic and sequential circuits
+\end{itemize}
+
+\input{chapter-0}
+\input{chapter-1}
+\input{chapter-2}
+\input{bibliography}
+\input{chapter-ack}
+\input{chapter-aut}
+
+\end{document}
