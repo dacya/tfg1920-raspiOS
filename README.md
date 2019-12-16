@@ -1,5 +1,6 @@
-# tfg1920-raspiOS
-Repositorio para crear un SO para la Raspi2
+# tfg1920-raspiOS -> Memoria dinámica
+Ejemplo de uso de la memoria dinámica.
+Para probarlo: "make run" en build/
 
 ## Enlaces:
 

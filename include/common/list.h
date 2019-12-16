@@ -1,3 +1,17 @@
+/**
+ * This library contains a linked list
+ * defined with macros.
+ *
+ * Obtained in 
+ * https://github.com/jsandler18/raspi-kernel/tree/bd5026277370360fb04f04f5b050c6853466c86d
+ *  
+ * Raúl Sánchez Montaño
+ * 
+ * Dic 16, 2019
+ */
+
+
+
 #ifndef LIST_H
 #define LIST_H
 

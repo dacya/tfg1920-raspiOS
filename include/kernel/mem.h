@@ -1,3 +1,12 @@
+/**
+ * This library contains methods for dynamic memory.
+ * Also manages the pages. 
+ * 
+ * Raúl Sánchez Montaño
+ * 
+ * Dic 16, 2019
+ */
+
 #include <kernel/atag.h>
 #include <common/list.h>
 #include <stdint.h>

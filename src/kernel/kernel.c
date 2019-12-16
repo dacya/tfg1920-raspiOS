@@ -1,3 +1,10 @@
+/**
+ * 
+ * Raúl Sánchez Montaño
+ * 
+ * Dic 16, 2019
+ */
+
 #include <stddef.h>
 #include <stdint.h>
 #include <kernel/uart.h>

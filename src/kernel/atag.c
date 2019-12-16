@@ -1,3 +1,9 @@
+/**
+ * 
+ * Raúl Sánchez Montaño
+ * 
+ * Dic 16, 2019
+ */
 #include <kernel/atag.h>
 #include <kernel/uart.h>
 #include <stdint.h>
