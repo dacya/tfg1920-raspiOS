@@ -13,4 +13,6 @@
 #define PHYSICAL_PBASE 0x3F000000
 #define VIRTUAL_PBASE  0x7E000000
 
+#define MAILBOX_OFFSET 0xB880
+
 #endif  /*_P_BASE_H */
