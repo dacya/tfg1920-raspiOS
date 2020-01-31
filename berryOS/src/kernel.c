@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <stdint.h>
+
 #include <io/uart.h>
 #include <interrupts.h>
 

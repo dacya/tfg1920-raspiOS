@@ -10,6 +10,8 @@ Memoria/*.log
 Memoria/*.out
 Memoria/*.pdf
 Memoria/*.toc
-build/*
-.vscode/*
+./berryOS/vscode
+./berryOS/compiler
+build/
+.vscode/
 
