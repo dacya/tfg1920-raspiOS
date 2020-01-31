@@ -6,8 +6,8 @@
 */
 
 #include <stddef.h>
-#include <peripherals/uart.h>
-#include <peripherals/gpio.h>
+#include <io/uart.h>
+#include <io/gpio.h>
 
 
 void uart_init()
