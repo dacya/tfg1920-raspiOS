@@ -7,7 +7,7 @@
 #ifndef	_P_MINI_UART_H
 #define	_P_MINI_UART_H
 
-#include <peripherals/base.h>
+#include <io/base.h>
 #include <stdint.h>
 
 //all define in page 8 of BCM2837 and forward.

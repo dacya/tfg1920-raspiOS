@@ -11,7 +11,7 @@
 #define _PL011_UART_H
 
 #include <stdint.h>
-#include <peripherals/base.h>
+#include <io/base.h>
 
 // The base memory address for UART.
 #define UART_BASE  (PHYSICAL_PBASE + 0x00201000) // for raspi2 & 3, 0x20201000 for raspi1
@@ -183,7 +183,9 @@
 
 void uart_init ( void );
 char uart_recv ( void );
-void uart_send ( char c );
-void uart_send_string(char* str);
+
+void uart_putc (unsigned char c);
+void uart_puts (const char* str);
+void uart_hex_puts(uint32_t value);
 
 #endif

@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include <stdint.h>
-#include <peripherals/uart.h>
+
+#include <io/uart.h>
 #include <interrupts.h>
 
 extern void io_halt();

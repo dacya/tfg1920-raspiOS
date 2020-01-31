@@ -12,7 +12,7 @@
 //TODO: try to read how to adapt it for local IRQ
 
 #include <stdint.h>
-#include <peripherals/base.h>
+#include <io/base.h>
 
 /**
  * Peripheral base memory address for controlling interrupts
