@@ -188,4 +188,6 @@ void uart_putc (unsigned char c);
 void uart_puts (const char* str);
 void uart_hex_puts(uint32_t value);
 
+unsigned char uart_getc();
+
 #endif

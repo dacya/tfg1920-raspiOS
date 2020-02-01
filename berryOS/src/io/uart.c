@@ -7,7 +7,7 @@
 
 #include <io/uart.h>
 #include <io/gpio.h>
-
+#include <stddef.h>
 
 void uart_init()
 {
