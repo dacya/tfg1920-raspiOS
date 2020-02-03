@@ -4,7 +4,7 @@
  * 
  * Dic 16, 2019
  */
-
+/*
 #include <mem/atag.h>
 #include <io/uart.h>
 #include <stdint.h>
@@ -20,8 +20,8 @@ uint32_t get_mem_size(atag_t * tag){
                 if(tag->tag == MEM){
                         return tag->mem.size;
                 }
-                tag = ((uint32_t *) tag) + tag->tag_size;
+                tag = (atag_t *)(((uint32_t *) tag) + tag->tag_size);
         }
         return 0;
 }
-
+*/

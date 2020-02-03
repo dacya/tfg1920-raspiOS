@@ -55,7 +55,7 @@ void mem_init(atag_t * atags){
     for (i = 0; i < kernel_pages; i++) {
         all_pages_array[i].vaddr_mapped = i * PAGE_SIZE;    // Identity map the kernel pages
         all_pages_array[i].flags.allocated = 1;
-        all_pages_arrbzeroay[i].flags.kernel_page = 1;
+        all_pages_array[i].flags.kernel_page = 1;
     }
 
      // Reserve 1 MB for the kernel heap
@@ -72,7 +72,7 @@ void mem_init(atag_t * atags){
     }
 
     //Initialize the heap
-    uint32_t page_array_end = &__end + page_array_len;
+    uint32_t page_array_end = ((uint32_t)&__end) + page_array_len;
     heap_init(page_array_end);
 }
 

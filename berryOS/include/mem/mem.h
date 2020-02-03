@@ -7,7 +7,7 @@
  * Dic 16, 2019
  */
 
-/*
+
 #ifndef MEM_H
 #define MEM_H
 
@@ -47,14 +47,14 @@ typedef struct heap_segment{
  * 
  * @param atags The atags that contains the info.
  * 
- *
+ */
 void mem_init(atag_t * atags);
 
 /**
  * Reserve a memory page.
  * 
  * @return The memory page address.
- * 
+ */
  
 void * alloc_page(void);
 
@@ -62,7 +62,7 @@ void * alloc_page(void);
  * Free a memory page
  * 
  * @param ptr The memory page address we want to free.
- * 
+ */ 
  
 void free_page(void * ptr);
 
@@ -70,7 +70,7 @@ void free_page(void * ptr);
  * Reserve <bytes> bytes of data. 
  * 
  * @param bytes The number of bytes we want to reserve.
- * 
+ */ 
  
 void * kmalloc(uint32_t bytes);
 
@@ -78,8 +78,7 @@ void * kmalloc(uint32_t bytes);
  * Free some data.
  * 
  * @param ptr The memory address we want to free.
- * 
+ */ 
  
 void kfree(void *ptr);
 #endif
-*/
