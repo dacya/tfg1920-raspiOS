@@ -72,7 +72,7 @@ void mem_init(atag_t * atags){
     }
 
     //Initialize the heap
-    uint32_t page_array_end = &__end + page_array_len;
+    uint32_t page_array_end = ((uint32_t)&__end) + page_array_len;
     heap_init(page_array_end);
 }
 

@@ -46,12 +46,12 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags){
     delay(1000);
     
     int first = 1;
-    void * firstt;
+    void * firstt = NULL;
     while (1) {
-        void * dest;
+        void * dest = NULL;
         char c;
         unsigned int i = 0;
-        unsigned char buf[100];
+        char buf[100];
         uart_puts("¿Que quieres hacer?\n > 1 --> Guardar cadena de texto\n > 2 --> Ver cadenas\n > 3 --> Liberar última cadena\n > 4 --> Liberar primera cadena\n > ");
         
         c = uart_getc();
