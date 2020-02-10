@@ -20,16 +20,6 @@ void bzero(void * dest, int bytes) {
     }
 }
 
-//i'm not sure if this is a good generic function in c or not, my intention
-//was to used it to fill the handlers and cleares arrays to a null value
-//when they are initialized in interrupts_init
-void fill_with(void* dest, int bytes, void* value){
-    char* d = dest;
-    while (bytes--){
-        *d++ = *(char*)value;
-    }
-}
-
 void interrupts_init(void)
 {
     interrupt_regs = (interrupt_registers_t *)INTERRUPTS_P_PENDING;
@@ -39,10 +29,6 @@ void interrupts_init(void)
 	interrupt_regs->irq_base_int_disable = 0xffffffff; 
 	interrupt_regs->irq_disable1 = 0xffffffff;
 	interrupt_regs->irq_disable2 = 0xffffffff;
-    /*
-    it should create the vector table and enable interrupts.
-    We are doing it in boot.S
-    */
 }
 
 void register_irq_handler(irq_number_t irq_num, 
@@ -112,18 +98,9 @@ void unregister_irq_isr(irq_number_t irq_num)
     }
 }
 
-//because we have a custom handler
+//Custom irq handler
 void irq_c_handler(void) {
-    if((*(volatile uint32_t*)CORE0_L_INT_SRC) & 0x8)
-    {
-        uart_puts("dentro\r\n");
-        asm volatile("mrc p15, #0, r0, c14, c0, #0");//we obtain CNTFRQ
-        asm volatile("mcr p15, #0, r0, c14, c3, #0");//1 irq per second
-    }
-    uart_puts("holo\r\n");
-    ENABLE_INTERRUPTS();
     //the cpu reaches this function with the IRQ exceptions disabled
-    /*
     for(int i = 0; i < NUM_P_IRQS; i++){
         if(IRQ_P_IS_PENDING(interrupt_regs, i) && handlers[i] != 0){
             clearers[i]();
@@ -131,7 +108,7 @@ void irq_c_handler(void) {
             ENABLE_INTERRUPTS();
             return;
         }
-    }*/
+    }
 }
 //register like arm timer interrupt
 static void local_timer_handler(void)
@@ -200,9 +177,11 @@ void local_timer_init(void)
 void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
 {
     // Declare as unused
-    (void) r0;
+    //(void) r0;
     (void) r1;
     (void) atags;
+    
+    uart_hex_puts(r0);
 
     register_irq_handler(ARM_TIMER, local_timer_handler, local_timer_clearer);
     uart_init();

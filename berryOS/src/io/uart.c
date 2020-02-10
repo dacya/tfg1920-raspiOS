@@ -106,13 +106,13 @@ unsigned char uart_getc()
 
 void uart_puts(const char* str)
 {
-    for (size_t i = 0; str[i] != '\0'; i ++)
+    for (size_t i = 0; str[i] != '\0'; i++)
         uart_putc((unsigned char)str[i]);
 }
 
 void convert_to_str(uint32_t value, char *buff, int size){
     char reminder;
-    while(value != 0){
+    while(value != 0 && size > 0){
         reminder = value & 0xF;
         value = value >> 4;
         if(reminder < 10){
@@ -126,7 +126,7 @@ void convert_to_str(uint32_t value, char *buff, int size){
 
 void uart_hex_puts(uint32_t value)
 {
-    char str_argument[8] = {'0','0','0','0','0','0','0','0'};
+    char str_argument[9] = {'0','0','0','0','0','0','0','0','\0'};
     convert_to_str(value, str_argument, 8);
     uart_puts("0x");
     uart_puts(str_argument);
