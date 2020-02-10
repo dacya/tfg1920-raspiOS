@@ -4,7 +4,7 @@
  * 
  * Dic 16, 2019
  */
-/*
+
 #include <mem/mem.h>
 #include <mem/atag.h>
 #include <io/uart.h>
@@ -23,14 +23,14 @@ page_list_t free_pages;
 
 /**
  * Heap
- *
+ */
 
 static void heap_init(uint32_t heap_start);
 /**
  * impliment kmalloc as a linked list of allocated segments.
  * Segments should be 4 byte aligned.
  * Use best fit algorithm to find an allocation
- *
+ */
 
 
 static heap_segment_t * heap_segment_list_head;
@@ -203,4 +203,3 @@ void print_data(void){
         seg = seg->next;
     }
 }
-*/

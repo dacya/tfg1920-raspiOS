@@ -141,6 +141,9 @@ void __attribute__ ((interrupt ("ABORT"))) reset_c_handler(void) {
     uart_puts("RESET Catched!\r\n");
 }
 void __attribute__ ((interrupt ("UNDEF"))) undefined_instruction_c_handler(void) {
+    uint32_t reg0;
+    asm volatile("mov %0, r0":"=r" (reg0) :);
+    uart_hex_puts(reg0);
     uart_puts("UNDEFINED_INSTRUCTION Catched!\r\n");
 }
 void __attribute__ ((interrupt ("SWI"))) software_interrupt_c_handler(void) {
@@ -180,14 +183,13 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
     //(void) r0;
     (void) r1;
     (void) atags;
-    
-    uart_hex_puts(r0);
 
-    register_irq_handler(ARM_TIMER, local_timer_handler, local_timer_clearer);
     uart_init();
+    register_irq_handler(ARM_TIMER, local_timer_handler, local_timer_clearer);
     local_timer_init();
     interrupts_init();
-    
+
+    uart_hex_puts(r0);
     uart_puts("Hello, World!\r\n");
     /*
     //just for testing asm function

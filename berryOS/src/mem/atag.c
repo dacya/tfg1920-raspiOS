@@ -4,7 +4,7 @@
  * 
  * Dic 16, 2019
  */
-/*
+
 #include <mem/atag.h>
 #include <io/uart.h>
 #include <stdint.h>
@@ -24,4 +24,4 @@ uint32_t get_mem_size(atag_t * tag){
         }
         return 0;
 }
-*/
+

@@ -1,0 +1,5 @@
+
+Running qemu...
+qemu-system-arm -m 256 -M raspi2 -serial stdio -kernel build/myos.elf
+0x60000153
+Hello, World!

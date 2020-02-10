@@ -148,11 +148,12 @@ undefined_instruction_s_handler:
        Mode: PL1 svc 
     */
     //nothing to adjust (Cortex-A PG)
-    srsdb sp!, #0x1B
+    srsdb sp!, #0x1b
     /*
     It is necessary to switch to supervisor mode and store some registers
     into it's stack for having support for nested exceptions
      */
+    mov r0, lr
     bl undefined_instruction_c_handler
     //I need to something more here
     rfeia sp! //we do the inverse operation of srsdb
@@ -193,16 +194,16 @@ data_abort_s_handler:
 //Simple version with no nested interrupts support
 irq_s_handler:
     /*Mode: PL1 irq */
-    //srsdb sp!, #0x12 //we stores the spsr and lr at the address contained in sp of the mode irq
+    srsda sp!, #0x12 //we stores the spsr and lr at the address contained in sp of the mode irq
     /*
     It is necessary to switch to supervisor mode and store some registers
     into it's stack for having support for nested exceptions
      */
-    push {r0-r12, lr}
+    push {r0-r12}
     bl irq_c_handler
-    pop {r0-r12, lr}
-    //rfeia sp! //we do the inverse operation of srsdb
-    sub pc, lr, #4 //we adjust the appropiate value considered by Cortex-A PG
+    pop {r0-r12}
+    rfeib sp! //we do the inverse operation of srsdb
+    //subs pc, lr, #4 //we adjust the appropiate value considered by Cortex-A PG
 
 
 

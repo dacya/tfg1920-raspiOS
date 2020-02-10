@@ -17,7 +17,7 @@
 
 #include <stddef.h>
 
-#define DEFINE_LIST(nodeType)                                                       \
+#define DEFINE_LIST(nodeType)       \
 typedef struct nodeType##list {     \
     struct nodeType * head;         \
     struct nodeType * tail;         \
