@@ -188,12 +188,12 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
     (void) r1;
     (void) atags;
 
-    uart_init();
+    /*uart_init();
     register_irq_handler(ARM_TIMER, local_timer_handler, local_timer_clearer);
     local_timer_init();
     interrupts_init();
 
-    uart_hex_puts(r0);
+    uart_hex_puts(r0);*/
     uart_puts("Hello, World!\r\n");
     /*
     //just for testing asm function
