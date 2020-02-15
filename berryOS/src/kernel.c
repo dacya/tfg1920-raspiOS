@@ -3,6 +3,7 @@
 
 #include <io/uart.h>
 #include <interrupts.h>
+#include <io/gpu.h>
 
 extern void io_halt();
 
@@ -179,6 +180,9 @@ void local_timer_init(void)
 
 void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
 {
+    // HDMI
+    gpu_init();
+
     // Declare as unused
     //(void) r0;
     (void) r1;
