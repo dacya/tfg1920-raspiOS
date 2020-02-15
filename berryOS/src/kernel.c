@@ -193,8 +193,8 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
     local_timer_init();
     interrupts_init();
 
-    uart_hex_puts(r0);*/
-    uart_puts("Hello, World!\r\n");
+    uart_hex_puts(r0);
+    uart_puts("Hello, World!\r\n");*/
     /*
     //just for testing asm function
     uart_puts("CPSR.MODE[4:0] value is: ");
