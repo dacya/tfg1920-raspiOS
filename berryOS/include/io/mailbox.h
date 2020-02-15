@@ -58,6 +58,16 @@ typedef enum {
     FB_GET_BYTES_PER_ROW = 0x00040008
 } property_tag_t;
 
+typedef struct {
+    void* fb_addr;
+    uint32_t fb_size;
+} fb_allocate_res_t;
+
+typedef struct {
+    uint32_t width;
+    uint32_t height;
+} fb_screen_size_t;
+
 /*
  * The value buffer can be any one of these types
  */

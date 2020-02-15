@@ -50,6 +50,19 @@ static mailbox_message_t mailbox_read(mailbox_channel_t channel) {
     return res;
 }
 
+static void mailbox_send(mail_message_t msg, int channel) {
+    mail_status_t stat;
+    msg.channel = channel;
+
+    // Make sure you can send mail
+    do {
+        stat = *MAIL0_STATUS;
+    } while (stat.full);
+
+    // send the message
+    *MAIL0_WRITE = msg;
+}
+
 int send_message(property_message_tag_t* tags, mailbox_channel_t channel) {
     property_message_buffer_t* msg;
     mailbox_message_t mail;

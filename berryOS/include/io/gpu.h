@@ -10,7 +10,7 @@
 #include <io/base.h>
 #include <io/framebuffer.h>
 #include <stdint.h>
-#include <utils/font.h>
+#include <utils/fonts/font.h>
 
 #define CHAR_WIDTH 8
 #define CHAR_HEIGHT 8
