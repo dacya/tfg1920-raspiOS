@@ -179,15 +179,16 @@ void local_timer_init(void)
 }
 
 void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
-{
-    // HDMI
-    gpu_init();
-
-    // Declare as unused
-    //(void) r0;
+{   
+    (void) r0;
     (void) r1;
     (void) atags;
-
+    // HDMI
+    mem_init(((atag_t *)atags));
+    gpu_init();
+    // Declare as unused
+    
+    
     /*uart_init();
     register_irq_handler(ARM_TIMER, local_timer_handler, local_timer_clearer);
     local_timer_init();

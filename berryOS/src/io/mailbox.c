@@ -50,8 +50,8 @@ static mailbox_message_t mailbox_read(mailbox_channel_t channel) {
     return res;
 }
 
-static void mailbox_send(mail_message_t msg, int channel) {
-    mail_status_t stat;
+static void mailbox_send(mailbox_message_t msg, int channel) {
+    mailbox_status_t stat;
     msg.channel = channel;
 
     // Make sure you can send mail

@@ -28,7 +28,8 @@ $(BUILD_DIR)/%_s.o: $(SRC_DIR)/%.S
 	$(CC)-gcc $(C_OPT) -MMD -c $< -o $@
 	@echo ""$(SRC_DIR)/
 
-C_FILES = $(wildcard $(SRC_DIR)/*/*.c)
+C_FILES = $(wildcard $(SRC_DIR)/*/*/*.c)
+C_FILES += $(wildcard $(SRC_DIR)/*/*.c)
 C_FILES += $(wildcard $(SRC_DIR)/*.c)
 
 ASM_FILES = $(wildcard $(SRC_ARCH)/ARMv7/*.S)

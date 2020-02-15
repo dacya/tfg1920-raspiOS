@@ -12,7 +12,7 @@ void gpu_init(void) {
     }
 }
 
-void write_pixel(uint32_t x, uint32_t y, const pixel_t* pix) {
+void write_pixel(uint32_t x, uint32_t y, pixel_t* pix) {
     uint8_t * location = fbinfo.buf + y*fbinfo.pitch + x*BYTES_PER_PIXEL;
     memcpy(location, pix, BYTES_PER_PIXEL);
 }
@@ -29,7 +29,7 @@ void gpu_putc(char c) {
         for (i = 0; i < num_rows-1; i++)
             memcpy(fbinfo.buf + fbinfo.pitch*i*CHAR_HEIGHT, fbinfo.buf + fbinfo.pitch*(i+1)*CHAR_HEIGHT, fbinfo.pitch * CHAR_HEIGHT);
         // zero out the last row
-        bzero(fbinfo.buf + fbinfo.pitch*i*CHAR_HEIGHT,fbinfo.pitch * CHAR_HEIGHT);
+        bzero2(fbinfo.buf + fbinfo.pitch*i*CHAR_HEIGHT,fbinfo.pitch * CHAR_HEIGHT);
         fbinfo.chars_y--;
     }
 
