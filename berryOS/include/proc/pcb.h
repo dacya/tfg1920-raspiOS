@@ -1,3 +1,4 @@
+/*
 /**
  * This library contains the pcb structure.
  * 
@@ -7,13 +8,15 @@
  * Raúl Sánchez Montaño
  * 
  * Feb, 9, 2020
-*/
-/*
+*
+
 #ifndef PCB_H
 #define PCB_H
 
 #include <stdint.h>
 #include <utils/list.h> 
+
+typedef void (*kthread_function_f)(void);
 
 typedef struct {
     uint32_t r0;
@@ -43,11 +46,26 @@ typedef struct pcb {
 
 
 /**
- *  Initialize and allocate the pcb,
- *  including the list of processes that
- *  want to run first.
+ * Initialize and allocate the pcb,
+ * including the list of processes that
+ * want to run first.
  *
 void process_init(void);
+
+/**
+ * Switch between the current process and the first
+ * process in the queue
+ *
+void schedule(void);
+
+/**
+ * Create a new process and add it to the queue
+ * 
+ * @param thread_func The address to the function that will be the new process 
+ * @param name The new process name
+ * @param name_size The new process name size
+ 
+void create_kernel_thread(kthread_function_f thread_func, char * name, int name_size);
 
 #endif
 */

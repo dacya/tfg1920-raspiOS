@@ -13,6 +13,8 @@
 #ifndef STDLIB_H
 #define STDLIB_H
 
+#define MIN(x,y) ((x < y ? x : y))
+
 void memcpy(void * dest, void * src, int size);
 
 void bzero2(void * dest, int size);
