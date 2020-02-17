@@ -15,7 +15,7 @@ int framebuffer_init(void) {
 
 
     // Send over the initialization
-    if (send_message(tags, MAILBOX_FRAMEBUFFER_CHANNEL) != 0) {
+    if (send_message(tags, MAILBOX_PROPERTY_CHANNEL) != 0) {
         return -1;
     }
 
@@ -35,7 +35,7 @@ int framebuffer_init(void) {
     tags[1].proptag = NULL_TAG;
 
 
-    if (send_message(tags, MAILBOX_FRAMEBUFFER_CHANNEL) != 0) {
+    if (send_message(tags, MAILBOX_PROPERTY_CHANNEL) != 0) {
         return -1;
     }
     

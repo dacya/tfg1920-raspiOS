@@ -16,11 +16,6 @@
 #define MAIL0_STATUS (((mailbox_status_t *)(0x18 + MAILBOX_BASE)))
 #define MAIL0_WRITE (((mailbox_message_t *)(0x20 + MAILBOX_BASE)))
 
-// When sending a message the request code must be 0
-#define MAILBOX_REQUEST_CODE ((uint32_t) 0)
-#define MAILBOX_RESPONSE_SUCCESS ((uint32_t) 0x80000000)
-#define MAILBOX_RESPONSE_ERROR   ((uint32_t) 0x80000001)
-
 // Channel types (there are more tho)
 typedef enum {
     MAILBOX_PROPERTY_CHANNEL = 8,
@@ -38,9 +33,18 @@ typedef struct {
     uint8_t full: 1;
 } mailbox_status_t;
 
+/**
+ * A property message can either be a request, or a response, and a response can be successfull or an error
+ */
+typedef enum {
+    MAILBOX_REQUEST_CODE = 0x00000000,
+    MAILBOX_RESPONSE_SUCCESS = 0x80000000,
+    MAILBOX_RESPONSE_ERROR = 0x80000001
+} buffer_req_res_code_t;
+
 typedef struct {
     uint32_t size;
-    uint32_t req_res_code;
+    buffer_req_res_code_t req_res_code;
     uint32_t tags[1]; /* just the padding, it will be filled with kmalloc */
 } property_message_buffer_t;
 
