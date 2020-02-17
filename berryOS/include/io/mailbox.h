@@ -8,6 +8,7 @@
 #define _MAILBOX_H
 
 #include <stdint.h>
+#include <mem/mem.h>
 #include <io/base.h>
 #include <io/framebuffer.h>
 #include <utils/stdlib.h>
