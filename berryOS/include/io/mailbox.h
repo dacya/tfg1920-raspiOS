@@ -10,6 +10,7 @@
 #include <stdint.h>
 #include <io/base.h>
 #include <io/framebuffer.h>
+#include <utils/stdlib.h>
 
 #define MAILBOX_BASE PHYSICAL_PBASE + MAILBOX_OFFSET
 #define MAIL0_READ (((mailbox_message_t *)(0x00 + MAILBOX_BASE)))
