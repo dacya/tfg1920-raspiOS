@@ -1,5 +1,5 @@
 #include <io/mailbox.h>
-
+#include <io/gpio.h>
 /**
  * Returns the size for a mailbox message tag as
  * defined in the protocol.
@@ -77,13 +77,13 @@ int send_message(property_message_tag_t* tags, mailbox_channel_t channel) {
     bufsize += 3*sizeof(uint32_t); 
 
     // buffer size must be 16 byte aligned (padding)
-    bufsize += 16 - (bufsize % 16);
-
+    //bufsize += 16 - (bufsize % 16);
+    bufsize += (bufsize % 16) ? 16 - (bufsize % 16) : 0;
     // kmalloc returns a 16 byte aligned address
     msg = kmalloc(bufsize);
-    if (!msg)
+    if (msg == NULL)
         return -1;
-
+    
     msg->size = bufsize;
     msg->req_res_code = MAILBOX_REQUEST_CODE;
 
@@ -109,11 +109,15 @@ int send_message(property_message_tag_t* tags, mailbox_channel_t channel) {
     if (msg->req_res_code == MAILBOX_REQUEST_CODE) {
         kfree(msg);
         return -2;
-    } else if (msg->req_res_code == MAILBOX_RESPONSE_ERROR) {
+    }
+
+    pin_set_as_output(17);
+    
+    if (msg->req_res_code == MAILBOX_RESPONSE_ERROR) {
         kfree(msg);
         return -3;
     }
-
+    
     
     // Copy the tags back into the array
     for (i = 0, bufpos = 0; tags[i].proptag != NULL_TAG; i++) {

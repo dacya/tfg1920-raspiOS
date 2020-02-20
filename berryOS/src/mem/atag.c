@@ -9,7 +9,7 @@
 #include <io/uart.h>
 #include <stdint.h>
 
-#define SIMULATOR 1 //este valor deberá ser 0 si se ejecuta en hardware  
+#define SIMULATOR 0 //este valor deberá ser 0 si se ejecuta en hardware  
 
  
 uint32_t get_mem_size(atag_t * tag){

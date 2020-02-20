@@ -2,15 +2,15 @@
 
 void gpu_init(void) {
     // Aparantly, this sometimes does not work, so try in a loop
-    int init = 0;
+    int init;
     do {
         init = framebuffer_init();
-    } while (!init);
+    } while (init != 0);
 
     // clear screen
     for (uint32_t i = 0; i < fbinfo.width; i++) {
         for (uint32_t j = 0; j < fbinfo.height; j++) {
-            write_pixel(i,j,&WHITE);
+            write_pixel(i,j,&BLACK);
         }
     }
 }
