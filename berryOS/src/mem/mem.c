@@ -121,8 +121,6 @@ void * kmalloc(uint32_t bytes){
     heap_segment_t * current, * best = NULL;
     int diff, best_diff = 0x7FFFFFFF;
     
-    
-    
     // Add the header to the number of bytes we need and make the size 16 byte aligned
     bytes += sizeof(heap_segment_t);
     if(bytes % 16 != 0){
@@ -130,7 +128,6 @@ void * kmalloc(uint32_t bytes){
     }
     
     // Find the allocation that is closest in size to this request Could be improved with a divide_and_conquer algorithm?
-
     for(current = heap_segment_list_head; current != NULL; current = current->next){
         
         diff = current->segment_size - bytes;
@@ -171,7 +168,7 @@ void kfree(void * ptr){
 
     seg = ptr - sizeof(heap_segment_t);
     seg->is_allocated = 0;
-    uart_puts("    Borrando\n");
+    //uart_puts("    Borrando\n");
     while(seg->prev != NULL && seg->prev->is_allocated == 0){
         seg->prev->segment_size += seg->segment_size;
         seg->prev->next = seg->next;

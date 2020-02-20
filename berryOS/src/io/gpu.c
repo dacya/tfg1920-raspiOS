@@ -2,7 +2,10 @@
 
 void gpu_init(void) {
     // Aparantly, this sometimes does not work, so try in a loop
-    while(framebuffer_init());
+    int init = 0;
+    do {
+        init = framebuffer_init();
+    } while (!init);
 
     // clear screen
     for (uint32_t i = 0; i < fbinfo.width; i++) {
