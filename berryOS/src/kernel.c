@@ -4,6 +4,7 @@
 #include <io/uart.h>
 #include <interrupts.h>
 #include <io/gpu.h>
+#include <io/gpio.h>
 
 extern void io_halt();
 
@@ -180,47 +181,9 @@ void local_timer_init(void)
 
 void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
 {   
-    (void) r0;
-    (void) r1;
-    (void) atags;
-    // HDMI
-    mem_init(((atag_t *)atags));
-    gpu_init();
-    // Declare as unused
-    
-    
-    /*uart_init();
-    register_irq_handler(ARM_TIMER, local_timer_handler, local_timer_clearer);
-    local_timer_init();
-    interrupts_init();
-
-    uart_hex_puts(r0);
-    uart_puts("Hello, World!\r\n");*/
-    /*
-    //just for testing asm function
-    uart_puts("CPSR.MODE[4:0] value is: ");
-    uint32_t value = 1;
-    uint32_t salida;
-    asm volatile("mrs r0, cpsr");
-    asm volatile("and r0, r0, #0x1f");
-    asm volatile("mov %0, r0": "=r"(salida));
-    uart_hex_puts(salida);
-    */
-    /*
-    if (INTERRUPTS_ENABLED()){
-        uart_puts("poz zi crack bro\r\n");
-    }
-    char c;
-    //char buf[20];
-    //unsigned int i;
-    while (1) {
-        uart_putc('>');
-        while ((c = uart_getc()) != '\r' ){
-            uart_putc(c);
-        }
-        uart_putc('\n');
-    }
-    */
+    // GPIO 0 > pin 27
+    pin_set_function(0, OUTPUT);
+    pin_set_as_output(0);
     while (1) {
         io_halt();
     }
