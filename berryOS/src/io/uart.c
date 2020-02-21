@@ -7,6 +7,7 @@
 
 #include <io/uart.h>
 #include <io/gpio.h>
+#include <stddef.h>
 
 
 void uart_init()
@@ -126,7 +127,7 @@ void convert_to_str(uint32_t value, char *buff, int size){
 
 void uart_hex_puts(uint32_t value)
 {
-    char str_argument[8] = {'0','0','0','0','0','0','0','0'};
+    char str_argument[9] = {'0','0','0','0','0','0','0','0', '\0'};
     convert_to_str(value, str_argument, 8);
     uart_puts("0x");
     uart_puts(str_argument);
