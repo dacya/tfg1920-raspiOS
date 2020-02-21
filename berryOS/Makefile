@@ -1,3 +1,4 @@
+PROC_ASM = ./berryOS/src/proc
 #
 #	ARMv8 COMPILER
 #
@@ -87,6 +88,7 @@ OBJ64_FILES += $(ASM64_FILES:${AARCH64}/%.S=$(BUILD_DIR)/%_s.o)
 #	ARMv7 list of .c and .S files to compile
 #
 ASM32_FILES = $(wildcard ${AARCHARMv7}/*.S)
+ASM32_FILES += $(wildcard ${PROC_ASM}/*.S)
 
 OBJ32_FILES = $(C_FILES:$(SRC_DIR)/%.c=$(BUILD_DIR)/%_rp2c.o)
 OBJ32_FILES += $(ASM32_FILES:${AARCHARMv7}/%.S=$(BUILD_DIR)/%_rp2s.o)

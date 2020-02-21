@@ -15,11 +15,11 @@ switch_to_thread:
     push {lr}
     push {sp}
     mrs r12, cspr
-    push {r0-12}
+    push {r0-r12}
     str sp, [r0]
     ldr sp, [r1]
-    ldr r0, =#10000
-    bl timer_set
-    pop {r0-12}
+    //ldr r0, =#10000
+    //bl timer_set
+    pop {r0-r12}
     msr cspr_c, r12
     pop {lr, pc}

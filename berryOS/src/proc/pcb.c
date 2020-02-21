@@ -1,8 +1,10 @@
-/*
+
 #include<proc/pcb.h>
 #include<mem/mem.h>
 #include<utils/stdlib.h>
 #include<interrupts.h>
+#include<io/uart.h>
+
 
 static uint32_t pids = 1;
 #define NEW_PID pids++;
@@ -36,7 +38,7 @@ void process_init(void){
 
     //Start timer with 10 ms
 
-    timer_set(10000);
+    //timer_set(10000);
 }
 
 void schedule(void){
@@ -60,6 +62,8 @@ void schedule(void){
 
     //Switch the processes contexts
     switch_to_thread(old_thread, new_thread);
+    uart_puts(new_thread->proc_name);
+    uart_puts(" -->");
     ENABLE_INTERRUPTS();
 }
 
@@ -109,6 +113,3 @@ void create_kernel_thread(kthread_function_f thread_func, char * name, int name_
     append_pcb_list(&all_proc_list, pcb);
     append_pcb_list(&run_queue, pcb);
 }
-
-*/
-
