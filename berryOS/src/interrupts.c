@@ -1,6 +1,6 @@
 #include <interrupts.h>
 #include <stddef.h>
-#include <peripherals/uart.h>
+#include <io/uart.h>
 
 static interrupt_registers_t* interrupt_regs;
 

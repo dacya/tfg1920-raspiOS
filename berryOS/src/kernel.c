@@ -1,7 +1,9 @@
 #include <stddef.h>
 #include <stdint.h>
-#include <peripherals/uart.h>
+
+#include <io/uart.h>
 #include <interrupts.h>
+#include <local_timer.h>
 
 extern void io_halt();
 
