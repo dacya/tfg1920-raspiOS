@@ -1,9 +1,11 @@
 CC = compiler/bin/arm-none-eabi
-C_OPT = -mcpu=cortex-a7 -O2 -Wall -Wextra -fpic -ffreestanding -std=gnu99 -nostdlib -I include 
-L_OPT = -ffreestanding -O2 -nostdlib
+OBJCOPY = compiler/bin/arm-none-eabi-objcopy
+C_OPT = -mcpu=cortex-a7 -O2 -Wall -Wextra -fpic -ffreestanding -std=gnu99 -nostdlib -I berryOS/include 
+L_OPT = -ffreestanding -O2 -nostdlib -mcpu=cortex-a7
 
 #-fpic position independent code
-SRC_DIR = src
+SRC_DIR = berryOS/src
+SRC_ARCH = berryOS/arch
 BUILD_DIR = build
 
 
@@ -25,19 +27,26 @@ $(BUILD_DIR)/%_s.o: $(SRC_DIR)/%.S
 	@mkdir -p $(@D)
 	@echo "Compiling .S files..."
 	$(CC)-gcc $(C_OPT) -MMD -c $< -o $@
-	@echo ""
+	@echo ""$(SRC_DIR)/
 
-C_FILES = $(wildcard $(SRC_DIR)/*.c)
+C_FILES = $(wildcard $(SRC_DIR)/*/*/*.c)
+C_FILES += $(wildcard $(SRC_DIR)/*/*.c)
+C_FILES += $(wildcard $(SRC_DIR)/*.c)
 
-ASM_FILES = $(wildcard $(SRC_DIR)/*.S)
+ASM_FILES = $(wildcard $(SRC_ARCH)/ARMv7/*.S) #Remember to add the context.S when using processes
 
 OBJ_FILES = $(C_FILES:$(SRC_DIR)/%.c=$(BUILD_DIR)/%_c.o)
+
 OBJ_FILES += $(ASM_FILES:$(SRC_DIR)/%.S=$(BUILD_DIR)/%_s.o)
 
-build: $(SRC_DIR)/linker.ld $(OBJ_FILES)
+build: $(SRC_ARCH)/ARMv7/linker.ld $(OBJ_FILES)
 	@echo "Linking .o files..."
-	$(CC)-gcc -T $(SRC_DIR)/linker.ld -o $(BUILD_DIR)/myos.elf $(L_OPT) $(OBJ_FILES)
-	$(CC)-objcopy $(BUILD_DIR)/myos.elf -O binary $(BUILD_DIR)/myos.bin
+	$(CC)-gcc -T $(SRC_ARCH)/ARMv7/linker.ld -o $(BUILD_DIR)/myos.elf $(L_OPT) $(OBJ_FILES)
+	#$(CC)-objcopy $(BUILD_DIR)/myos.elf -O binary $(BUILD_DIR)/myos.bin
+	@echo "Done!"
+
+build_hard: build
+	$(OBJCOPY) $(BUILD_DIR)/myos.elf -O binary $(BUILD_DIR)/kernel7.img
 	@echo "Done!"
 
 variable_test: 

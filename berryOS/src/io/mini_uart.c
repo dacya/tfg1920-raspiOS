@@ -1,6 +1,6 @@
 #include <stdint.h>
-#include <peripherals/mini_uart.h>
-#include <peripherals/gpio.h>
+#include <io/mini_uart.h>
+#include <io/gpio.h>
 
 void mini_uart_transmit_reg( void ){
 	uint32_t aux_mu_stat_register = *(AUX_MU_STAT);
