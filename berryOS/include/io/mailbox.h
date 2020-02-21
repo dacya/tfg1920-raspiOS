@@ -3,23 +3,20 @@
  * 
  * Tomás Golomb Durán - Dec. 05, 2019
  */
-/*
+
 #ifndef _MAILBOX_H
 #define _MAILBOX_H
 
 #include <stdint.h>
-#include <peripherals/base.h>
-//#include <framebuffer.h>
+#include <mem/mem.h>
+#include <io/base.h>
+#include <io/framebuffer.h>
+#include <utils/stdlib.h>
 
 #define MAILBOX_BASE PHYSICAL_PBASE + MAILBOX_OFFSET
 #define MAIL0_READ (((mailbox_message_t *)(0x00 + MAILBOX_BASE)))
 #define MAIL0_STATUS (((mailbox_status_t *)(0x18 + MAILBOX_BASE)))
 #define MAIL0_WRITE (((mailbox_message_t *)(0x20 + MAILBOX_BASE)))
-
-// When sending a message the request code must be 0
-#define MAILBOX_REQUEST_CODE ((uint32_t) 0)
-#define MAILBOX_RESPONSE_SUCCESS ((uint32_t) 0x80000000)
-#define MAILBOX_RESPONSE_ERROR   ((uint32_t) 0x80000001)
 
 // Channel types (there are more tho)
 typedef enum {
@@ -38,12 +35,21 @@ typedef struct {
     uint8_t full: 1;
 } mailbox_status_t;
 
+/**
+ * A property message can either be a request, or a response, and a response can be successfull or an error
+ */
+typedef enum {
+    MAILBOX_REQUEST_CODE = 0x00000000,
+    MAILBOX_RESPONSE_SUCCESS = 0x80000000,
+    MAILBOX_RESPONSE_ERROR = 0x80000001
+} buffer_req_res_code_t;
+
 typedef struct {
     uint32_t size;
-    uint32_t req_res_code;*/
-//    uint32_t tags[1]; /* just the padding, it will be filled with kmalloc */
-//} property_message_buffer_t;
-/*
+    buffer_req_res_code_t req_res_code;
+    uint32_t tags[1]; /* just the padding, it will be filled with kmalloc */
+} property_message_buffer_t;
+
 
 typedef enum {
     NULL_TAG = 0,
@@ -57,15 +63,37 @@ typedef enum {
     FB_SET_BITS_PER_PIXEL = 0x00048005,
     FB_GET_BYTES_PER_ROW = 0x00040008
 } property_tag_t;
-*/
+
+typedef struct {
+    void* fb_addr;
+    uint32_t fb_size;
+} fb_allocate_res_t;
+
+typedef struct {
+    uint32_t width;
+    uint32_t height;
+} fb_screen_size_t;
+
+/*
+ * The value buffer can be any one of these types
+ */
+typedef union {
+    uint32_t fb_allocate_align;
+    fb_allocate_res_t fb_allocate_res;
+    fb_screen_size_t fb_screen_size;
+    uint32_t fb_bits_per_pixel;
+    uint32_t fb_bytes_per_row;
+} value_buffer_t;
+
+
 /*
  * A message can contain any number of these.
- *//*
+ */
 typedef struct {
     property_tag_t proptag;
-    //value_buffer_t value_buffer;
+    value_buffer_t value_buffer;
 } property_message_tag_t;
-*/
+
 /**
  * Sends a message through a mailbox channel
  * and overrides the message with the response.
@@ -79,6 +107,6 @@ typedef struct {
  * @see property_message_tag_t
  * @see mailbox_channel_t
  */
-//int send_message(property_message_tag_t * msg, mailbox_channel_t channel);
+int send_message(property_message_tag_t* msg, mailbox_channel_t channel);
 
-//#endif /* _MAILBOX_H */
+#endif /* _MAILBOX_H */

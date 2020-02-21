@@ -9,9 +9,7 @@
 #include <io/gpio.h>
 #include <stddef.h>
 
-
-void uart_init()
-{
+void uart_init() {
     uint32_t selector;
 
     *(UART0_CR) = 0; //we disable UART
@@ -86,8 +84,7 @@ void uart_init()
     *(UART0_CR) = selector;
 }
 
-void uart_putc(unsigned char c)
-{
+void uart_putc(unsigned char c) {
     // Wait for UART to become ready to transmit.
     while ( *(UART0_FR) & (1 << 5) );
     /* this doesn't work and i don't know why
@@ -98,22 +95,20 @@ void uart_putc(unsigned char c)
    *(UART0_DR) = c;
 }
 
-unsigned char uart_getc()
-{
+unsigned char uart_getc() {
     // Wait for UART to have received something.
     while ( *(UART0_FR) & (1 << 4) ) { }
     return *(UART0_DR);
 }
 
-void uart_puts(const char* str)
-{
-    for (size_t i = 0; str[i] != '\0'; i ++)
+void uart_puts(const char* str) {
+    for (size_t i = 0; str[i] != '\0'; i++)
         uart_putc((unsigned char)str[i]);
 }
 
-void convert_to_str(uint32_t value, char *buff, int size){
+void convert_to_str(uint32_t value, char *buff, int size) {
     char reminder;
-    while(value != 0){
+    while(value != 0 && size > 0){
         reminder = value & 0xF;
         value = value >> 4;
         if(reminder < 10){
@@ -125,8 +120,7 @@ void convert_to_str(uint32_t value, char *buff, int size){
     }
 }
 
-void uart_hex_puts(uint32_t value)
-{
+void uart_hex_puts(uint32_t value) {
     char str_argument[9] = {'0','0','0','0','0','0','0','0', '\0'};
     convert_to_str(value, str_argument, 8);
     uart_puts("0x");
@@ -134,10 +128,8 @@ void uart_hex_puts(uint32_t value)
     uart_puts("\r\n");
 }
 
-void clean_buf(char *buf, int size)
-{
-    for(int i = 0; i < size; i++)
-    {
+void clean_buf(char *buf, int size) {
+    for(int i = 0; i < size; i++) {
         buf[i] = 0;
     }
 }
