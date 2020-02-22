@@ -56,7 +56,7 @@ typedef enum {
     FB_ALLOCATE_BUFFER = 0x00040001,
     FB_RELESE_BUFFER = 0x00048001,
     FB_GET_PHYSICAL_DIMENSIONS = 0x00040003,
-    FB_SET_PHYSICAL_DIMENSIONS = 0x00048003,
+    FB_SET_PHYSICAL_DIMENSIONS = 0x00048003,  
     FB_GET_VIRTUAL_DIMENSIONS = 0x00040004,
     FB_SET_VIRTUAL_DIMENSIONS = 0x00048004,
     FB_GET_BITS_PER_PIXEL = 0x00040005,
@@ -107,6 +107,9 @@ typedef struct {
  * @see property_message_tag_t
  * @see mailbox_channel_t
  */
-int send_message(property_message_tag_t* msg, mailbox_channel_t channel);
+int send_messages(property_message_tag_t* msg, mailbox_channel_t channel);
+
+void mailbox_send(mailbox_message_t msg, mailbox_channel_t channel);
+mailbox_message_t mailbox_read(mailbox_channel_t channel);
 
 #endif /* _MAILBOX_H */

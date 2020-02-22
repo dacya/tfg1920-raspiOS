@@ -108,13 +108,14 @@ void local_timer_clearer(void) {
 }
 
 //because we have a custom handler
-void irq_c_handler(void){
-    if((*(volatile uint32_t*)CORE0_L_INT_SRC) & 0x8)
-    {
-       local_timer_handler();
+void irq_c_handler(void) {
+    if((*(volatile uint32_t*)CORE0_L_INT_SRC) & 0x8) {
+        clearers[ARM_TIMER]();
+        handlers[ARM_TIMER]();
+        //local_timer_handler();
     }
     uart_puts("limpiesa\r\n");
-    local_timer_clearer();
+    //local_timer_clearer();
     ENABLE_INTERRUPTS();
     //the cpu reaches this function with the IRQ exceptions disabled
     /*

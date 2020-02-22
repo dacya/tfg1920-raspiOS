@@ -1,4 +1,5 @@
 #include <io/mailbox.h>
+#include <io/uart.h>
 
 /**
  * Returns the size for a mailbox message tag as
@@ -7,7 +8,7 @@
  * @param tag the tag to get the size of
  * @return bytes of a mailbox message type
  */
-static uint32_t get_value_buffer_len(property_message_tag_t* tag) {
+uint32_t get_value_buffer_len(property_message_tag_t* tag) {
     switch(tag->proptag) {
         case FB_ALLOCATE_BUFFER: 
         case FB_GET_PHYSICAL_DIMENSIONS:
@@ -32,7 +33,7 @@ static uint32_t get_value_buffer_len(property_message_tag_t* tag) {
  * @param tag the tag to get the size of
  * @return bytes of a mailbox message type
  */
-static mailbox_message_t mailbox_read(mailbox_channel_t channel) {
+mailbox_message_t mailbox_read(mailbox_channel_t channel) {
     mailbox_status_t stat;
     mailbox_message_t res;
 
@@ -50,7 +51,7 @@ static mailbox_message_t mailbox_read(mailbox_channel_t channel) {
     return res;
 }
 
-static void mailbox_send(mailbox_message_t msg, int channel) {
+void mailbox_send(mailbox_message_t msg, mailbox_channel_t channel) {
     mailbox_status_t stat;
     msg.channel = channel;
 
@@ -63,7 +64,7 @@ static void mailbox_send(mailbox_message_t msg, int channel) {
     *MAIL0_WRITE = msg;
 }
 
-int send_message(property_message_tag_t* tags, mailbox_channel_t channel) {
+int send_messages(property_message_tag_t* tags, mailbox_channel_t channel) {
     property_message_buffer_t* msg;
     mailbox_message_t mail;
     uint32_t bufsize = 0, i, len, bufpos;
@@ -77,13 +78,13 @@ int send_message(property_message_tag_t* tags, mailbox_channel_t channel) {
     bufsize += 3*sizeof(uint32_t); 
 
     // buffer size must be 16 byte aligned (padding)
-    bufsize += 16 - (bufsize % 16);
-
+    //bufsize += 16 - (bufsize % 16);
+    bufsize += (bufsize % 16) ? 16 - (bufsize % 16) : 0;
     // kmalloc returns a 16 byte aligned address
     msg = kmalloc(bufsize);
-    if (!msg)
+    if (msg == NULL)
         return -1;
-
+    
     msg->size = bufsize;
     msg->req_res_code = MAILBOX_REQUEST_CODE;
 
@@ -105,7 +106,6 @@ int send_message(property_message_tag_t* tags, mailbox_channel_t channel) {
     mailbox_send(mail, channel);
     mail = mailbox_read(channel);
 
-
     if (msg->req_res_code == MAILBOX_REQUEST_CODE) {
         kfree(msg);
         return -2;
@@ -113,7 +113,7 @@ int send_message(property_message_tag_t* tags, mailbox_channel_t channel) {
         kfree(msg);
         return -3;
     }
-
+    
     
     // Copy the tags back into the array
     for (i = 0, bufpos = 0; tags[i].proptag != NULL_TAG; i++) {

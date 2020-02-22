@@ -13,9 +13,8 @@ int framebuffer_init(void) {
     tags[2].value_buffer.fb_bits_per_pixel = COLORDEPTH;
     tags[3].proptag = NULL_TAG;
 
-
     // Send over the initialization
-    if (send_message(tags, MAILBOX_PROPERTY_CHANNEL) != 0) {
+    if (send_messages(tags, MAILBOX_PROPERTY_CHANNEL) != 0) {
         return -1;
     }
 
@@ -34,11 +33,10 @@ int framebuffer_init(void) {
     tags[0].value_buffer.fb_allocate_align = 16;
     tags[1].proptag = NULL_TAG;
 
-
-    if (send_message(tags, MAILBOX_PROPERTY_CHANNEL) != 0) {
+    if (send_messages(tags, MAILBOX_PROPERTY_CHANNEL) != 0) {
         return -1;
     }
-    
+
     fbinfo.buf = tags[0].value_buffer.fb_allocate_res.fb_addr;
     fbinfo.buf_size = tags[0].value_buffer.fb_allocate_res.fb_size;
 

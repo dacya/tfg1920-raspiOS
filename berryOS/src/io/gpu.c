@@ -1,20 +1,34 @@
 #include <io/gpu.h>
+#include <io/uart.h>
 
 void gpu_init(void) {
     // Aparantly, this sometimes does not work, so try in a loop
-    while(framebuffer_init());
+    uart_hex_puts(fbinfo.buf);
+    while(framebuffer_init() != 0);
 
     // clear screen
+    uart_hex_puts(fbinfo.buf);
     for (uint32_t i = 0; i < fbinfo.width; i++) {
         for (uint32_t j = 0; j < fbinfo.height; j++) {
-            write_pixel(i,j,&WHITE);
+            write_pixel(i, j, &WHITE);
         }
     }
+    gpu_puts("\n");
+    gpu_puts("\n");
+    gpu_puts("\n");
+    gpu_puts("\n");
+    gpu_puts("                  GANAMOS AMIGOS");
 }
 
 void write_pixel(uint32_t x, uint32_t y, pixel_t* pix) {
-    uint8_t * location = fbinfo.buf + y*fbinfo.pitch + x*BYTES_PER_PIXEL;
+    uint32_t* location = fbinfo.buf + y*fbinfo.pitch + x*BYTES_PER_PIXEL;
+    //uint8_t * location = fbinfo.buf + y*fbinfo.pitch + x*BYTES_PER_PIXEL;
     memcpy(location, pix, BYTES_PER_PIXEL);
+}
+
+void gpu_puts(char* string) {
+    for (size_t i = 0; string[i] != '\0'; i++)
+        gpu_putc((unsigned char)string[i]);
 }
 
 void gpu_putc(char c) {
