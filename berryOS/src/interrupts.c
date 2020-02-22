@@ -32,36 +32,26 @@ void interrupts_init(void)
     */
 }
 
-void register_irq_handler(irq_number_t irq_num, 
-                          interrupt_handler_f_ptr handler_to_register, 
-                          interrupt_clearer_f_ptr clearer_to_register)
-{
+void register_irq_handler(irq_number_t irq_num, interrupt_handler_f_ptr handler_to_register, interrupt_clearer_f_ptr clearer_to_register) {
     uint32_t pos;
-    if(IRQ_P_IS_BASIC(irq_num))
-    {
+    if(IRQ_P_IS_BASIC(irq_num)) {
         pos = irq_num - 64; //to get a number between 0 and 7
         handlers[irq_num] = handler_to_register;
         clearers[irq_num] = clearer_to_register;
         interrupt_regs->irq_base_int_disable &= ~(1 << pos);
         interrupt_regs->irq_base_int_enable |= (1 << pos);
-    }
-    else if (IRQ_P_IS_GPU2(irq_num))
-    {
+    } else if (IRQ_P_IS_GPU2(irq_num)) {
         pos = irq_num - 32; // to get a number between 0 and 31
         handlers[irq_num] = handler_to_register;
         clearers[irq_num] = clearer_to_register;
         interrupt_regs->irq_disable2 &= ~(1 << pos);
         interrupt_regs->irq_enable2 |= (1 << pos);
-    }
-    else if (IRQ_P_IS_GPU1(irq_num))
-    {
+    } else if (IRQ_P_IS_GPU1(irq_num)) {
         handlers[irq_num] = handler_to_register;
         clearers[irq_num] = clearer_to_register;
         interrupt_regs->irq_disable1 &= ~(1 << irq_num);
         interrupt_regs->irq_enable1 |= (1 << irq_num);
-    }
-    else
-    {
+    } else {
         uart_puts("HANDLER ERROR: Couldn't register the handler & clearer!\r\n");
     }
     
@@ -100,8 +90,7 @@ void unregister_irq_isr(irq_number_t irq_num)
 }
 
 //register like arm timer interrupt
-static void local_timer_handler(void)
-{
+void local_timer_handler(void) {
     uint32_t value2;
     uint32_t memory = *(volatile uint32_t*)CORE0_L_INT_SRC;
     uart_puts("Receive a generic timer interrupt \r\n");
@@ -113,8 +102,7 @@ static void local_timer_handler(void)
 }
 
 
-static void local_timer_clearer(void)
-{
+void local_timer_clearer(void) {
     asm volatile("mrc p15, #0, r0, c14, c0, #0");//we obtain CNTFRQ
     asm volatile("mcr p15, #0, r0, c14, c3, #0");//1 irq per second
 }

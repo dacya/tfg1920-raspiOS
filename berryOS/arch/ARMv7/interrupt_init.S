@@ -1,4 +1,3 @@
-
 //we define the vector table and we will be using ldr instrunctions because a
 //branch instruction have a limited range of 32 MB and our c handler routine
 //may be far from that

@@ -33,25 +33,6 @@ _start:
     cmp r1, #0
     bne halt
 
-    /* INITIALIZE ANY CRITICAL I/O DEVICES */
-    //Code here...
-
-    /* PERFORM ANY NECESSARY INITIALIZATION OF NEON OR VFP */
-    //we won't use the Neon or VFP hardware
-    //Code here...
-
-    /* ENABLE INTERRUPTS */
-    cpsie i
-
-    /* CHANGE CORE MODE OR STATE */
-    //Because the kernel runs un Supervisor mode, this step is done at the end
-    //of the step 4
-
-    /* HANDLE ANY SET UP REQUIRE FOR SECURE WORLD */
-    //we won't use the Secure support
-    //Code here...
-
-    /* CALL THE MAIN() APPLICATION */
     // Clear out bss.
     ldr r4, =__bss_start
     ldr r9, =__bss_end
@@ -113,8 +94,8 @@ _start:
     blx r3
 
 halt:
-    wfe //wait for event
-    //wfi
+    //wfe //wait for event
+    wfi
     b halt
 
 .globl io_halt
@@ -124,23 +105,24 @@ io_halt:
 
 
 .globl _local_timer_init
-/*
-        THIS STEPS APPLIES IN A SYSTEM WHERE THERE IS NOT VIRTUALIZATION SUPPORT
-
-    1. Look into CNTKCTL register if you need
-    2. Look into CNTP_CTL or CNTH_CTL or CNTV_CTL to enable or disable
-       the corresponding timer (bit 0)
-    3. You have to set the compare value for the corresponding timer
-       CNTP_CVAL, CNTH_CVAL, CNTV_CVAL if needed
-    4. It should be in boot.S but you have to initialize the counter 
-       frequency register, CNTFRQ
-    5. Putting the corresponding TVAL register to a right value
-    6. Routing the IRQ and enabling IRQ of the corresponding core
-*/
+/**
+     * THIS STEPS APPLIES IN A SYSTEM WHERE THERE IS NOT VIRTUALIZATION SUPPORT
+     * 
+     * 1. Look into CNTKCTL register if you need
+     * 2. Look into CNTP_CTL or CNTH_CTL or CNTV_CTL to enable or disable
+     *    the corresponding timer (bit 0)
+     * 3. You have to set the compare value for the corresponding timer
+     *    CNTP_CVAL, CNTH_CVAL, CNTV_CVAL if needed
+     * 4. It should be in boot.S but you have to initialize the counter 
+     *    frequency register, CNTFRQ
+     * 5. Putting the corresponding TVAL register to a right value
+     * 6. Routing the IRQ and enabling IRQ of the corresponding core
+    */
 _local_timer_init:
     // ENABLING TIMER
     //mrc p15, #0, r0, c14, c3, #1 //we obtain CNTV_CTL register value
     //orr r1, r1, #1 //we enable virtual timer
+    push {r0-r12, lr}
     mov r0, #1
     mcr p15, #0, r0, c14, c3, #1
     // SETTING FREQUENCY TIMER
@@ -148,3 +130,5 @@ _local_timer_init:
     // SETTING TVAL REGISTER (virtual)
     mrc p15, #0, r0, c14, c0, #0 //we obtain CNTFRQ
     mcr p15, #0, r0, c14, c3, #0 //1 irq per second
+    pop {r0-r12, lr}
+    mov pc, lr
