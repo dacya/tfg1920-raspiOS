@@ -21,9 +21,11 @@ void gpu_init(void) {
 }
 
 void write_pixel(uint32_t x, uint32_t y, pixel_t* pix) {
-    uint32_t* location = fbinfo.buf + y*fbinfo.pitch + x*BYTES_PER_PIXEL;
     //uint8_t * location = fbinfo.buf + y*fbinfo.pitch + x*BYTES_PER_PIXEL;
-    memcpy(location, pix, BYTES_PER_PIXEL);
+    if (0 <= x && x < fbinfo.width && 0 <= 0 && y < fbinfo.height) {
+        uint32_t* location = fbinfo.buf + y*fbinfo.pitch + x*BYTES_PER_PIXEL;
+        memcpy(location, pix, BYTES_PER_PIXEL);
+    }
 }
 
 void gpu_puts(char* string) {
