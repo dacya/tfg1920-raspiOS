@@ -1,17 +1,26 @@
 #include <ui/view.h>
 #include <io/gpu.h>
+#include <utils/color.h>
+#include <io/uart.h>
 
-view create_view(int width, int height, int x, int y) {
-    view v;
+VIEW new_view(int width, int height, int x, int y) {
+    VIEW v;
     v.width = width;
     v.height = height;
     v.x = x;
     v.y = y;
-    v.bgColor = { 0xFF, 0xFF, 0xFF };
+    v.bgColor = WHITE;
+
+    return v;
 }
 
-void draw() {
-    for (int i = 0; i < width; i++) {
-        for (int j = 0; i < )
+void draw(VIEW v) {
+    int width = v.x + v.width;
+    int height = v.y + v.height;
+
+    for (int i = v.x; i < width; i++) {
+        for (int j = v.y; j < height; j++) {
+            write_pixel(i, j, &v.bgColor);
+        }
     }
 }

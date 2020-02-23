@@ -9,7 +9,9 @@ typedef struct {
     int x;
     int y;
     color_24 bgColor;
-} view;
+} VIEW;
 
+VIEW new_view(int width, int height, int x, int y);
+void draw(VIEW v);
 
 #endif /* _VIEW_H */
