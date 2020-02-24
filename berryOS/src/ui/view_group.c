@@ -1,3 +1,4 @@
+/*
 #include <ui/view_group.h>
 #include <ui/view.h>
 #include <utils/color.h>
@@ -23,3 +24,4 @@ VIEW_GROUP new_view_group(int width, int height, int x, int y) {
 void draw_group(VIEW_GROUP vg) {
     draw(vg.view);
 }
+*/

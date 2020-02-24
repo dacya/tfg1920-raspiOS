@@ -2,6 +2,7 @@
 #include <io/uart.h>
 #include <utils/color.h>
 #include <ui/view.h>
+#include <io/gpio.h>
 
 void gpu_init(void) {
     // Aparantly, this sometimes does not work, so try in a loop
@@ -42,7 +43,7 @@ void clear_screen() {
 void write_pixel(uint32_t x, uint32_t y, color_24* pix) {
     //uint8_t * location = fbinfo.buf + y*fbinfo.pitch + x*BYTES_PER_PIXEL;
     if (x < fbinfo.width && y < fbinfo.height) {
-        uint32_t* location = fbinfo.buf + y*fbinfo.pitch + x*BYTES_PER_PIXEL;
+        uint8_t* location = fbinfo.buf + y*fbinfo.pitch + x*BYTES_PER_PIXEL;
         memcpy(location, pix, BYTES_PER_PIXEL);
     }
 }

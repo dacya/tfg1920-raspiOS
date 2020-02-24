@@ -24,7 +24,7 @@ fast_irq_handler_abs_addr:            .word fast_irq_c_handler
 // asm function to store the vector table into the default memory area
 .globl str_vector_table
 str_vector_table:
-    push    {r4, r5, r6, r7, r8, r9}
+    push    {r4, r5, r6, r7, r8, r9, lr}
     ldr     r0, =vector_table 
     mov     r1, #0x0000
     ldmia   r0!,{r2, r3, r4, r5, r6, r7, r8, r9}
@@ -34,8 +34,8 @@ str_vector_table:
     ldmia   r0!,{r2, r3, r4, r5, r6, r7, r8}
     stmia   r1!,{r2, r3, r4, r5, r6, r7, r8}
     //-----
-    pop     {r4, r5, r6, r7, r8, r9}
-    blx     lr //copies the addres of the next instruction
+    pop     {r4, r5, r6, r7, r8, r9, lr}
+    mov pc, lr //copies the addres of the next instruction
 
 
 halt:

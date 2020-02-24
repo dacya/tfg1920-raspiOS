@@ -17,6 +17,12 @@
 #define CHAR_WIDTH 8
 #define CHAR_HEIGHT 8
 
+void gpu_putc(char c);
+
+void gpu_puts(char* string);
+
+void clear_screen();
+
 /**
  * Initializes the gpu module by
  * initializing the framebuffer
