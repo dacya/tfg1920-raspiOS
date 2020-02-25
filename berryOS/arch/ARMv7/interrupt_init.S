@@ -35,7 +35,7 @@ str_vector_table:
     stmia   r1!,{r2, r3, r4, r5, r6, r7, r8}
     //-----
     pop     {r4, r5, r6, r7, r8, r9}
-    bx lr //copies the addres of the next instruction
+    mov pc, lr //copies the addres of the next instruction
 
 
 halt:

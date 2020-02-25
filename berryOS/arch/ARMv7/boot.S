@@ -54,7 +54,6 @@ _start:
     cpsid i
     /* INITIALIZE EXCEPTION VECTORS */
 
-    //ldr r3, =str_vector_table
     bl str_vector_table
     /* INITIALIZE THE MEMORY SYSTEM, INCLUDIN MMU */
     //We won't use the MMU, only dynamic memory
@@ -89,9 +88,7 @@ _start:
 
     /* CALL THE MAIN() APPLICATION */
     // Call kernel_main
-    mov r5, pc
-    ldr r3, =kernel_main
-    blx r3
+    bl kernel_main
 
 halt:
     //wfe //wait for event
@@ -113,16 +110,13 @@ io_halt:
      *    the corresponding timer (bit 0)
      * 3. You have to set the compare value for the corresponding timer
      *    CNTP_CVAL, CNTH_CVAL, CNTV_CVAL if needed
-     * 4. It should be in boot.S but you have to initialize the counter 
-     *    frequency register, CNTFRQ
-     * 5. Putting the corresponding TVAL register to a right value
-     * 6. Routing the IRQ and enabling IRQ of the corresponding core
+     * 4. Putting the corresponding TVAL register to a right value
+     * 5. Routing the IRQ and enabling IRQ of the corresponding core
     */
 _local_timer_init:
     // ENABLING TIMER
     //mrc p15, #0, r0, c14, c3, #1 //we obtain CNTV_CTL register value
     //orr r1, r1, #1 //we enable virtual timer
-    push {r0-r12, lr}
     mov r0, #1
     mcr p15, #0, r0, c14, c3, #1
     // SETTING FREQUENCY TIMER
@@ -130,5 +124,4 @@ _local_timer_init:
     // SETTING TVAL REGISTER (virtual)
     mrc p15, #0, r0, c14, c0, #0 //we obtain CNTFRQ
     mcr p15, #0, r0, c14, c3, #0 //1 irq per second
-    pop {r0-r12, lr}
     mov pc, lr
