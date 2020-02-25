@@ -52,9 +52,6 @@ _start:
     blo 1b
 
     cpsid i
-    /* INITIALIZE EXCEPTION VECTORS */
-
-    bl str_vector_table
     /* INITIALIZE THE MEMORY SYSTEM, INCLUDIN MMU */
     //We won't use the MMU, only dynamic memory
     //code here...
@@ -67,7 +64,10 @@ _start:
     //we change again to svc mode
     cps #0x13 
     mov sp, #0x8000 
+    /* INITIALIZE EXCEPTION VECTORS */
 
+    bl str_vector_table
+    
     /* INITIALIZE ANY CRITICAL I/O DEVICES */
     //Code here...
 
