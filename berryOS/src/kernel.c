@@ -17,14 +17,14 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
     pin_set_function(17, OUTPUT);
     
     /* UART */
-    uart_init();
-    uart_puts("Hello, World!\r\n\r\n");
+    //uart_init();
+    //uart_puts("Hello, World!\r\n\r\n");
 
     
     /* DYNAMIC MEMORY */
-    uart_puts(">> Dynamic memory: ");
+    //uart_puts(">> Dynamic memory: ");
     mem_init(((atag_t *)atags));
-    uart_puts(" [OK] \r\n");
+    //uart_puts(" [OK] \r\n");
     
     /* HDMI */
     gpu_init();

@@ -54,8 +54,8 @@ _start:
     cpsid i
     /* INITIALIZE EXCEPTION VECTORS */
 
-    ldr r3, =str_vector_table
-    blx r3
+    //ldr r3, =str_vector_table
+    bl str_vector_table
     /* INITIALIZE THE MEMORY SYSTEM, INCLUDIN MMU */
     //We won't use the MMU, only dynamic memory
     //code here...
