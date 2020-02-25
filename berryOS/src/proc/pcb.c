@@ -62,8 +62,14 @@ void schedule(void){
 
     //Switch the processes contexts
     switch_to_thread(old_thread, new_thread);
+    
     uart_puts(new_thread->proc_name);
-    uart_puts(" -->");
+    uart_puts(" le quita el procesador a ");
+    uart_puts(old_thread->proc_name);
+    uart_putc('\n');
+    
+    //uart_puts(new_thread->proc_name);
+    //uart_puts(" -->");
     ENABLE_INTERRUPTS();
 }
 
@@ -112,4 +118,7 @@ void create_kernel_thread(kthread_function_f thread_func, char * name, int name_
     // add the thread to the lists
     append_pcb_list(&all_proc_list, pcb);
     append_pcb_list(&run_queue, pcb);
+    uart_puts("\nCreado ");
+    uart_puts(pcb->proc_name);
+    uart_puts("\n\n");
 }
