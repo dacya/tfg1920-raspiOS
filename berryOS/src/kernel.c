@@ -22,7 +22,7 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
 
     /* INTERRUPTS */
     uart_puts(">> Local timer init: ");
-    local_timer_init();
+    //local_timer_init();
     uart_puts(" [OK] \r\n");
     
     uart_puts(">> Interrupts init: ");
@@ -34,14 +34,16 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
     uart_puts(" [OK] \r\n");
 
     /* DYNAMIC MEMORY */
-    //uart_puts(">> Dynamic memory: ");
+    uart_puts(">> Dynamic memory: ");
     mem_init(((atag_t *)atags));
-    //uart_puts(" [OK] \r\n");
+    uart_puts(" [OK] \r\n");
 
     
     
     /* HDMI */
+    uart_puts(">> GPU init: ");
     gpu_init();
+    uart_puts(" [OK] \r\n");
 
     pin_set_as_output(17);
 
