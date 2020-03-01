@@ -1,29 +1,51 @@
 #include <io/gpu.h>
 #include <io/uart.h>
+#include <utils/color.h>
+#include <ui/view.h>
+#include <io/gpio.h>
 
 void gpu_init(void) {
     // Aparantly, this sometimes does not work, so try in a loop
-    uart_hex_puts(fbinfo.buf);
     while(framebuffer_init() != 0);
 
     // clear screen
-    uart_hex_puts(fbinfo.buf);
-    for (uint32_t i = 0; i < fbinfo.width; i++) {
-        for (uint32_t j = 0; j < fbinfo.height; j++) {
-            write_pixel(i, j, &WHITE);
-        }
-    }
+    clear_screen();
+
     gpu_puts("\n");
     gpu_puts("\n");
     gpu_puts("\n");
     gpu_puts("\n");
     gpu_puts("                  GANAMOS AMIGOS");
+
+    VIEW v = new_view(640, 20, 0, 0);
+    v.bgColor = GREY;
+    draw(v);
+
+    VIEW v2 = new_view(40, 40, 100, 100);
+    v2.bgColor = RED;
+    draw(v2);
+
+    VIEW anim = new_view(40, 20, 0, 200);
+    for (int i = 0; i < 640; i++) {
+        anim.x = i;
+        draw(anim);
+    }
 }
 
-void write_pixel(uint32_t x, uint32_t y, pixel_t* pix) {
-    uint32_t* location = fbinfo.buf + y*fbinfo.pitch + x*BYTES_PER_PIXEL;
+void clear_screen() {
+    for (uint32_t i = 0; i < fbinfo.width; i++) {
+        for (uint32_t j = 0; j < fbinfo.height; j++) {
+            write_pixel(i, j, &BLACK);
+        }
+    }
+}
+
+void write_pixel(uint32_t x, uint32_t y, color_24* pix) {
     //uint8_t * location = fbinfo.buf + y*fbinfo.pitch + x*BYTES_PER_PIXEL;
-    memcpy(location, pix, BYTES_PER_PIXEL);
+    if (x < fbinfo.width && y < fbinfo.height) {
+        uint8_t* location = fbinfo.buf + y*fbinfo.pitch + x*BYTES_PER_PIXEL;
+        memcpy(location, pix, BYTES_PER_PIXEL);
+    }
 }
 
 void gpu_puts(char* string) {

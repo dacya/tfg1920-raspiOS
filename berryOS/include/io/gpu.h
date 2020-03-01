@@ -12,24 +12,16 @@
 #include <stdint.h>
 #include <utils/fonts/chars_pixel.h>
 #include <utils/stdlib.h>
+#include <utils/color.h>
+
 #define CHAR_WIDTH 8
 #define CHAR_HEIGHT 8
 
-/**
- * struct representing a pixel 
- */
-typedef struct pixel {
-    uint8_t red;
-    uint8_t green;
-    uint8_t blue;
-} pixel_t;
+void gpu_putc(char c);
 
-#define BLACK ((pixel_t){0x00, 0x00, 0x00})
-#define WHITE ((pixel_t){0xFF, 0xFF, 0xFF})
-#define RED ((pixel_t){0xFF, 0x00, 0x00})
-//const pixel_t RED = {0xFF, 0x00, 0x00};
-//const pixel_t GREEN = {0x00, 0xFF, 0x00};
-//const pixel_t BLUE = {0x00, 0x00, 0xFF};
+void gpu_puts(char* string);
+
+void clear_screen();
 
 /**
  * Initializes the gpu module by
@@ -48,7 +40,7 @@ void gpu_init(void);
  * @param y The y-axis value
  * @param pixel RGB color to set into the (x, y) pixel
  */
-void write_pixel(uint32_t x, uint32_t y, pixel_t * pixel);
+void write_pixel(uint32_t x, uint32_t y, color_24* pixel);
 
 /**
  * Draws a char in the screen where the current pointer is located.

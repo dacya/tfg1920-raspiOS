@@ -171,7 +171,7 @@ void kfree(void * ptr){
 
     seg = ptr - sizeof(heap_segment_t);
     seg->is_allocated = 0;
-    uart_puts("    Borrando\n");
+    //uart_puts("    Borrando\n");
     while(seg->prev != NULL && seg->prev->is_allocated == 0){
         seg->prev->segment_size += seg->segment_size;
         seg->prev->next = seg->next;

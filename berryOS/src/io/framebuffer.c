@@ -40,5 +40,5 @@ int framebuffer_init(void) {
     fbinfo.buf = tags[0].value_buffer.fb_allocate_res.fb_addr;
     fbinfo.buf_size = tags[0].value_buffer.fb_allocate_res.fb_size;
 
-    return 0;
+    return !fbinfo.buf;
 }
