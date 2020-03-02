@@ -42,12 +42,13 @@ void process_init(void){
 }
 
 void schedule(void){
-    DISABLE_INTERRUPTS();
-    process_control_block_t * new_thread, * old_thread;
+    //DISABLE_INTERRUPTS();
+    process_control_block_t* new_thread;
+    process_control_block_t* old_thread;
 
     //If run_queue is empty, the current process continue
     if(size_pcb_list(&run_queue) == 0){
-        ENABLE_INTERRUPTS();
+        //ENABLE_INTERRUPTS();
         return;
     }
     
@@ -60,21 +61,23 @@ void schedule(void){
 
     append_pcb_list(&run_queue, old_thread);
 
-    //Switch the processes contexts
-    switch_to_thread(old_thread, new_thread);
-    
-    uart_puts(new_thread->proc_name);
+    uart_puts(itoa(new_thread->pid));
     uart_puts(" le quita el procesador a ");
     uart_puts(old_thread->proc_name);
     uart_putc('\n');
+
+    //Switch the processes contexts
+    switch_to_thread(old_thread, new_thread);
+    
+    
     
     //uart_puts(new_thread->proc_name);
     //uart_puts(" -->");
-    ENABLE_INTERRUPTS();
+    //ENABLE_INTERRUPTS();
 }
 
 static void reap(void){
-    DISABLE_INTERRUPTS();
+    //DISABLE_INTERRUPTS();
     process_control_block_t * new_thread, * old_thread;
 
     // If nothing on the run queue, there is nothing to do now. just loop
@@ -95,8 +98,8 @@ static void reap(void){
 }
 
 void create_kernel_thread(kthread_function_f thread_func, char * name, int name_size){
-    process_control_block_t * pcb;
-    proc_saved_state_t * new_proc_state;
+    process_control_block_t* pcb;
+    proc_saved_state_t* new_proc_state;
 
     //Allocate and initialize the pcb block
     pcb = kmalloc(sizeof(process_control_block_t));
@@ -104,7 +107,7 @@ void create_kernel_thread(kthread_function_f thread_func, char * name, int name_
     pcb->pid = NEW_PID;
     memcpy(pcb->proc_name, name, MIN(name_size, 19));
     pcb->proc_name[MIN(name_size, 19) + 1] = '\0'; //changed last character
-
+        
     //Calculate the location of the stack pointer
     new_proc_state = pcb->stack_page + PAGE_SIZE - sizeof(proc_saved_state_t);
     pcb->saved_state = new_proc_state;
@@ -120,5 +123,9 @@ void create_kernel_thread(kthread_function_f thread_func, char * name, int name_
     append_pcb_list(&run_queue, pcb);
     uart_puts("\nCreado ");
     uart_puts(pcb->proc_name);
-    uart_puts("\n\n");
+    uart_puts(" con PID ");
+    uart_puts(itoa(pcb->pid));
+    uart_puts(", hay ");
+    uart_puts(itoa(run_queue.size));
+    uart_puts(" en la run_queue\n\n");
 }

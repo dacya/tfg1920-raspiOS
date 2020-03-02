@@ -19,12 +19,9 @@ void cuenta10(){
     uart_puts("FIN --> ");
 }
 
-void suma10(){
-    int i;
-    for(i = 0; i < 10; i++){
-        j++;
-    }
-    uart_puts("FIN --> proc1\n");
+void saluda(){
+    uart_puts("Hola, soy proc1\n");
+    schedule();
 }
 
 void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
@@ -36,13 +33,15 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
     uart_init();
     mem_init(((atag_t*)atags));
     uart_puts("\nMemoria inicializada\n");
-
-
-    create_kernel_thread(suma10, "proc1", 5);
+    process_init();
+    uart_puts("\nProcesos inicializados\n");
+    
+    create_kernel_thread(saluda, "a", 5);
     schedule();
-
-    uart_puts(itoa(j));
-    uart_putc('\n');
+    
+    //uart_puts("Valor de j --> ");
+    //uart_puts(itoa(j));
+    //uart_putc('\n');
     
     
     /*
@@ -62,7 +61,7 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
         schedule();
     }
     */
-    print_data();
+    //print_data();
     uart_puts("FIN --> main");
     
     while(1);
