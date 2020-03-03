@@ -11,16 +11,16 @@ int j = 0;
 void cuenta10(){
     int i;
     for(i = 0; i < 10; i++){
-
         uart_puts(itoa(i));
         uart_putc('\n');
         schedule();
     }
     uart_puts("FIN --> ");
+    while(1){schedule();}
 }
 
-void saluda(){
-    uart_puts("Hola, soy proc1\n");
+void suma10(){
+    j += 10;
     schedule();
 }
 
@@ -36,16 +36,18 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
     process_init();
     uart_puts("\nProcesos inicializados\n");
     
-    create_kernel_thread(saluda, "a", 5);
+    /*
+    create_kernel_thread(suma10, "proc1", 5);
+    //print_processes();
+
     schedule();
     
-    //uart_puts("Valor de j --> ");
-    //uart_puts(itoa(j));
-    //uart_putc('\n');
-    
-    
-    /*
-    
+
+    uart_puts("Valor de j --> ");
+    uart_puts(itoa(j));
+    uart_putc('\n');
+    */
+
     int i;
     for(i = 0; i < 10; i++){
         uart_puts("Main --> ");
@@ -54,16 +56,15 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
 
         if(i == 2)
             create_kernel_thread(cuenta10, "proc1", 5);
-        //if(i == 5)
-            //create_kernel_thread(cuenta10, "proc2", 5);
-        //if(i == 8)
-            //create_kernel_thread(cuenta10, "proc3", 5);
+        if(i == 5)
+            create_kernel_thread(cuenta10, "proc2", 5);
+        if(i == 8)
+            create_kernel_thread(cuenta10, "proc3", 5);
         schedule();
     }
-    */
     //print_data();
     uart_puts("FIN --> main");
     
-    while(1);
+    while(1){schedule();}
 }
 

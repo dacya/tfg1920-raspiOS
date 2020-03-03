@@ -29,11 +29,25 @@ struct nodeType * next##nodeType;   \
 struct nodeType * prev##nodeType;
 
 #define INITIALIZE_LIST(list)           \
-    list.head = list.tail = (void *)0;  \
+    list.head = (void *)0;  \
+    list.tail = list.head;  \
     list.size = 0;
 
 #define IMPLEMENT_LIST(nodeType)                                                    \
+                                                                                    \
+void firstIns_##nodeType##_list(nodeType##_list_t * list, struct nodeType * node){  \
+    list->head = node;                                                              \
+    list->tail = node;                                                              \
+    list->size = 1;                                                                 \
+    node->prev##nodeType = NULL;                                                    \
+    node->next##nodeType = NULL;                                                    \
+    return;                                                                         \
+}                                                                                   \
 void append_##nodeType##_list(nodeType##_list_t * list, struct nodeType * node) {   \
+    if(list->size == 0){                                                            \
+        firstIns_##nodeType##_list(list, node);                                     \
+        return;                                                                     \
+    }                                                                               \
     list->tail->next##nodeType = node;                                              \
     node->prev##nodeType = list->tail;                                              \
     list->tail = node;                                                              \
@@ -42,6 +56,10 @@ void append_##nodeType##_list(nodeType##_list_t * list, struct nodeType * node) 
 }                                                                                   \
                                                                                     \
 void push_##nodeType##_list(nodeType##_list_t * list, struct nodeType * node) {     \
+    if(list->size == 0){                                                            \
+        firstIns_##nodeType##_list(list, node);                                     \
+        return;                                                                     \
+    }                                                                               \
     node->next##nodeType = list->head;                                              \
     node->prev##nodeType = NULL;                                                    \
     list->head = node;                                                              \
@@ -53,7 +71,15 @@ struct nodeType * peek_##nodeType##_list(nodeType##_list_t * list) {            
 }                                                                                   \
                                                                                     \
 struct nodeType * pop_##nodeType##_list(nodeType##_list_t * list) {                 \
+    if(list->size == 0)                                                             \
+        return NULL;                                                                \
     struct nodeType * res = list->head;                                             \
+    if(list->size == 1){                                                            \
+        list->size = 0;                                                              \
+        list->head = NULL;                                                          \
+        list->tail = NULL;                                                          \
+        return res;                                                                 \
+    }                                                                               \
     list->head = list->head->next##nodeType;                                        \
     list->head->prev##nodeType = NULL;                                              \
     list->size -= 1;                                                                \

@@ -14,6 +14,7 @@ extern void switch_to_thread(process_control_block_t * old, process_control_bloc
 
 DEFINE_LIST(pcb);
 IMPLEMENT_LIST(pcb);
+
 process_control_block_t * current_process;
 
 pcb_list_t run_queue;
@@ -35,7 +36,15 @@ void process_init(void){
     //Add pcb to all process list and set it as the current process
     append_pcb_list(&all_proc_list, main_pcb);
     current_process = main_pcb;
-
+    
+    /*process_control_block_t* aux = pop_pcb_list(&all_proc_list);
+    
+    uart_puts("Probando no tan chorrada 1 --> ");
+    uart_puts(aux->proc_name);
+    uart_puts(" PID -->");
+    uart_puts(itoa(aux->pid));
+    */
+    
     //Start timer with 10 ms
 
     //timer_set(10000);
@@ -61,18 +70,23 @@ void schedule(void){
 
     append_pcb_list(&run_queue, old_thread);
 
-    uart_puts(itoa(new_thread->pid));
+    /*
+    uart_puts(new_thread->proc_name);
     uart_puts(" le quita el procesador a ");
     uart_puts(old_thread->proc_name);
     uart_putc('\n');
+    */
 
+    if(new_thread->pid != 1){
+        uart_puts(new_thread->proc_name);
+        uart_puts(" -->");
+    }  
+    
     //Switch the processes contexts
     switch_to_thread(old_thread, new_thread);
     
     
-    
-    //uart_puts(new_thread->proc_name);
-    //uart_puts(" -->");
+     
     //ENABLE_INTERRUPTS();
 }
 
@@ -121,11 +135,34 @@ void create_kernel_thread(kthread_function_f thread_func, char * name, int name_
     // add the thread to the lists
     append_pcb_list(&all_proc_list, pcb);
     append_pcb_list(&run_queue, pcb);
+    
+    /*
     uart_puts("\nCreado ");
     uart_puts(pcb->proc_name);
     uart_puts(" con PID ");
     uart_puts(itoa(pcb->pid));
     uart_puts(", hay ");
     uart_puts(itoa(run_queue.size));
-    uart_puts(" en la run_queue\n\n");
+    uart_puts(" procesos en la run_queue\n\n");
+    */
+}
+
+void print_processes(){
+    
+    process_control_block_t * aux = current_process;
+
+    uart_puts("Iniciamos print -> ");
+    uart_puts(itoa(aux));
+    uart_puts("\n");
+        
+    while(aux != NULL){
+        uart_puts("Proceso ");
+        uart_puts(aux->proc_name);
+        uart_puts(" con PID ");
+        uart_puts(itoa(aux->pid));
+        uart_puts("\n");
+        aux = aux->nextpcb;
+    }
+    uart_puts("Print end");
+
 }

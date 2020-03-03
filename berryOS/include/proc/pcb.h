@@ -67,4 +67,7 @@ void schedule(void);
  */
 void create_kernel_thread(kthread_function_f thread_func, char * name, int name_size);
 
+void print_processes();
+
+
 #endif
