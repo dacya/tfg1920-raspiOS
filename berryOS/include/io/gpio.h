@@ -12,7 +12,7 @@
 
 #include <stdint.h>
 #include <utils/mm.h>
-#include <peripherals/base.h>
+#include <io/base.h>
 
 /**
  * @dependency

@@ -12,7 +12,7 @@
 //TODO: try to read how to adapt it for local IRQ
 
 #include <stdint.h>
-#include <peripherals/base.h>
+#include <io/base.h>
 
 /**
  * Peripheral base memory address for controlling interrupts
@@ -204,5 +204,8 @@ __inline__ void DISABLE_INTERRUPTS(void) {
         __asm__ __volatile__("cpsid i");
     }
 }
+
+void local_timer_handler(void);
+void local_timer_clearer(void);
 
 #endif
