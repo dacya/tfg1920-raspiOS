@@ -1,4 +1,3 @@
-
 #include<proc/pcb.h>
 #include<mem/mem.h>
 #include<utils/stdlib.h>
@@ -106,6 +105,7 @@ static void reap(void){
     // should still be fine
     free_page(old_thread->stack_page);
     kfree(old_thread);
+    
 
     // Context Switch
     switch_to_thread(old_thread, new_thread);
@@ -152,7 +152,7 @@ void print_processes(){
     process_control_block_t * aux = current_process;
 
     uart_puts("Iniciamos print -> ");
-    uart_puts(itoa(aux));
+    uart_puts(itoa((int)aux));
     uart_puts("\n");
         
     while(aux != NULL){
