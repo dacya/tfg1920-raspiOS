@@ -3,6 +3,7 @@
 #include <utils/color.h>
 #include <ui/view.h>
 #include <io/gpio.h>
+#include <ui/view_group.h>
 
 void gpu_init(void) {
     // Aparantly, this sometimes does not work, so try in a loop
@@ -19,17 +20,18 @@ void gpu_init(void) {
 
     VIEW v = new_view(640, 20, 0, 0);
     v.bgColor = GREY;
-    draw(v);
+    draw(&v);
 
-    VIEW v2 = new_view(40, 40, 100, 100);
+    VIEW v2 = new_view(40, 40, 0, 0);
     v2.bgColor = RED;
-    draw(v2);
 
-    VIEW anim = new_view(40, 20, 0, 200);
-    for (int i = 0; i < 640; i++) {
-        anim.x = i;
-        draw(anim);
-    }
+    VIEW anim = new_view(40, 20, 80, 80);
+    anim.bgColor = RED;
+
+    VIEW_GROUP parent = new_view_group(200, 200, 200, 200);
+    addView(&parent, &v2);
+    addView(&parent, &anim);
+    drawGroup(&parent);
 }
 
 void clear_screen() {
