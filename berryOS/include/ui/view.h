@@ -13,7 +13,7 @@ typedef struct VIEW{
     DEFINE_LINK(VIEW);
 } VIEW;
 
-VIEW new_view(int width, int height, int x, int y);
+void new_view(VIEW* v, int width, int height, int x, int y);
 void draw(VIEW* v);
 
 #endif /* _VIEW_H */

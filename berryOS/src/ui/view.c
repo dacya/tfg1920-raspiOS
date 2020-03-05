@@ -3,15 +3,12 @@
 #include <utils/color.h>
 #include <io/uart.h>
 
-VIEW new_view(int width, int height, int x, int y) {
-    VIEW v;
-    v.width = width;
-    v.height = height;
-    v.x = x;
-    v.y = y;
-    v.bgColor = WHITE;
-
-    return v;
+void new_view(VIEW* v, int width, int height, int x, int y) {
+    v->width = width;
+    v->height = height;
+    v->x = x;
+    v->y = y;
+    v->bgColor = WHITE;
 }
 
 void draw(VIEW* v) {

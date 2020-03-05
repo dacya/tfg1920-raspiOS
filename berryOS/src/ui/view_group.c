@@ -1,25 +1,22 @@
 #include <ui/view_group.h>
 #include <ui/view.h>
 #include <utils/color.h>
-#include <utils/list.h>
 #include <io/gpu.h>
 #include <io/uart.h>
+#include <utils/stdlib.h>
 
 IMPLEMENT_LIST(VIEW);
 
-VIEW_GROUP new_view_group(int width, int height, int x, int y) {
-    VIEW_GROUP vg;
-    INITIALIZE_LIST2(vg.children, VIEW);
-    uart_hex_puts(vg.children.ghost.nextVIEW);
+void new_view_group(VIEW_GROUP* vg, int width, int height, int x, int y, void(*layout)(void*)) {
+    INITIALIZE_LIST2(vg->children, VIEW);
+    vg->layout = layout;
 
-    VIEW* v = &vg.view;
+    VIEW* v = &vg->view;
     v->width = width;
     v->height = height;
     v->x = x;
     v->y = y;
     v->bgColor = WHITE;
-
-    return vg;
 }
 
 void addView(VIEW_GROUP* vg, VIEW* view) {
@@ -31,16 +28,8 @@ void removeView(VIEW_GROUP* vg, VIEW* view) {
 }
 
 void drawRelative(VIEW_GROUP*vg, VIEW* v) {
-    int width = vg->view.width > v->width ? v->width : vg->view.width;
-    int height = vg->view.height > v->height ? v->height : vg->view.height;
-    uart_puts(itoa(width));
-    uart_puts(", h:");
-    uart_puts(itoa(height));
-    uart_puts(", x:");
-    uart_puts(itoa(vg->view.x + v->x));
-    uart_puts(", y:");
-    uart_puts(itoa(vg->view.y + v->y));
-    uart_puts("]\n");
+    int width = MIN(v->x + vg->view.x + v->width, vg->view.x + vg->view.width);
+    int height = MIN(v->y + vg->view.y + v->height, vg->view.y + vg->view.height);
     for (int i = vg->view.x + v->x; i < width; i++) {
         for (int j = vg->view.y + v->y; j < height; j++) {
             write_pixel(i, j, &v->bgColor);
@@ -50,12 +39,11 @@ void drawRelative(VIEW_GROUP*vg, VIEW* v) {
 }
 
 void drawGroup(VIEW_GROUP* vg) {
-    //draw(&vg->view);
+    draw(&vg->view);
     VIEW* node = head_VIEW_list(&vg->children);
-    uart_hex_puts(node);
-    while (node != vg->children.pghost) {
-        uart_puts("drawing child [w:");
+    vg->layout(vg);
+    while (node != &vg->children.ghost) {
         drawRelative(vg, node);
-        node = node->prevVIEW;
+        node = node->nextVIEW;
     }
 }
