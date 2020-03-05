@@ -3,6 +3,7 @@
 
 #include <interrupts.h>
 
+#define QUANTUM 10
 
 /**
  * We can select the counter to trigger interrupts.
@@ -16,14 +17,15 @@ typedef enum{
 
 /**
  * It initialize the local timer for core 0 to a specified value
- * 
+ * In order to make an appropiate use of this function you must to use calculate_time()
+ * function
  * @param local_timer A selection of the timer to use. It can be
  *  PHYSICAL_SYS, VIRTUAL_SYS
- * @param time an unsigned 32 bit value indicating the period of each interrupt
- * (1.000.000 is 1 second)
+ * @param time an unsigned 32 bit value indicating the period time in milisecons of each interrupt
  * @return it returns -1 on error and 0 if everything went well.
+ * @see calculate_time()
 */
-uint32_t local_timer_init(timer_selection_t local_timer_select, uint32_t time);
+uint32_t local_timer_init(timer_selection_t local_timer_select, unsigned int time);
 
 /**
  * Read the physical count. This values is updated by the system counter

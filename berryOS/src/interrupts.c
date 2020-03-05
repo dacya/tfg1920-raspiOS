@@ -5,6 +5,7 @@
 
 //from local timer
 extern timer_selection_t core_timer_selected;
+extern unsigned int current_time_value;
 
 static interrupt_registers_t* interrupt_regs;
 
@@ -107,11 +108,8 @@ void local_timer_handler(void) {
 
 
 void local_timer_clearer(void) {
-    uint64_t new_time;
-    //we obtain CNTPCT
-    new_time = read_CNTFRQ();
     //update the counter cval
-    write_CNTX_TVAL(core_timer_selected, new_time);
+    write_CNTX_TVAL(core_timer_selected, current_time_value);
 }
 
 //because we have a custom handler
@@ -121,7 +119,6 @@ void irq_c_handler(void) {
         handlers[ARM_TIMER]();
         //local_timer_handler();
     }
-    uart_puts("limpiesa\r\n");
     //local_timer_clearer();
     ENABLE_INTERRUPTS();
     //the cpu reaches this function with the IRQ exceptions disabled

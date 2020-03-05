@@ -1,5 +1,7 @@
 #include <local_timer.h>
 #include <io/uart.h>
+
+
 /**
  * THIS STEPS APPLIES IN A SYSTEM WHERE THERE IS NOT VIRTUALIZATION SUPPORT
  * 
@@ -10,25 +12,30 @@
  * 3. Routing the IRQ and enabling IRQ of the corresponding core
  * To adjust the timer value you have to read the CNTFRQ register
 */
-
+unsigned int current_time_value;
 timer_selection_t core_timer_selected;
 
-uint32_t local_timer_init(timer_selection_t local_timer, uint32_t time){
-    uint64_t insert_value;
+uint32_t local_timer_init(timer_selection_t local_timer, unsigned int time){
+    long long unsigned int insert_value;
     //ENABLING TIMER
     write_CNTX_CTL(local_timer, 1);
     core_timer_selected = local_timer;
+    uart_puts("After writing in ctl\r\n");
 
-    //reading CNTPCT
-    //insert_value = read_CNTPCT();
+    //reading CNTFRQ
     insert_value = read_CNTFRQ();
     uart_puts("After reading cntpct\r\n");
-    //updating CVAL
-    //insert_value += time;
-
-    //write_CNTX_CVAL(local_timer, insert_value);
+    
+    //updating TVAL
+    uart_puts("before: ");
+    uart_hex_puts(insert_value);
+    insert_value = (insert_value >> 10)*time;
+    uart_puts("\r\nafter: ");
+    uart_hex_puts(insert_value);
+    current_time_value = insert_value;
+    
     write_CNTX_TVAL(local_timer, insert_value);
-    uart_puts("After writing cval\r\n");
+    uart_puts("After writing tval\r\n");
 
     // ROUTING IRQ, we will assume just one core
     *(volatile uint32_t*)CORE0_L_TIMER_INT_CTL = 0x8;
