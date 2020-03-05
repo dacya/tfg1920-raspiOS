@@ -22,7 +22,7 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
 
     /* INTERRUPTS */
     uart_puts(">> Local timer init: ");
-    //local_timer_init();
+    local_timer_init(VIRTUAL_SYS, 0);
     uart_puts(" [OK] \r\n");
     
     uart_puts(">> Interrupts init: ");

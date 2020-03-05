@@ -99,29 +99,3 @@ halt:
 io_halt:
     wfi
     bx lr
-
-
-.globl _local_timer_init
-/**
-     * THIS STEPS APPLIES IN A SYSTEM WHERE THERE IS NOT VIRTUALIZATION SUPPORT
-     * 
-     * 1. Look into CNTKCTL register if you need
-     * 2. Look into CNTP_CTL or CNTH_CTL or CNTV_CTL to enable or disable
-     *    the corresponding timer (bit 0)
-     * 3. You have to set the compare value for the corresponding timer
-     *    CNTP_CVAL, CNTH_CVAL, CNTV_CVAL if needed
-     * 4. Putting the corresponding TVAL register to a right value
-     * 5. Routing the IRQ and enabling IRQ of the corresponding core
-    */
-_local_timer_init:
-    // ENABLING TIMER
-    //mrc p15, #0, r0, c14, c3, #1 //we obtain CNTV_CTL register value
-    //orr r1, r1, #1 //we enable virtual timer
-    mov r0, #1
-    mcr p15, #0, r0, c14, c3, #1
-    // SETTING FREQUENCY TIMER
-    //we don't need this right now
-    // SETTING TVAL REGISTER (virtual)
-    mrc p15, #0, r0, c14, c0, #0 //we obtain CNTFRQ
-    mcr p15, #0, r0, c14, c3, #0 //1 irq per second
-    mov pc, lr

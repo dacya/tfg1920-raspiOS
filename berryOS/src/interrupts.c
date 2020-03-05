@@ -1,6 +1,10 @@
 #include <interrupts.h>
 #include <stddef.h>
 #include <io/uart.h>
+#include <local_timer.h>
+
+//from local timer
+extern timer_selection_t core_timer_selected;
 
 static interrupt_registers_t* interrupt_regs;
 
@@ -103,8 +107,11 @@ void local_timer_handler(void) {
 
 
 void local_timer_clearer(void) {
-    asm volatile("mrc p15, #0, r0, c14, c0, #0");//we obtain CNTFRQ
-    asm volatile("mcr p15, #0, r0, c14, c3, #0");//1 irq per second
+    uint64_t new_time;
+    //we obtain CNTPCT
+    new_time = read_CNTFRQ();
+    //update the counter cval
+    write_CNTX_TVAL(core_timer_selected, new_time);
 }
 
 //because we have a custom handler
