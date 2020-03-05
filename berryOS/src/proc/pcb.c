@@ -36,14 +36,6 @@ void process_init(void){
     append_pcb_list(&all_proc_list, main_pcb);
     current_process = main_pcb;
     
-    /*process_control_block_t* aux = pop_pcb_list(&all_proc_list);
-    
-    uart_puts("Probando no tan chorrada 1 --> ");
-    uart_puts(aux->proc_name);
-    uart_puts(" PID -->");
-    uart_puts(itoa(aux->pid));
-    */
-    
     //Start timer with 10 ms
 
     //timer_set(10000);
@@ -68,13 +60,6 @@ void schedule(void){
     current_process = new_thread;
 
     append_pcb_list(&run_queue, old_thread);
-
-    /*
-    uart_puts(new_thread->proc_name);
-    uart_puts(" le quita el procesador a ");
-    uart_puts(old_thread->proc_name);
-    uart_putc('\n');
-    */
 
     if(new_thread->pid != 1){
         uart_puts(new_thread->proc_name);

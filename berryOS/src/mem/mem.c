@@ -171,20 +171,21 @@ void kfree(void * ptr){
 
     seg = ptr - sizeof(heap_segment_t);
     seg->is_allocated = 0;
-    print_data();
     uart_puts("    Borrando\n");
     while(seg->prev != NULL && seg->prev->is_allocated == 0){
         seg->prev->segment_size += seg->segment_size;
         seg->prev->next = seg->next;
-        seg->next->prev = seg->prev;
+        if(seg->next != NULL)
+            seg->next->prev = seg->prev;
         seg = seg->prev;
     }
     uart_puts("Hasta aquí, llego\n\n");
 
     while(seg->next != NULL && seg->next->is_allocated == 0){
-        seg->next->next->prev = seg;
+        if(seg->next->next != NULL)
+            seg->next->next->prev = seg;
         seg->segment_size += seg->next->segment_size;
-        seg->next = seg->next->next;    
+        seg->next = seg->next->next;   
     }        
 }
 
