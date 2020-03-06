@@ -81,4 +81,7 @@ void * kmalloc(uint32_t bytes);
  */ 
  
 void kfree(void *ptr);
+
+void print_data(void);
+
 #endif

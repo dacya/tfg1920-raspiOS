@@ -7,7 +7,6 @@
 #include <local_timer.h>
 #include <io/gpio.h>
 
-
 extern void io_halt();
 
 void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {   
@@ -36,16 +35,17 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
     /* DYNAMIC MEMORY */
     uart_puts(">> Dynamic memory: ");
     mem_init(((atag_t *)atags));
-    uart_puts(" [OK] \r\n");
-
-    
+    uart_puts(" [OK] \r\n");  
     
     /* HDMI */
     uart_puts(">> GPU init: ");
     gpu_init();
     uart_puts(" [OK] \r\n");
 
-    pin_set_as_output(17);
+    /* Processes */
+    uart_puts("\nMemoria inicializada\n");
+    process_init();
+    uart_puts("\nProcesos inicializados\n");
 
     while (1) {
         //io_halt();
