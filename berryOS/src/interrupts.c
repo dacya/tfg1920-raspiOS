@@ -1,6 +1,11 @@
 #include <interrupts.h>
 #include <stddef.h>
 #include <io/uart.h>
+#include <local_timer.h>
+
+//from local timer
+extern timer_selection_t core_timer_selected;
+extern unsigned int current_time_value;
 
 static interrupt_registers_t* interrupt_regs;
 
@@ -103,8 +108,8 @@ void local_timer_handler(void) {
 
 
 void local_timer_clearer(void) {
-    asm volatile("mrc p15, #0, r0, c14, c0, #0");//we obtain CNTFRQ
-    asm volatile("mcr p15, #0, r0, c14, c3, #0");//1 irq per second
+    //update the counter cval
+    write_CNTX_TVAL(core_timer_selected, current_time_value);
 }
 
 //because we have a custom handler
@@ -114,7 +119,6 @@ void irq_c_handler(void) {
         handlers[ARM_TIMER]();
         //local_timer_handler();
     }
-    uart_puts("limpiesa\r\n");
     //local_timer_clearer();
     ENABLE_INTERRUPTS();
     //the cpu reaches this function with the IRQ exceptions disabled
