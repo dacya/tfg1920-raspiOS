@@ -12,7 +12,14 @@ extern void io_halt();
 
 
 void saluda(){
-    uart_puts("Hola, soy el otro\n");
+    int i = 0;
+    while(1){
+        if(i == 1000000000){
+            uart_puts("Hola, soy el otro\n");
+            i = 0;
+        }
+       i++;
+    }
 }
 
 void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {   
@@ -55,12 +62,15 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
     
     create_kernel_thread(saluda, "Proc1", 5);
 
-    schedule();
+    print_processes();
 
-    uart_puts("FIN --> Main\n");
+    int i = 0;    
     while (1) {
-        //uart_puts("Soy el prinsipal\n");
-        //io_halt();
+        if(i == 1000000000){
+            uart_puts("Soy el prinsipal\n");
+            i = 0;
+        }
+       i++;    
     }
 }
 /*

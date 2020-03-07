@@ -2,7 +2,7 @@
 #include <stddef.h>
 #include <io/uart.h>
 #include <local_timer.h>
-
+#include <proc/pcb.h>
 //from local timer
 extern timer_selection_t core_timer_selected;
 extern unsigned int current_time_value;
@@ -98,12 +98,15 @@ void unregister_irq_isr(irq_number_t irq_num)
 void local_timer_handler(void) {
     uint32_t value2;
     uint32_t memory = *(volatile uint32_t*)CORE0_L_INT_SRC;
-    uart_puts("Receive a generic timer interrupt \r\n");
-    uart_puts("Value of core0 int source: ");
+    //uart_puts("Receive a generic timer interrupt \r\n");
+    //uart_puts("Value of core0 int source: ");
     asm volatile("ldr %0, [%1]" : "=r"(value2) : "r"(memory));
     value2 &= ~(0x8);
-    uart_hex_puts(value2);
-    uart_puts("\r\n");
+    //uart_hex_puts(value2);
+    //uart_puts("\r\n");
+    
+    uart_puts("Cambio!!!\n");
+    //schedule();
 }
 
 
