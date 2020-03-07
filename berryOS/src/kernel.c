@@ -6,8 +6,14 @@
 #include <io/gpu.h>
 #include <local_timer.h>
 #include <io/gpio.h>
+#include <proc/pcb.h>
 
 extern void io_halt();
+
+
+void saluda(){
+    uart_puts("Hola, soy el otro\n");
+}
 
 void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {   
     (void) r0;
@@ -43,11 +49,17 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
     uart_puts(" [OK] \r\n");
 
     /* Processes */
-    uart_puts("\nMemoria inicializada\n");
+    uart_puts(">> Processes init: ");
     process_init();
-    uart_puts("\nProcesos inicializados\n");
+    uart_puts(" [OK] \r\n");
+    
+    create_kernel_thread(saluda, "Proc1", 5);
 
+    schedule();
+
+    uart_puts("FIN --> Main\n");
     while (1) {
+        //uart_puts("Soy el prinsipal\n");
         //io_halt();
     }
 }

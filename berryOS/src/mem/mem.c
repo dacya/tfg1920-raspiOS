@@ -15,7 +15,6 @@
 extern uint8_t __end; 
 static uint32_t num_pages;
 
-DEFINE_LIST(page);
 IMPLEMENT_LIST(page);
 
 static page_t * all_pages_array;
@@ -47,7 +46,7 @@ void mem_init(atag_t * atags) {
     page_array_len = sizeof(page_t) * num_pages;
     all_pages_array = (page_t *)&__end;
     bzero2(all_pages_array, page_array_len);
-    INITIALIZE_LIST(free_pages);
+    INITIALIZE_LIST2(free_pages, page);
 
     // Iterate over all pages and mark them with the appropriate flags
     // Start with kernel pages
@@ -160,7 +159,7 @@ void * kmalloc(uint32_t bytes) {
     }
 
     best->is_allocated = 1;
-    return best + 1; //why + 1 instead of sizeof(heap_segment_t)?
+    return best + 1; 
 }
 
 void kfree(void * ptr) {
@@ -171,7 +170,6 @@ void kfree(void * ptr) {
 
     seg = ptr - sizeof(heap_segment_t);
     seg->is_allocated = 0;
-    uart_puts("    Borrando\n");
     while (seg->prev != NULL && seg->prev->is_allocated == 0){
         seg->prev->segment_size += seg->segment_size;
         seg->prev->next = seg->next;
@@ -179,8 +177,7 @@ void kfree(void * ptr) {
             seg->next->prev = seg->prev;
         seg = seg->prev;
     }
-    uart_puts("Hasta aquí, llego\n\n");
-
+    
     while (seg->next != NULL && seg->next->is_allocated == 0) {
         if (seg->next->next != NULL)
             seg->next->next->prev = seg;

@@ -43,6 +43,8 @@ typedef struct pcb {
     char proc_name[20];               // The process's name
 } process_control_block_t;
 
+DEFINE_LIST(pcb);
+DEFINE_HEADERS(pcb);
 
 /**
  * Initialize and allocate the pcb,

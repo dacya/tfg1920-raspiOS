@@ -8,7 +8,6 @@
 #include <io/uart.h>
 #include <io/gpio.h>
 #include <stddef.h>
-<<<<<<< HEAD
 
 void uart_init() {
     uint32_t selector;
@@ -26,26 +25,6 @@ void uart_init() {
     pin_set_function(12, ALT5);
     pin_set_function(15, ALT5);
 
-=======
-
-void uart_init()
-{
-    uint32_t selector;
-
-    *(UART0_CR) = 0; //we disable UART
-    /*
-    selector = *(GPFSEL1);  //we obtaine the GPFSEL1 register
-	selector &= ~(7<<12); // clean gpio14
-	selector |= (4<<12);  // set alt0 for gpio14
-	selector &= ~(7<<15); // clean gpio15
-	selector |= (4<<15);  // set alt0 for gpio15
-	
-	*(GPFSEL1) = selector;
-    */
-    pin_set_function(12, ALT5);
-    pin_set_function(15, ALT5);
-
->>>>>>> PROC
     /*
       this method of changing the pull-ups and timers is defined in page 101
       of documentation from BCM2837
@@ -122,12 +101,7 @@ unsigned char uart_getc() {
     return *(UART0_DR);
 }
 
-<<<<<<< HEAD
 void uart_puts(const char* str) {
-=======
-void uart_puts(const char* str)
-{
->>>>>>> PROC
     for (size_t i = 0; str[i] != '\0'; i++)
         uart_putc((unsigned char)str[i]);
 }
@@ -146,14 +120,8 @@ void convert_to_str(unsigned int value, char *buff, int size) {
     }
 }
 
-<<<<<<< HEAD
 void uart_hex_puts(uint32_t value) {
     char str_argument[9] = {'0','0','0','0','0','0','0','0', '\0'};
-=======
-void uart_hex_puts(uint32_t value)
-{
-    char str_argument[9] = {'0','0','0','0','0','0','0','0','\0'};
->>>>>>> PROC
     convert_to_str(value, str_argument, 8);
     uart_puts("0x");
     uart_puts(str_argument);

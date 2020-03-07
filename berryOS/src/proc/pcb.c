@@ -10,8 +10,8 @@ static uint32_t pids = 1;
 extern uint8_t __end;
 extern void switch_to_thread(process_control_block_t * old, process_control_block_t * new);
 
-DEFINE_LIST(pcb);
 IMPLEMENT_LIST(pcb);
+
 process_control_block_t * current_process;
 
 pcb_list_t run_queue;
@@ -19,8 +19,8 @@ pcb_list_t all_proc_list;
 
 void process_init(void){
     process_control_block_t * main_pcb;
-    INITIALIZE_LIST(run_queue);
-    INITIALIZE_LIST(all_proc_list);
+    INITIALIZE_LIST2(run_queue, pcb);
+    INITIALIZE_LIST2(all_proc_list, pcb);
 
     //Allocate and initialize the block 
     main_pcb = kmalloc(sizeof(process_control_block_t));
@@ -38,13 +38,13 @@ void process_init(void){
 }
 
 void schedule(void){
-    //DISABLE_INTERRUPTS();
+    DISABLE_INTERRUPTS();
     process_control_block_t* new_thread;
     process_control_block_t* old_thread;
 
     //If run_queue is empty, the current process continue
     if(size_pcb_list(&run_queue) == 0){
-        //ENABLE_INTERRUPTS();
+        ENABLE_INTERRUPTS();
         return;
     }
     
@@ -55,23 +55,18 @@ void schedule(void){
     old_thread = current_process;
     current_process = new_thread;
 
-    append_pcb_list(&run_queue, old_thread);
-
-    if(new_thread->pid != 1){
-        uart_puts(new_thread->proc_name);
-        uart_puts(" -->");
-    }  
+    append_pcb_list(&run_queue, old_thread); 
+    
+    uart_puts(new_thread->proc_name);
+    uart_puts(" --> ");
     
     //Switch the processes contexts
     switch_to_thread(old_thread, new_thread);
-    
-    
-     
-    //ENABLE_INTERRUPTS();
+    ENABLE_INTERRUPTS();
 }
 
 static void reap(void){
-    //DISABLE_INTERRUPTS();
+    DISABLE_INTERRUPTS();
     process_control_block_t * new_thread, * old_thread;
 
     // If nothing on the run queue, there is nothing to do now. just loop
