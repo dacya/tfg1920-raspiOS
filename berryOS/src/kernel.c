@@ -17,6 +17,7 @@ void saluda(){
         if(i == 1000000000){
             uart_puts("Hola, soy el otro\n");
             i = 0;
+            schedule();
         }
        i++;
     }
@@ -64,11 +65,14 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
 
     print_processes();
 
+    
+
     int i = 0;    
     while (1) {
         if(i == 1000000000){
             uart_puts("Soy el prinsipal\n");
             i = 0;
+            schedule();
         }
        i++;    
     }

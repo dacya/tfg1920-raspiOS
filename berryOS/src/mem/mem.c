@@ -46,7 +46,7 @@ void mem_init(atag_t * atags) {
     page_array_len = sizeof(page_t) * num_pages;
     all_pages_array = (page_t *)&__end;
     bzero2(all_pages_array, page_array_len);
-    INITIALIZE_LIST2(free_pages, page);
+    INITIALIZE_LIST(free_pages, page);
 
     // Iterate over all pages and mark them with the appropriate flags
     // Start with kernel pages

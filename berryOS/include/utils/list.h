@@ -25,10 +25,7 @@ typedef struct nodeType##list {     \
 struct nodeType * next##nodeType;   \
 struct nodeType * prev##nodeType;
 
-#define INITIALIZE_LIST(list)           \
-    list.size = 0;
-
-#define INITIALIZE_LIST2(list, nodeType)           \
+#define INITIALIZE_LIST(list, nodeType)           \
     list.size = 0;\
     list.ghost.next##nodeType = &list.ghost; \
     list.ghost.prev##nodeType = &list.ghost;

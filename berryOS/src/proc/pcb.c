@@ -15,12 +15,17 @@ IMPLEMENT_LIST(pcb);
 process_control_block_t * current_process;
 
 pcb_list_t run_queue;
-pcb_list_t all_proc_list;
+//pcb_list_t all_proc_list;
 
 void process_init(void){
     process_control_block_t * main_pcb;
-    INITIALIZE_LIST2(run_queue, pcb);
-    INITIALIZE_LIST2(all_proc_list, pcb);
+    INITIALIZE_LIST(run_queue, pcb);
+    //INITIALIZE_LIST(all_proc_list, pcb);
+
+    uart_puts("Run queue -->");
+    uart_puts(itoa((int)&run_queue));
+    uart_putc('\n');
+    
 
     //Allocate and initialize the block 
     main_pcb = kmalloc(sizeof(process_control_block_t));
@@ -29,7 +34,13 @@ void process_init(void){
     memcpy(main_pcb->proc_name, "Init", 5*sizeof(char));
 
     //Add pcb to all process list and set it as the current process
-    append_pcb_list(&all_proc_list, main_pcb);
+    
+   
+    //append_pcb_list(&all_proc_list, main_pcb);
+    
+    
+ 
+    
     current_process = main_pcb;
     
     //Start timer with 10 ms
@@ -112,13 +123,19 @@ void create_kernel_thread(kthread_function_f thread_func, char * name, int name_
     new_proc_state->cpsr = 0x13 | (8 << 1);         // Sets the thread up to run in supervisor mode with irqs only
     
     // add the thread to the lists
-    append_pcb_list(&all_proc_list, pcb);
-    append_pcb_list(&run_queue, pcb);
     
+    
+    //append_pcb_list(&all_proc_list, pcb);
+    append_pcb_list(&run_queue, pcb);
+
+       
+    
+
+    /*
     uart_puts("Create -->");
     uart_puts(itoa((int)pcb));
     uart_putc('\n');
-    
+    */ 
 
     /*
     uart_puts("\nCreado ");
@@ -133,54 +150,24 @@ void create_kernel_thread(kthread_function_f thread_func, char * name, int name_
 
 void print_processes(){
     
-    process_control_block_t* aux = peek_pcb_list(&all_proc_list);
-    
-    uart_puts("Prev ghost -->");
-    uart_puts(itoa((int)all_proc_list.ghost.prevpcb));
-    uart_putc('\n');
-    
-    uart_puts("Ghost -->");
-    uart_puts(itoa((int)&all_proc_list.ghost));
-    uart_putc('\n');
-
-    uart_puts("Next ghost -->");
-    uart_puts(itoa((int)all_proc_list.ghost.nextpcb));
-    uart_putc('\n');
-
-    uart_puts("1 -->");
-    uart_puts(itoa((int)aux));
-    uart_putc('\n');
-
-    uart_puts("Prev1 -->");
-    uart_puts(itoa((int)aux->prevpcb));
-    uart_putc('\n');
-
-    uart_puts("Next1 -->");
-    uart_puts(itoa((int)aux->nextpcb));
-    uart_putc('\n');
-
-    aux = next_pcb_list(aux);
-
-    uart_puts("2 -->");
-    uart_puts(itoa((int)aux));
-    uart_putc('\n');
-
-    uart_puts("Prev2 -->");
-    uart_puts(itoa((int)aux->prevpcb));
-    uart_putc('\n');
-
-    uart_puts("Next2 -->");
-    uart_puts(itoa((int)aux->nextpcb));
-    uart_putc('\n');
-
-    while(has_next_pcb_list(&all_proc_list, aux)){
+    if(run_queue.size == 0){
+        uart_puts("F\n");
+        return;
+    }
+    process_control_block_t* aux = &run_queue.ghost;
+    uart_puts("Size -->");
+    uart_puts(itoa(run_queue.size));
+    uart_puts("\n");
+        
+    while (has_next_pcb_list(&run_queue, aux)){
+        aux = next_pcb_list(aux);
         uart_puts("Proceso ");
         uart_puts(aux->proc_name);
         uart_puts(" con PID ");
         uart_puts(itoa(aux->pid));
         uart_puts("\n");
-        aux = next_pcb_list(aux);
+        
     }
-    uart_puts("Print end");
+    uart_puts("Print end\n");
 
 }
