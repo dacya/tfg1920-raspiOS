@@ -20,7 +20,7 @@ void gpu_init(void) {
     gpu_puts("                  GANAMOS AMIGOS");
 
     VIEW v;
-    new_view(&v, 640, 20, 0, 0);
+    new_view(&v, 640, 200, 0, 0);
     v.bgColor = GREY;
     draw(&v);
 
@@ -32,9 +32,10 @@ void gpu_init(void) {
 
     VIEW v3;
     v3.bgColor = YELLOW;
+    v3.textColor = BLACK;
 
     VIEW_GROUP parent;
-    new_view_group(&parent, 200, 200, 200, 200, three_columns_layout);
+    new_view_group(&parent, 200, 200, 200, 200, vertical_linear_layout);
     addView(&parent, &v3);
     addView(&parent, &anim);
     push_VIEW_list(&parent.children, &v2);

@@ -2,6 +2,46 @@
 #include <utils/stdlib.h>
 #include <io/uart.h>
 
+void horizontal_linear_layout(void* self) {
+    VIEW_GROUP* vg = (VIEW_GROUP*)self;
+    int ccount = vg->children.size;
+    if (ccount == 0) {
+        return;
+    }
+
+    int widthX = vg->view.width / ccount;
+    int x = 0;
+    VIEW* node = head_VIEW_list(&vg->children);
+    for (int i = 0; i < ccount; i++) {
+        node->x = x;
+        node->y = 0;
+        node->width = x + widthX;
+        node->height = vg->view.height;
+        node = next_VIEW_list(node);
+        x += widthX;
+    }
+}
+
+void vertical_linear_layout(void* self) {
+    VIEW_GROUP* vg = (VIEW_GROUP*)self;
+    int ccount = vg->children.size;
+    if (ccount == 0) {
+        return;
+    }
+
+    int heightX = vg->view.height / ccount;
+    int y = 0;
+    VIEW* node = head_VIEW_list(&vg->children);
+    for (int i = 0; i < ccount; i++) {
+        node->x = 0;
+        node->y = y;
+        node->width = vg->view.width;
+        node->height = y + heightX;
+        node = next_VIEW_list(node);
+        y += heightX;
+    }
+}
+
 void three_columns_layout(void* self) {
     VIEW_GROUP* vg = (VIEW_GROUP*)self;
     int ccount = vg->children.size;
@@ -31,7 +71,6 @@ void three_columns_layout(void* self) {
     if (extra == 1) {
         int x = 0;
         for (int i = 0; i < ccount % 3; i++) {
-            uart_puts("HERE2");
             node->x = x;
             node->y = heightX * its;
             node->width = width3;

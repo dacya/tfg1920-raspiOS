@@ -1,5 +1,9 @@
-#include <utils/fonts/chars_pixel.h>
 /* From https://github.com/dhepper/font8x8/blob/master/font8x8_block.h */
+
+#include <utils/fonts/chars_pixel.h>
+
+int CHAR_MIN_SIZE = 8;
+
 const uint8_t * font(int c) {
 	static const char f[128][8] = {
 		{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+0000 (nul)

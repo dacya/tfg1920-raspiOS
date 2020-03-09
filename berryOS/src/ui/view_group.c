@@ -28,14 +28,13 @@ void removeView(VIEW_GROUP* vg, VIEW* view) {
 }
 
 void drawRelative(VIEW_GROUP*vg, VIEW* v) {
-    int width = MIN(v->x + vg->view.x + v->width, vg->view.x + vg->view.width);
-    int height = MIN(v->y + vg->view.y + v->height, vg->view.y + vg->view.height);
-    for (int i = vg->view.x + v->x; i < width; i++) {
-        for (int j = vg->view.y + v->y; j < height; j++) {
-            write_pixel(i, j, &v->bgColor);
-        }
-    }
-    uart_puts("\n");
+    int width = MAX(0, vg->view.width - v->x);
+    int height = MAX(0, vg->view.height - v->y);
+    v->x = vg->view.x + v->x;
+    v->y = vg->view.y + v->y;
+    v->width = width;
+    v->height = height;
+    draw(v);
 }
 
 void drawGroup(VIEW_GROUP* vg) {

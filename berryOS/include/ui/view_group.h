@@ -13,7 +13,6 @@ typedef struct VIEW_GROUP {
     void (*layout)(void*);
 } VIEW_GROUP;
 
-
 void new_view_group(VIEW_GROUP* vg, int width, int height, int x, int y, void(*layout)(void*));
 void addView(VIEW_GROUP* vg, VIEW* view);
 void removeView(VIEW_GROUP* vg, VIEW* view);
