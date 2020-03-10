@@ -28,12 +28,8 @@ void removeView(VIEW_GROUP* vg, VIEW* view) {
 }
 
 void drawRelative(VIEW_GROUP*vg, VIEW* v) {
-    int width = MAX(0, vg->view.width - v->x);
-    int height = MAX(0, vg->view.height - v->y);
     v->x = vg->view.x + v->x;
     v->y = vg->view.y + v->y;
-    v->width = width;
-    v->height = height;
     draw(v);
 }
 

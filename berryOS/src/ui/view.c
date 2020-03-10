@@ -10,8 +10,11 @@ void new_view(VIEW* v, int width, int height, int x, int y) {
     v->y = y;
     v->bgColor = BLACK;
     v->textColor = WHITE;
-    v->fontSize = 2;
+    v->fontSize = 1;
+
     v->text = NULL;
+    v->textAlign = LEFT;
+    v->textLines = 1;
 }
 
 void write_pixel_inside(VIEW* v, int x, int y, color_24* color) {
@@ -19,21 +22,23 @@ void write_pixel_inside(VIEW* v, int x, int y, color_24* color) {
         write_pixel(x, y, color);
 }
 
-void putChar(VIEW* v, char c, int posX) {
+void putChar(VIEW* v, char c, int posX, int offsetx, int offsety) {
     uint8_t w,h;
     uint8_t mask;
     const uint8_t* bmp = font(c);
     int charSize = CHAR_MIN_SIZE * v->fontSize;
     int charsPerLine = v->width / charSize;
     int x = posX % charsPerLine;
-    int y = posX / charsPerLine;
+    int y = MIN(posX / charsPerLine, v->textLines);
+    offsetx = offsetx + v->x;
+    offsety = offsety + v->y;
     for(w = 0; w < CHAR_MIN_SIZE * v->fontSize; w++) {
         for(h = 0; h < CHAR_MIN_SIZE * v->fontSize; h++) {
             mask = 1 << (w / v->fontSize);
             if (bmp[h / v->fontSize] & mask)
-                write_pixel_inside(v, v->x + x * CHAR_MIN_SIZE * v->fontSize + w, v->y + y * CHAR_MIN_SIZE * v->fontSize + h, &v->textColor);
+                write_pixel_inside(v, offsetx + x * CHAR_MIN_SIZE * v->fontSize + w, offsety + y * CHAR_MIN_SIZE * v->fontSize + h, &v->textColor);
             else
-                write_pixel_inside(v, v->x + x * CHAR_MIN_SIZE * v->fontSize + w, v->y + y * CHAR_MIN_SIZE * v->fontSize + h, &v->bgColor);
+                write_pixel_inside(v, offsetx + x * CHAR_MIN_SIZE * v->fontSize + w, offsety + y * CHAR_MIN_SIZE * v->fontSize + h, &v->bgColor);
         }
     }
 }
@@ -47,20 +52,21 @@ void draw(VIEW* v) {
             write_pixel(i, j, &v->bgColor);
         }
     }
-    v->text = "HOLA";
     if (v->text != NULL) {
         int i = 0;
+        int ssize = 0;
         char c;
-        uart_puts("HAS TEXT\n");
+        while ((c = v->text[ssize++]) != '\0');
         while ((c = v->text[i]) != '\0') {
-            putChar(v, c, i);
+            int offset;
+            if (v->textAlign == LEFT)
+                offset = 10;
+            else if (v->textAlign == RIGHT)
+                offset = v->width - MIN((CHAR_MIN_SIZE * v->fontSize * ssize), v->width) - 10;
+            else
+                offset = (v->width - MIN((CHAR_MIN_SIZE * v->fontSize * ssize), v->width)) / 2;
+            putChar(v, c, i, offset, (v->height - CHAR_MIN_SIZE * v->textLines) / 2);
             i++;
-            uart_puts("1 CHAR\n");
         }
     }
-}
-
-void setText(VIEW* v, char* text) {
-    v->text = text;
-    draw(v);
 }

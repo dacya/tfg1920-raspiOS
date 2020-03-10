@@ -15,7 +15,7 @@ void horizontal_linear_layout(void* self) {
     for (int i = 0; i < ccount; i++) {
         node->x = x;
         node->y = 0;
-        node->width = x + widthX;
+        node->width = widthX;
         node->height = vg->view.height;
         node = next_VIEW_list(node);
         x += widthX;
@@ -36,7 +36,7 @@ void vertical_linear_layout(void* self) {
         node->x = 0;
         node->y = y;
         node->width = vg->view.width;
-        node->height = y + heightX;
+        node->height = heightX;
         node = next_VIEW_list(node);
         y += heightX;
     }

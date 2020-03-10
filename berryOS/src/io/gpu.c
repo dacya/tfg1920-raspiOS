@@ -5,6 +5,7 @@
 #include <io/gpio.h>
 #include <ui/view_group.h>
 #include <ui/layouts.h>
+#include <ui/views/status_bar.h>
 
 void gpu_init(void) {
     // Aparantly, this sometimes does not work, so try in a loop
@@ -19,23 +20,23 @@ void gpu_init(void) {
     gpu_puts("\n");
     gpu_puts("                  GANAMOS AMIGOS");
 
-    VIEW v;
-    new_view(&v, 640, 200, 0, 0);
-    v.bgColor = GREY;
-    draw(&v);
+    init_status_bar(640, 480);
 
     VIEW v2;
+    new_view(&v2, 640, 200, 0, 0);
     v2.bgColor = RED;
 
     VIEW anim;
+    new_view(&anim, 640, 200, 0, 0);
     anim.bgColor = RED;
 
     VIEW v3;
+    new_view(&v3, 640, 200, 0, 0);
     v3.bgColor = YELLOW;
     v3.textColor = BLACK;
 
     VIEW_GROUP parent;
-    new_view_group(&parent, 200, 200, 200, 200, vertical_linear_layout);
+    new_view_group(&parent, 225, 225, 225, 225, vertical_linear_layout);
     addView(&parent, &v3);
     addView(&parent, &anim);
     push_VIEW_list(&parent.children, &v2);
