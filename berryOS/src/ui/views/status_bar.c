@@ -7,7 +7,7 @@ VIEW time;
 VIEW version;
 
 void init_status_bar(int width, int height) {
-    new_view_group(&statusBarView, width, height*WIDTH_PERCENTAGE/100, 0, 0, horizontal_linear_layout);
+    new_view_group(&statusBarView, width, height, 0, 0, horizontal_fitted_linear_layout);
     statusBarView.view.bgColor = BG_COLOR;
 
     new_view(&brand, 0, 0, 0, 0);
@@ -26,6 +26,4 @@ void init_status_bar(int width, int height) {
     version.text = "1.0";
     version.textAlign = RIGHT;
     version.bgColor = BG_COLOR;
-
-    drawGroup(&statusBarView);
 }

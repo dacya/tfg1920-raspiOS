@@ -96,6 +96,10 @@ struct nodeType * tail_##nodeType##_list(nodeType##_list_t * list) {            
     return list->ghost.prev##nodeType;                                              \
 }                                                                                   \
                                                                                     \
+struct nodeType * start_iterate_##nodeType##_list(nodeType##_list_t * list) {       \
+    return &list->ghost;                                                            \
+}                                                                                   \
+                                                                                    \
 int has_next_##nodeType##_list(nodeType##_list_t * list, struct nodeType * node) {  \
     return node->next##nodeType != &list->ghost;                                    \
 }                                                                                   \

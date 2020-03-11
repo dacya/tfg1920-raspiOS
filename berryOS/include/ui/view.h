@@ -2,7 +2,6 @@
 #define _VIEW_H
 
 #include <utils/color.h>
-#include <utils/list.h>
 
 typedef enum TEXT_ALIGN {
     CENTER,
@@ -18,7 +17,6 @@ typedef struct VIEW {
     int fontSize;
     color_24 bgColor;
     color_24 textColor;
-    DEFINE_LINK(VIEW);
 
     char* text;
     TEXT_ALIGN textAlign;

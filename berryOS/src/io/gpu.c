@@ -6,41 +6,26 @@
 #include <ui/view_group.h>
 #include <ui/layouts.h>
 #include <ui/views/status_bar.h>
+#include <ui/views/console_view.h>
+#include <ui/views/views_configuration.h>
 
 void gpu_init(void) {
     // Aparantly, this sometimes does not work, so try in a loop
     while(framebuffer_init() != 0);
 
-    // clear screen
     clear_screen();
 
-    gpu_puts("\n");
-    gpu_puts("\n");
-    gpu_puts("\n");
-    gpu_puts("\n");
-    gpu_puts("                  GANAMOS AMIGOS");
+    int width = fbinfo.width;
+    int height = fbinfo.height;
 
-    init_status_bar(640, 480);
-
-    VIEW v2;
-    new_view(&v2, 640, 200, 0, 0);
-    v2.bgColor = RED;
-
-    VIEW anim;
-    new_view(&anim, 640, 200, 0, 0);
-    anim.bgColor = RED;
-
-    VIEW v3;
-    new_view(&v3, 640, 200, 0, 0);
-    v3.bgColor = YELLOW;
-    v3.textColor = BLACK;
-
-    VIEW_GROUP parent;
-    new_view_group(&parent, 225, 225, 225, 225, vertical_linear_layout);
-    addView(&parent, &v3);
-    addView(&parent, &anim);
-    push_VIEW_list(&parent.children, &v2);
-    drawGroup(&parent);
+    int sb_height = height*WIDTH_PERCENTAGE/100;
+    init_status_bar(width, sb_height);
+    init_console(width, height - sb_height);
+    VIEW_GROUP main_ui;
+    new_view_group(&main_ui, width, height, 0, 0, vertical_linear_layout);
+    addViewGroup(&main_ui, &statusBarView);
+    addViewGroup(&main_ui, &consoleView);
+    drawGroup(&main_ui);
 }
 
 void clear_screen() {
