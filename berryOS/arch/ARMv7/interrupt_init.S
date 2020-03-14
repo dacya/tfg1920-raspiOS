@@ -99,7 +99,6 @@ irq_s_handler:
     //rfeia sp! //we do the inverse operation of srsdb
     subs pc, lr, #4
 
-
 fast_irq_s_handler:
     sub lr, lr, #4 //we adjust the appropiate value considered by Cortex-A PG
     srsdb sp!, #0x11 //fiq mode

@@ -94,38 +94,15 @@ void unregister_irq_isr(irq_number_t irq_num)
     }
 }
 
-//register like arm timer interrupt
-void local_timer_handler(void) {
-    uint32_t value2;
-    uint32_t memory = *(volatile uint32_t*)CORE0_L_INT_SRC;
-    //uart_puts("Receive a generic timer interrupt \r\n");
-    //uart_puts("Value of core0 int source: ");
-    asm volatile("ldr %0, [%1]" : "=r"(value2) : "r"(memory));
-    value2 &= ~(0x8);
-    //uart_hex_puts(value2);
-    //uart_puts("\r\n");
-    
-    uart_puts("Cambio!!!\n");
-    //schedule();
-}
-
-
-void local_timer_clearer(void) {
-    //update the counter cval
-    write_CNTX_TVAL(core_timer_selected, current_time_value);
-}
-
-//because we have a custom handler
+//TODO: FIX THE SECOND LOOP LOGIC
 void irq_c_handler(void) {
     if((*(volatile uint32_t*)CORE0_L_INT_SRC) & 0x8) {
         clearers[ARM_TIMER]();
         handlers[ARM_TIMER]();
-        //local_timer_handler();
     }
-    //local_timer_clearer();
     ENABLE_INTERRUPTS();
     //the cpu reaches this function with the IRQ exceptions disabled
-    /*
+    /* 
     for(int i = 0; i < NUM_P_IRQS; i++){
         if(IRQ_P_IS_PENDING(interrupt_regs, i) && handlers[i] != 0){
             clearers[i]();
@@ -133,7 +110,7 @@ void irq_c_handler(void) {
             ENABLE_INTERRUPTS();
             return;
         }
-    }*/
+    } */
 }
 
 

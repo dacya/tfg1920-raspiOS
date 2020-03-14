@@ -106,6 +106,13 @@ void uart_puts(const char* str) {
         uart_putc((unsigned char)str[i]);
 }
 
+void uart_putln(const char* str){
+    for (size_t i = 0; str[i] != '\0'; i++)
+        uart_putc((unsigned char)str[i]);
+    uart_putc('\r');
+    uart_putc('\n');
+}
+
 void convert_to_str(unsigned int value, char *buff, int size) {
     char reminder;
     while(value != 0 && size > 0){

@@ -53,24 +53,31 @@ void schedule(void){
     process_control_block_t* new_thread;
     process_control_block_t* old_thread;
 
+    uart_putln("size_pcb comparison");
     //If run_queue is empty, the current process continue
     if(size_pcb_list(&run_queue) == 0){
         ENABLE_INTERRUPTS();
+        uart_putln("inside the if size_pcb comparison");
         return;
     }
     
     //If is not empty, save the current process and pop the first process in the run_queue.
     //This replacement method works for RR and FIFO.
-    
+    uart_putln("new_thread pop");
     new_thread = pop_pcb_list(&run_queue);
+    uart_putln("old_thread assign");
     old_thread = current_process;
+    uart_putln("current process");
     current_process = new_thread;
 
+    uart_putln("append");
     append_pcb_list(&run_queue, old_thread); 
     
     //uart_puts(new_thread->proc_name);
     //uart_puts(" --> ");
-    
+    uart_putln("switch_to_thread");
+    uart_hex_puts((uint32_t)old_thread);
+    uart_hex_puts((uint32_t)new_thread);
     //Switch the processes contexts
     switch_to_thread(old_thread, new_thread);
     ENABLE_INTERRUPTS();
@@ -151,11 +158,11 @@ void create_kernel_thread(kthread_function_f thread_func, char * name, int name_
 void print_processes(){
     
     if(run_queue.size == 0){
-        uart_puts("F\n");
+        uart_putln("F");
         return;
     }
     process_control_block_t* aux = &run_queue.ghost;
-    uart_puts("Size -->");
+    uart_puts("\r\nSize -->");
     uart_puts(itoa(run_queue.size));
     uart_puts("\n");
         
@@ -168,6 +175,7 @@ void print_processes(){
         uart_puts("\n");
         
     }
-    uart_puts("Print end\n");
+    uart_putln("Print end");
+    uart_putln("");
 
 }

@@ -23,3 +23,21 @@ switch_to_thread:
     pop {r0-r12}
     msr cpsr_c, r12
     pop {lr, pc}
+
+    /*
+    
+switch_to_thread:
+    push {r12, sp, lr}
+    mrs r12, cpsr
+    push {r0-r12}
+    str sp, [r0]
+    ldr sp, [r1]
+    pop {r0-r12}
+    msr cpsr_c, r12
+    pop {lr, pc}
+
+/*
+    STEPS TO FOLLOW
+    
+    1. Store all register of the old process including
+ */
