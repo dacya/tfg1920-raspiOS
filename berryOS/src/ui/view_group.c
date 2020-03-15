@@ -90,7 +90,6 @@ void drawGroup(VIEW_GROUP* vg) {
 void* removeViewByIndex(VIEW_GROUP* vg, int index) {
     if (index < vg->children.size) {
         VIEW_OR_GROUP* node = start_iterate_VIEW_OR_GROUP_list(&vg->children);
-        vg->layout(vg);
         int i = 0;
         while (i < vg->children.size) {
             node = next_VIEW_OR_GROUP_list(node);
@@ -100,6 +99,20 @@ void* removeViewByIndex(VIEW_GROUP* vg, int index) {
         void* child = node->child;
         kfree(node);
         return child;
+    }
+
+    return NULL;
+}
+
+VIEW_OR_GROUP* getViewByIndex(VIEW_GROUP* vg, int index) {
+    if (index < vg->children.size) {
+        VIEW_OR_GROUP* node = start_iterate_VIEW_OR_GROUP_list(&vg->children);
+        int i = 0;
+        while (i < vg->children.size) {
+            node = next_VIEW_OR_GROUP_list(node);
+            i++;
+        }
+        return node;
     }
 
     return NULL;

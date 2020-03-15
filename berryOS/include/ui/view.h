@@ -21,10 +21,13 @@ typedef struct VIEW {
     char* text;
     TEXT_ALIGN textAlign;
     int textLines;
+    int padding;
 } VIEW;
 
 void new_view(VIEW* v, int width, int height, int x, int y);
 void draw(VIEW* v);
 void printView(VIEW *v);
+void setText(VIEW* v, char* str);
+void destroyView(VIEW* v);
 
 #endif /* _VIEW_H */

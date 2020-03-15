@@ -11,6 +11,7 @@ void new_view(VIEW* v, int width, int height, int x, int y) {
     v->bgColor = BLACK;
     v->textColor = WHITE;
     v->fontSize = 1;
+    v->padding = 1;
 
     v->text = NULL;
     v->textAlign = LEFT;
@@ -32,6 +33,7 @@ void putChar(VIEW* v, char c, int posX, int offsetx, int offsety) {
     int y = MIN(posX / charsPerLine, v->textLines);
     offsetx = offsetx + v->x;
     offsety = offsety + v->y;
+
     for(w = 0; w < CHAR_MIN_SIZE * v->fontSize; w++) {
         for(h = 0; h < CHAR_MIN_SIZE * v->fontSize; h++) {
             mask = 1 << (w / v->fontSize);
@@ -57,21 +59,31 @@ void draw(VIEW* v) {
         int ssize = 0;
         char c;
         while ((c = v->text[ssize++]) != '\0');
+        ssize--;
         while ((c = v->text[i]) != '\0') {
             int offset;
             if (v->textAlign == LEFT)
-                offset = 10;
+                offset = v->padding;
             else if (v->textAlign == RIGHT)
-                offset = v->width - MIN((CHAR_MIN_SIZE * v->fontSize * ssize), v->width) - 10;
+                offset = v->width - MIN(CHAR_MIN_SIZE * v->fontSize * ssize, v->width) - v->padding;
             else
-                offset = (v->width - MIN((CHAR_MIN_SIZE * v->fontSize * ssize), v->width)) / 2;
+                offset = (v->width - MIN(CHAR_MIN_SIZE * v->fontSize * ssize, v->width)) / 2;
             putChar(v, c, i, offset, (v->height - CHAR_MIN_SIZE * v->textLines) / 2);
             i++;
         }
     }
 }
 
-void printView(VIEW *v) {
+void setText(VIEW* v, char* str) {
+    if (v->text != NULL) {
+        kfree(v->text);
+    }
+    int ssize = strlen(str);
+    v->text = kmalloc(sizeof(str) * ssize);
+    memcpy(v->text, str, ssize);
+}
+
+void printView(VIEW* v) {
     uart_puts("X: ");
     uart_puts(itoa(v->x));
     uart_puts("y: ");
@@ -81,4 +93,10 @@ void printView(VIEW *v) {
     uart_puts("H: ");
     uart_puts(itoa(v->height));
     uart_puts("\n");
+}
+
+void destroyView(VIEW* v) {
+    if (v->text != NULL) {
+        kfree(v->text);
+    }
 }

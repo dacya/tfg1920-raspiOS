@@ -26,10 +26,11 @@ void gpu_init(void) {
     addViewGroup(&main_ui, &statusBarView);
     addViewGroup(&main_ui, &consoleView);
     drawGroup(&main_ui);
-    printView(&main_ui.view);
-    printView(&statusBarView.view);
-    printView(&consoleView.view);
-    printView(&display.view);
+    console_putLn("Hola", &GREEN, &WHITE);
+    console_putStr(" AMIGOS", &RED, NULL);
+    console_putLn("YA", &GREEN, &WHITE);
+    console_putStr(" TenemOs", &RED, NULL);
+    console_putStr(" CONSOLA", &YELLOW, NULL);
 }
 
 void clear_screen() {

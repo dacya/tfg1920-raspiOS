@@ -30,6 +30,7 @@ void addViewGroup(VIEW_GROUP* vg, VIEW_GROUP* view);
 void removeView(VIEW_GROUP* vg, VIEW* view);
 void removeViewGroup(VIEW_GROUP* vg, VIEW_GROUP* view);
 void* removeViewByIndex(VIEW_GROUP* vg, int index);
+VIEW_OR_GROUP* getViewByIndex(VIEW_GROUP* vg, int index);
 void drawGroup(VIEW_GROUP* v);
 //void drawRelative(VIEW_GROUP*vg, VIEW* v);
 
