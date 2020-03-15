@@ -70,3 +70,15 @@ void draw(VIEW* v) {
         }
     }
 }
+
+void printView(VIEW *v) {
+    uart_puts("X: ");
+    uart_puts(itoa(v->x));
+    uart_puts("y: ");
+    uart_puts(itoa(v->y));
+    uart_puts("W: ");
+    uart_puts(itoa(v->width));
+    uart_puts("H: ");
+    uart_puts(itoa(v->height));
+    uart_puts("\n");
+}

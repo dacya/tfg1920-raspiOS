@@ -14,11 +14,12 @@
 #define LIST_H
 
 #include <stddef.h>
+#include <utils/stdlib.h>
 
 #define DEFINE_LIST(nodeType)       \
 typedef struct nodeType##list {     \
     struct nodeType ghost;          \
-    uint32_t size;                  \
+    int size;                  \
 } nodeType##_list_t;
 
 #define DEFINE_LINK(nodeType)       \
@@ -35,12 +36,13 @@ void append_##nodeType##_list(nodeType##_list_t * list, struct nodeType * node);
 void push_##nodeType##_list(nodeType##_list_t * list, struct nodeType * node);      \
 struct nodeType * peek_##nodeType##_list(nodeType##_list_t * list);                 \
 struct nodeType * pop_##nodeType##_list(nodeType##_list_t * list);                  \
-uint32_t size_##nodeType##_list(nodeType##_list_t * list);                          \
+int size_##nodeType##_list(nodeType##_list_t * list);                          \
 struct nodeType * next_##nodeType##_list(struct nodeType * node);                   \
 struct nodeType * prev_##nodeType##_list(struct nodeType * node);                   \
 struct nodeType * head_##nodeType##_list(nodeType##_list_t * list);                 \
 struct nodeType * tail_##nodeType##_list(nodeType##_list_t * list);                 \
-void remove_##nodeType##_list(nodeType##_list_t * list, struct nodeType * node);
+void remove_##nodeType##_list(nodeType##_list_t * list, struct nodeType * node);    \
+void remove_##nodeType##_immediate(nodeType##_list_t * list, struct nodeType * node);
 
 #define IMPLEMENT_LIST(nodeType)                                                    \
 void append_##nodeType##_list(nodeType##_list_t * list, struct nodeType * node) {   \
@@ -76,7 +78,7 @@ struct nodeType * pop_##nodeType##_list(nodeType##_list_t * list) {             
     return res;                                                                     \
 }                                                                                   \
                                                                                     \
-uint32_t size_##nodeType##_list(nodeType##_list_t * list) {                         \
+int size_##nodeType##_list(nodeType##_list_t * list) {                         \
     return list->size;                                                              \
 }                                                                                   \
                                                                                     \
@@ -108,6 +110,12 @@ int has_prev_##nodeType##_list(nodeType##_list_t * list, struct nodeType * node)
     return node->prev##nodeType != &list->ghost;                                    \
 }                                                                                   \
                                                                                     \
+void remove_##nodeType##_immediate(nodeType##_list_t * list, struct nodeType * node){\
+    node->prev##nodeType->next##nodeType = node->next##nodeType;                    \
+    node->next##nodeType->prev##nodeType = node->prev##nodeType;                    \
+    list->size = MAX(list->size - 1, 0);                                            \
+}                                                                                   \
+                                                                                    \
 void remove_##nodeType##_list(nodeType##_list_t * list, struct nodeType * node) {   \
     struct nodeType* init = list->ghost.next##nodeType;                             \
     if (list->size == 1) {                                                          \
@@ -118,7 +126,7 @@ void remove_##nodeType##_list(nodeType##_list_t * list, struct nodeType * node) 
         if (init == node) {                                                         \
             init->prev##nodeType->next##nodeType = init->next##nodeType;            \
             init->next##nodeType->prev##nodeType = init->prev##nodeType;            \
-            list->size -= 1;                                                        \
+            list->size = MAX(list->size - 1, 0);                                    \
             return;                                                                 \
         }                                                                           \
         init = init->next##nodeType;                                                \

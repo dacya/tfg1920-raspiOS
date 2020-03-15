@@ -7,6 +7,7 @@
 #define BG_COLOR GREY
 
 extern VIEW_GROUP consoleView;
+extern VIEW_GROUP display;
 
 void init_console(int width, int height);
 

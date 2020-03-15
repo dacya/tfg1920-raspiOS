@@ -26,6 +26,10 @@ void gpu_init(void) {
     addViewGroup(&main_ui, &statusBarView);
     addViewGroup(&main_ui, &consoleView);
     drawGroup(&main_ui);
+    printView(&main_ui.view);
+    printView(&statusBarView.view);
+    printView(&consoleView.view);
+    printView(&display.view);
 }
 
 void clear_screen() {

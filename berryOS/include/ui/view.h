@@ -25,5 +25,6 @@ typedef struct VIEW {
 
 void new_view(VIEW* v, int width, int height, int x, int y);
 void draw(VIEW* v);
+void printView(VIEW *v);
 
 #endif /* _VIEW_H */

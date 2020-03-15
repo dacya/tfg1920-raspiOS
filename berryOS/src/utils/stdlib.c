@@ -6,6 +6,12 @@
  */
 #include <utils/stdlib.h>
 
+int strlen(char* string) {
+	int i = 0;
+	while (string[i++] != '\0');
+	return i - 1;
+}
+
 void memcpy(void * dest, void * src, int size){
 	char * d  = dest;
 	char * s = src;

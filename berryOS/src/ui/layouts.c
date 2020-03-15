@@ -15,8 +15,8 @@ void horizontal_linear_layout(void* self) {
         if (node->type == TYPE_VIEW) {
             ((VIEW*)node->child)->x = x;
             ((VIEW*)node->child)->y = 0;
-            x +=((VIEW*)node->child)->width;
-        } else if (node->type == TYPE_VIEW) {
+            x += ((VIEW*)node->child)->width;
+        } else if (node->type == TYPE_VIEW_GROUP) {
             ((VIEW_GROUP*)node->child)->view.x = x;
             ((VIEW_GROUP*)node->child)->view.y = 0;
             x += ((VIEW_GROUP*)node->child)->view.width;
@@ -43,7 +43,6 @@ void vertical_linear_layout(void* self) {
             ((VIEW_GROUP*)node->child)->view.x = 0;
             ((VIEW_GROUP*)node->child)->view.y = y;
             y += ((VIEW_GROUP*)node->child)->view.height;
-
         }
         node = next_VIEW_OR_GROUP_list(node);
     }

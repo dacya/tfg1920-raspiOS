@@ -72,7 +72,7 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
     uart_puts(" [OK] \r\n");
 
     /* Processes */
-    uart_puts(">> Processes init: ");
+    /*uart_puts(">> Processes init: ");
     process_init();
     uart_puts(" [OK] \r\n");
 
@@ -83,4 +83,5 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
     // TEST PROCESS SECTION
     main_function_process_test();
     //while (1){}
+    */
 }
