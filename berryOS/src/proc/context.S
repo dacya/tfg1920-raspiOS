@@ -36,7 +36,7 @@ switch_to_thread:
     msr cpsr_c, r12
     pop {lr, pc}
 
-/*
+
     STEPS TO FOLLOW
     
     1. Store all register of the old process including
