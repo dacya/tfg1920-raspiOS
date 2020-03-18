@@ -89,7 +89,7 @@ void * alloc_page(void) {
     void * page_mem;
 
     if(size_page_list(&free_pages) == 0)
-        return 0;
+        return NULL;
     
     // Get a free page
     page = pop_page_list(&free_pages);

@@ -30,10 +30,26 @@ typedef struct {
     uint32_t r9;
     uint32_t r10;
     uint32_t r11;
+    
+    //Jsandler  NO FUNCIONA
+    /* uint32_t cpsr; 
+    uint32_t sp;
+    uint32_t lr; */
+
+    //Jsandler modificado NO FUNCIONA
+    /* uint32_t cpsr;
+    uint32_t sp; 
+    uint32_t lr;
+    uint32_t limit;  */
+   
+    
+    //nozotroz FUNCIONA, PERO CREEMOS QUE NO BIEN DEL TODO
+    
     uint32_t r12;
     uint32_t sp;
     uint32_t lr;
     uint32_t cpsr;
+    
 } proc_saved_state_t;
 
 typedef struct pcb {
