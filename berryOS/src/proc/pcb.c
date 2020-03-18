@@ -127,8 +127,13 @@ void create_kernel_thread(kthread_function_f thread_func, char * name, int name_
     bzero2(new_proc_state, sizeof(proc_saved_state_t));
     new_proc_state->lr = (uint32_t)thread_func;     // lr is used as return address in switch_to_thread
     new_proc_state->sp = (uint32_t)reap;            // When the thread function returns, this reaper routine will clean it up
-    new_proc_state->cpsr = 0x13 | (8 << 1);         // Sets the thread up to run in supervisor mode with irqs only
+    new_proc_state->cpsr = 0x12 | (3 << 5);         // Sets the thread up to run in supervisor mode with irqs only
     
+    //0x12 | (3 << 5)--> IRQ mode, all disabled except IRQ, it works
+    //0x12 | (7 << 5)--> IRQ mode, all disabled, it doesn't work
+    //0x12 --> IRQ mode, all enabled, it works
+    //0x13 --> supervisor mode, it doesn't work
+
     // add the thread to the lists
     
     
