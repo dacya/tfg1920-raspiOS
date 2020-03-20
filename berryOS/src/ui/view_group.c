@@ -22,6 +22,7 @@ void addView(VIEW_GROUP* vg, VIEW* view) {
     vog->child = view;
     vog->type = TYPE_VIEW;
     append_VIEW_OR_GROUP_list(&vg->children, vog);
+    vg->dirty = 1;
 }
 
 void addViewGroup(VIEW_GROUP* vg, VIEW_GROUP* view) {
@@ -29,6 +30,7 @@ void addViewGroup(VIEW_GROUP* vg, VIEW_GROUP* view) {
     vog->child = view;
     vog->type = TYPE_VIEW_GROUP;
     append_VIEW_OR_GROUP_list(&vg->children, vog);
+    vg->dirty = 1;
 }
 
 void removeView(VIEW_GROUP* vg, VIEW* view) {
@@ -43,6 +45,7 @@ void removeView(VIEW_GROUP* vg, VIEW* view) {
         }
         i++;
     }
+    vg->dirty = 1;
 }
 
 void removeViewGroup(VIEW_GROUP* vg, VIEW_GROUP* view) {
@@ -57,14 +60,15 @@ void removeViewGroup(VIEW_GROUP* vg, VIEW_GROUP* view) {
         }
         i++;
     }
+    vg->dirty = 1;
 }
 
-void drawRelative(VIEW_GROUP*vg, VIEW* v) {
+void adjustRelative(VIEW_GROUP*vg, VIEW* v) {
     v->x = vg->view.x + v->x;
     //v->width = MIN(vg->view.width - v->x, v->width);
     v->y = vg->view.y + v->y;
     //v->height = MIN(vg->view.height - v->y, v->height);
-    draw(v);
+    //draw(v);
 }
 
 void adjustGroupRelative(VIEW_GROUP* parent, VIEW_GROUP* child) {
@@ -74,30 +78,53 @@ void adjustGroupRelative(VIEW_GROUP* parent, VIEW_GROUP* child) {
 
 void drawGroup(VIEW_GROUP* vg) {
     draw(&vg->view);
+    if (vg->dirty)
+        vg->layout(vg);
+    VIEW_OR_GROUP* node = start_iterate_VIEW_OR_GROUP_list(&vg->children);
+    while (has_next_VIEW_OR_GROUP_list(&vg->children, node)) {
+        node = next_VIEW_OR_GROUP_list(node);
+        if (node->type == TYPE_VIEW_GROUP) {
+            if (vg->dirty) {
+                adjustGroupRelative(vg, node->child);
+                ((VIEW_GROUP*)node->child)->dirty = 1;
+            }
+            drawGroup(node->child);
+        } else if (node->type == TYPE_VIEW) {
+            if (vg->dirty)
+                adjustGroupRelative(vg, node->child);
+            draw(node->child);
+        }
+    }
+    vg->dirty = 0;
+}
+
+void layoutGroup(VIEW_GROUP* vg) {
     vg->layout(vg);
     VIEW_OR_GROUP* node = start_iterate_VIEW_OR_GROUP_list(&vg->children);
     while (has_next_VIEW_OR_GROUP_list(&vg->children, node)) {
         node = next_VIEW_OR_GROUP_list(node);
         if (node->type == TYPE_VIEW_GROUP) {
             adjustGroupRelative(vg, node->child);
-            drawGroup(node->child);
+            layoutGroup(node->child);
         } else if (node->type == TYPE_VIEW) {
-            drawRelative(vg, node->child);
+            adjustRelative(vg, node->child);
         }
     }
+    vg->dirty = 0;
 }
 
 void* removeViewByIndex(VIEW_GROUP* vg, int index) {
     if (index < vg->children.size) {
         VIEW_OR_GROUP* node = start_iterate_VIEW_OR_GROUP_list(&vg->children);
-        int i = 0;
-        while (i < vg->children.size) {
+        int i = -1;
+        do {
             node = next_VIEW_OR_GROUP_list(node);
             i++;
-        }
+        } while (i < index);
         remove_VIEW_OR_GROUP_immediate(&vg->children, node);
         void* child = node->child;
         kfree(node);
+        vg->dirty = 1;
         return child;
     }
 
@@ -107,11 +134,11 @@ void* removeViewByIndex(VIEW_GROUP* vg, int index) {
 VIEW_OR_GROUP* getViewByIndex(VIEW_GROUP* vg, int index) {
     if (index < vg->children.size) {
         VIEW_OR_GROUP* node = start_iterate_VIEW_OR_GROUP_list(&vg->children);
-        int i = 0;
-        while (i < vg->children.size) {
+        int i = -1;
+        do {
             node = next_VIEW_OR_GROUP_list(node);
             i++;
-        }
+        } while (i < index);
         return node;
     }
 
