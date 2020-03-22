@@ -1,12 +1,14 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include <io/uart.h>
 #include <interrupts.h>
-#include <io/gpu.h>
 #include <local_timer.h>
 #include <io/gpio.h>
+#include <io/uart.h>
 #include <proc/pcb.h>
+#include <io/stdio.h>
+#include <mem/mem.h>
+#include <io/gpu.h>
 
 extern void io_halt();
 
@@ -62,38 +64,36 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
     (void) r1;
     (void) atags;
     pin_set_function(17, OUTPUT);
-    
-    /* UART */
-    uart_init();
-    uart_puts("Hello, World!\r\n\r\n");
-
-    /* INTERRUPTS */
-    uart_puts(">> Interrupts init: ");
-    interrupts_init();
-    uart_puts(" [OK] \r\n");
-    
-    uart_puts(">> Local timer init: ");
-    local_timer_init(VIRTUAL_SYS, 2000);
-    uart_puts(" [OK] \r\n");
-
-    uart_puts(">> Register timer handler and clearer: ");
-    register_irq_handler(ARM_TIMER, local_timer_handler, local_timer_clearer);
-    uart_puts(" [OK] \r\n");
 
     /* DYNAMIC MEMORY */
     uart_puts(">> Dynamic memory: ");
     mem_init(((atag_t *)atags));
-    uart_puts(" [OK] \r\n");  
-    
+    uart_putln(" [OK]");  
+
     /* HDMI */
-    uart_puts(">> GPU init: ");
     gpu_init();
-    uart_puts(" [OK] \r\n");
+
+    /* UART */
+    uart_init();
+    printLn("Hello world!");
+
+    /* INTERRUPTS */
+    printLn(">> Interrupts init: ");
+    interrupts_init();
+    enrichedPrint(" [OK]", &GREEN, NULL);
+    
+    printLn(">> Local timer init: ");
+    local_timer_init(VIRTUAL_SYS, 2000);
+    enrichedPrint(" [OK]", &GREEN, NULL);
+
+    printLn(">> Register timer handler & clearer: ");
+    register_irq_handler(ARM_TIMER, local_timer_handler, local_timer_clearer);
+    enrichedPrint(" [OK]", &GREEN, NULL);
 
     /* Processes */
-    uart_puts(">> Processes init: ");
+    printLn(">> Processes init: ");
     process_init();
-    uart_puts(" [OK] \r\n");
+    enrichedPrint(" [OK]", &GREEN, NULL);
 
     create_kernel_thread(saluda, "Proc1", 5);
     create_kernel_thread(saluda2, "Proc2", 5);
