@@ -1,43 +1,218 @@
 .section ".text"
 
-.global switch_to_thread
+.extern __stack_memory
+.extern __scheduler_finished
+
+.global pointer_test
+/* r0 pointer r1 pointer */
+pointer_test:
+    mov pc, lr
+
+.global switch_process_context
 
 /**
- * switch_to_thread(process_control_block_t * old, process_control_block_t * new);
+ * switch_process_context(proc_saved_state_t* old, proc_saved_state_t* new);
+ * 
+ * Switch two process context. Store into old thread's stack his processor state
+ * and extract from new thread's stack the new processor state.
  *
- *Swith two threads, storing in the stack the old thread registers
- *and extracting those of the new thread.
- *
- * @param old The context to store
- * @param new The context to extract
+ * @param old A pointer to old process control block
+ * @param new A pointer pointer to new process control block
  */
-switch_to_thread:
+switch_process_context:
+/* IN THIS PART OF CODE WE WILL STORE PROCESS STATE OF THE FIRST ARGUMENT */
+    /*
+    IRQ STACK FROM __stack_memory WHEN ENTER THIS FUNCTION
+    r0 < __stack_memory
+    r1
+    r2
+    ...
+    r12
+    lr
+     */
+    push {r4-r12} //this is necessary to accomplish the arm calling standard
+    push {r0}
+    ldr r0, [r0] //we load old process's stack pointer
+    ldr r2, =__stack_memory
+    ldr r2, [r2] // irq stack
+    ldmfd r2!, {r3-r12} //load from r0 to r9 from irq stack
+    stmfd r0!, {r3-r12} //we store into first argument stack
+    ldmfd r2!, {r3-r6}  //we extract remaining registes r10-r12 and lr
+    
+    mov r7, r6
+    mov r6, r3
+    mov r3, r7
+
+    mov r7, r5
+    mov r5, r4
+    mov r4, r7
+
+    stmfd r0!, {r3-r6} //we store into first argument stack
+    mrs r12, spsr //we obtain the corresponding value of CPSR for our old process
+    stmfd r0!, {r12}
+    pop {r3} //we obtain old process's pcb pointer
+    str r0, [r3] //we update old process's stack pointer
+    /*
+    OLD PROCESS STACK
+    spsr (Saved Process State Register)
+    lr
+    r12
+    r11
+    r10
+    r0
+    ...
+    r9
+    */
+
+/* IN THIS PART OF CODE WE WILL LOAD PROCESS STATE OF THE SECOND ARGUMENT*/
+    ldr r0, [r1] // we load new process's stack pointer
+    ldmfd r0!, {r3} //we load new process's spsr register 
+    msr spsr_cxsf, r3 //we store new process's spsr register
+    /* we load lr, r12, r11, r10 from new process's stack but
+       because of the way ldmfd(pop), stmfd(push)operations works
+       it will load into the lowest register in the list the
+       first value pointed by r1(sp) which, in this case is lr*/
+    ldmfd r0!, {r3, r4, r5, r6}//r3=lr, r4=r12, r5=r11, r6=r10
+    //we turn the register list
+    mov r7, r6
+    mov r6, r3
+    mov r3, r7
+
+    mov r7, r5
+    mov r5, r4
+    mov r4, r7
+    //r3=INIT(r10), r4=INIT(r11), r5=INIT(r12), r6=INIT(lr)
+    stmfd r2!, {r3, r4, r5, r6}
+    ldmfd r0!, {r3-r12} //we load r0 to r9 registers from INIT process's stack
+    //r3=INIT(r0), r4=INIT(r1), r5=INIT(r2), r6=INIT(r3), r7=INIT(r4), r8=INIT(r5), r9=INIT(r6), r10=INIT(r7), r11=INIT(r8), r12=INIT(r9)
+    stmfd r2!, {r3-r12}
+    str r0, [r1] //we update new process's stack pointer
+    ldr r0, =__scheduler_finished
+    mov r1, #0x1
+    str r1, [r0]
+    /*
+    IRQ STACK FROM __stack_memory WHEN FINISH THIS PART OF CODE
+    r0(new process) < __stack_memory
+    r1(new process)
+    r2(new process)
+    ...
+    r12(new process)
+    lr(new process)
+    */
+    //direcion = valor
+    //
+    pop {r4-r12}
+    mov pc, lr
+
+
+
+/*
+    IRQ STACK FROM __stack_memory WHEN ENTER THIS FUNCTION
+    r0 < __stack_memory
+    r1
+    r2
+    ...
+    r12
+    lr
+*/
+/*
+    IRQ FROM __stack_memory + 0x38
+    r0
+    r1
+    r2
+    ...
+    r12
+    lr
+    x < r2
+ */
+.global load_init_process
+/**
+ * load_init_process(proc_saved_state_t* init_pcb);
+ * 
+ * loads init to be the first process to execute.
+ *
+ * @param init_pcb A pointer to init process control block
+ */
+load_init_process:
+    push {r4-r7}
+    ldr r2, =__stack_memory
+    ldr r2, [r2] // irq stack
+    add r2, r2, #0x38 
+    mov r1, r0
+    ldr r0, [r1] // we load INIT process's stack pointer
+    ldmfd r0!, {r3} //we load INIT process's spsr register 
+    msr spsr_cxsf, r3 //we store new process's spsr register
+    /* we load lr, r12, r11, r10 from INIT process's stack but
+       because of the way ldmfd(pop), stmfd(push)operations works
+       it will load into the lowest register in the list the
+       first value pointed by r0(sp) which, in this case is lr*/
+    ldmfd r0!, {r3, r4, r5, r6} //r3=lr, r4=r12, r5=r11, r6=r10
+    //we turn the register list
+    mov r7, r6
+    mov r6, r3
+    mov r3, r7
+
+    mov r7, r5
+    mov r5, r4
+    mov r4, r7
+    //r3=INIT(r10), r4=INIT(r11), r5=INIT(r12), r6=INIT(lr)
+    stmfd r2!, {r3, r4, r5, r6} 
+    ldmfd r0!, {r3-r12} //we load r0 to r9 registers from INIT process's stack
+    //r3=INIT(r0), r4=INIT(r1), r5=INIT(r2), r6=INIT(r3), r7=INIT(r4), r8=INIT(r5), r9=INIT(r6), r10=INIT(r7), r11=INIT(r8), r12=INIT(r9)
+    stmfd r2!, {r3-r12}
+    str r0, [r1] //we update INIT process's stack pointer
+    ldr r0, =__scheduler_finished
+    mov r1, #0x1
+    str r1, [r0]
+    pop {r4-r7}
+    mov pc, lr
+
+/*    
     push {lr}
     push {sp}
     mrs r12, cpsr
     push {r0-r12}
-    str sp, [r0]
+//----------------------------
+    str sp, [r0] 
+
+    FIRST EXECUTION TRACE
+    process_control_block_t from old{
+        proc_saved_state_t* changes it to irq_sp
+        ... 
+        leaves the rest as it was
+    }
+/
     ldr sp, [r1]
-    //ldr r0, =#10000
-    //bl timer_set
+
+    FIRST EXECUTION TRACE
+    process_control_block_t from new{
+        proc_saved_state_t* will be loaded into sp
+        ...
+        leaves the rest as it was
+    }
+/
+
+    FIRST EXECUTION TRACE
+    Because of the create_kernel_thread, sp will be pointing to
+    the correct value in new process stack
+/
     pop {r0-r12}
+
+    FIRST EXECUTION TRACE
+    it will load from r0 to cpsr from proc_saved_state_t structure into
+    r0 to r12 registers
+/
+//  change the current cpsr to a new mode of execution 
     msr cpsr_c, r12
+
+    FIRST EXECUTION TRACE
+    it will load from sp and lr from proc_saved_state_t structure into
+    lr and pc registers (reap_function and function_process)
+/
     pop {lr, pc}
 
-    /*
-    
-switch_to_thread:
-    push {r12, sp, lr}
-    mrs r12, cpsr
-    push {r0-r12}
-    str sp, [r0]
-    ldr sp, [r1]
-    pop {r0-r12}
-    msr cpsr_c, r12
-    pop {lr, pc}
 
-
-    STEPS TO FOLLOW
-    
-    1. Store all register of the old process including
- */
+    IT WILL NEVER RETURN TO IRQ_S_HANDLER.
+    potencial error for clearing interrupts
+/
+*/

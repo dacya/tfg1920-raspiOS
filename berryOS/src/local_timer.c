@@ -148,17 +148,8 @@ void write_CNTX_TVAL(timer_selection_t local_timer_select, uint32_t value){
 
 //register like arm timer interrupt
 void local_timer_handler(void) {
-    
-    uint32_t value2;
-    uint32_t memory = *(volatile uint32_t*)CORE0_L_INT_SRC;
-    uart_putln("Receive a generic timer interrupt");
-    uart_puts("Value of core0 int source: ");
-    asm volatile("ldr %0, [%1]" : "=r"(value2) : "r"(memory));
-    value2 &= ~(0x8);
-    uart_hex_puts(value2);
-    uart_putln("");
-    
-    //uart_putln("\r\nChanging process!");
+    uart_putln("timer interrupt detected!");
+    uart_putln("changing process");
     schedule();
 }
 

@@ -18,6 +18,22 @@
 typedef void (*kthread_function_f)(void);
 
 typedef struct {
+    uint32_t cpsr; //(Saved Process State Register)
+    uint32_t* lr; //pointer to return address
+    uint32_t r12;
+    uint32_t r11;
+    uint32_t r10;
+    uint32_t r0;
+    uint32_t r1;
+    uint32_t r2;
+    uint32_t r3;
+    uint32_t r4;
+    uint32_t r5;
+    uint32_t r6;
+    uint32_t r7;
+    uint32_t r8;
+    uint32_t r9;
+    /* 
     uint32_t r0;
     uint32_t r1; 
     uint32_t r2; 
@@ -30,12 +46,13 @@ typedef struct {
     uint32_t r9;
     uint32_t r10;
     uint32_t r11;
-    
+     */
     //Jsandler  NO FUNCIONA
+    /* 
     uint32_t cpsr; 
     uint32_t sp;
     uint32_t lr;
-
+ */
     //Jsandler modificado NO FUNCIONA
     /* uint32_t cpsr;
     uint32_t sp; 
@@ -44,17 +61,22 @@ typedef struct {
    
     
     //nozotroz FUNCIONA, PERO CREEMOS QUE NO BIEN DEL TODO
-    
-    /* uint32_t r12;
+    /*
+    uint32_t r12;
     uint32_t sp;
     uint32_t lr;
     uint32_t cpsr;
-     */
+    */
 } proc_saved_state_t;
 
 typedef struct pcb {
-    proc_saved_state_t * saved_state; // Pointer to where on the stack this process's state is saved. Becomes invalid once the process is running
-    void * stack_page;                // The stack for this proces.  The stack starts at the end of this page
+    /*
+    Pointer to corresponding stack for this process. At first it will be initialized with a pointer
+    to proc_saved_state_t but after the first scheduling process, that pointer will be changed to
+    a correct value
+    */
+    uint32_t* stack_pointer_to_saved_state;
+    void* stack_page;                // The stack for this proces.  The stack starts at the end of this page
     uint32_t pid;                     // The process ID number
     DEFINE_LINK(pcb);
     char proc_name[20];               // The process's name

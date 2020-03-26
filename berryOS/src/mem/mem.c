@@ -56,7 +56,6 @@ void mem_init(atag_t * atags) {
         all_pages_array[i].flags.allocated = 1;
         all_pages_array[i].flags.kernel_page = 1;
     }
-
      // Reserve 1 MB for the kernel heap
     for (; i < kernel_pages + (KERNEL_HEAP_SIZE / PAGE_SIZE); i++) {
         all_pages_array[i].vaddr_mapped = i * PAGE_SIZE;    // Identity map the kernel pages
