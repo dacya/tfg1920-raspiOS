@@ -26,9 +26,7 @@ uint32_t local_timer_init(timer_selection_t local_timer, unsigned int time){
     insert_value = read_CNTFRQ();
 
     //updating TVAL
-    uart_hex_puts(insert_value);
     insert_value = (insert_value >> 10)*time;
-    uart_hex_puts(insert_value);
     current_time_value = insert_value;
 
     write_CNTX_TVAL(local_timer, insert_value);

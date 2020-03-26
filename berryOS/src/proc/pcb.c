@@ -96,10 +96,6 @@ void process_init(void){
     INITIALIZE_LIST(run_queue, pcb);
     //INITIALIZE_LIST(all_proc_list, pcb);
 
-    uart_puts("Run queue -->");
-    uart_puts(itoa((int)&run_queue));
-    uart_putc('\n');
-
     //Allocate and initialize the block 
     main_pcb = kmalloc(sizeof(process_control_block_t));
     main_pcb->pid = NEW_PID;
@@ -180,9 +176,6 @@ void create_kernel_thread(kthread_function_f thread_func, char * name, int name_
 
     //Allocate and initialize the pcb block
     pcb = kmalloc(sizeof(process_control_block_t));
-    uart_puts("Allocate -->");
-    uart_puts(itoa((int)pcb));
-    uart_putc('\n');
     pcb->stack_page = alloc_page();
     pcb->pid = NEW_PID;
     memcpy(pcb->proc_name, name, MIN(name_size, 19));

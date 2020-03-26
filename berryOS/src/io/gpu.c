@@ -30,7 +30,8 @@ void gpu_init(void) {
     console_putStr(" AMIGOS", &RED, NULL);
     console_putLn("YA", &GREEN, &WHITE);
     console_putStr(" TenemOs", &RED, NULL);
-    console_putStr(" CONSOLA", &YELLOW, NULL);
+    console_putLn("CONSOLA", &YELLOW, NULL);
+    console_putLn("CON SCROLL", &GREEN, NULL);
 }
 
 void clear_screen() {

@@ -36,8 +36,8 @@ void init_console(int width, int height) {
 
 void console_putLn(char* str, color_24* textColor, color_24* bgColor) {
     VIEW_GROUP* line;
+    int update = 0;
     if (display.children.size < MAX_LINES) {
-        uart_putln(itoa(display.children.size));
         line = kmalloc(sizeof(VIEW_GROUP));
         new_view_group(line, display.view.width, LINE_HEIGHT, 0, 0, horizontal_linear_layout);
     } else {
@@ -47,6 +47,7 @@ void console_putLn(char* str, color_24* textColor, color_24* bgColor) {
             destroyView(v);
             kfree(v);
         }
+        update = 1;
     }
     addViewGroup(&display, line);
     
@@ -55,12 +56,17 @@ void console_putLn(char* str, color_24* textColor, color_24* bgColor) {
 
     string->textColor = textColor == NULL ? display.view.textColor : *textColor;
     string->bgColor = bgColor == NULL ? display.view.bgColor : *bgColor;
-
     string->fontSize = display.view.fontSize;
     string->padding = 0;
+
     setText(string, str);
     addView(line, string);
-    drawGroup(&display);
+    if (update) {
+        drawGroup(&display);
+    } else {
+        layoutGroup(&display);
+        drawGroup(line);
+    }
 }
 
 void console_putStr(char* str, color_24* textColor, color_24* bgColor) {
@@ -68,9 +74,9 @@ void console_putStr(char* str, color_24* textColor, color_24* bgColor) {
     if (display.children.size == 0) {
         console_putLn(str, textColor, bgColor);
         return;
-    } else {
-        line = getViewByIndex(&display, display.children.size - 1)->child;
     }
+    
+    line = getViewByIndex(&display, display.children.size - 1)->child;
     
     VIEW* string = kmalloc(sizeof(VIEW));
     new_view(string, CHAR_MIN_SIZE*display.view.fontSize*strlen(str), LINE_HEIGHT, 0, 0);
@@ -82,5 +88,6 @@ void console_putStr(char* str, color_24* textColor, color_24* bgColor) {
     string->padding = 2;
     setText(string, str);
     addView(line, string);
-    drawGroup(line);
+    layoutGroup(line);
+    draw(string);
 }
