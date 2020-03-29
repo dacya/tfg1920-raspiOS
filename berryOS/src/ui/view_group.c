@@ -135,10 +135,10 @@ VIEW_OR_GROUP* getViewByIndex(VIEW_GROUP* vg, int index) {
     if (index < vg->children.size) {
         VIEW_OR_GROUP* node = start_iterate_VIEW_OR_GROUP_list(&vg->children);
         int i = -1;
-        do {
+        while (has_next_VIEW_OR_GROUP_list(&vg->children, node) && i < index) {
             node = next_VIEW_OR_GROUP_list(node);
             i++;
-        } while (i < index);
+        }
         return node;
     }
 

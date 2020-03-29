@@ -95,6 +95,16 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
     process_init();
     enrichedPrint(" [OK]", &GREEN, NULL);
 
+    printLn("");
+    printLn("");
+    printLn("");
+    for (size_t i = 0; i < 28; i++) {
+        print(itoa(i));
+        print(" ");
+    }
+    
+    printLn("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+
     create_kernel_thread(saluda, "Proc1", 5);
     create_kernel_thread(saluda2, "Proc2", 5);
     
