@@ -7,6 +7,8 @@
 extern timer_selection_t core_timer_selected;
 extern unsigned int current_time_value;
 
+extern uint8_t __stack_memory;
+
 static interrupt_registers_t* interrupt_regs;
 
 // array of pointers to handlers functions
@@ -92,6 +94,23 @@ void unregister_irq_isr(irq_number_t irq_num)
     {
         uart_puts("HANDLER ERROR: Couldn't remove the handler and clearer!\r\n");
     }
+}
+
+void print_irq_stack(void){
+    uint32_t* stack_memory = (uint32_t*)&__stack_memory;
+    uart_putln("\n--------------PRINT_IRQ_STACK----------------------");
+    uart_putln("stack_memory_tag is inside of:");
+    uart_hex_puts((uint32_t)stack_memory);
+    uint32_t* stack = (uint32_t*)(*stack_memory);
+    uart_putln("registers:");
+    for(unsigned int i = 0; i <= 13; i++ ){
+        uart_puts("stack_memory: ");
+        uart_hex_puts((uint32_t)(stack+i));
+        uart_puts("value inside:");
+        uart_hex_puts(*(stack+i));
+        uart_putln("");
+    }
+    uart_putln("--------------PRINT_IRQ_STACK END----------------------");
 }
 
 //TODO: FIX THE SECOND LOOP LOGIC

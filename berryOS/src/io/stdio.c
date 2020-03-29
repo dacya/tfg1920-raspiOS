@@ -14,10 +14,12 @@ void enrichedPrint(char* text, color_24* txtColor, color_24* bgColor) {
 
 void printLn(char* text) {
     //uart_putln(text);
-    console_putLn(text, NULL, NULL);
+    console_putStr(text, NULL, NULL);
+    console_putLn("", NULL, NULL);
 }
 
 void enrichedPrintLn(char* text, color_24* txtColor, color_24* bgColor) {
     //uart_putln(text);
-    console_putLn(text, txtColor, bgColor);
+    console_putStr(text, txtColor, bgColor);
+    console_putLn("", NULL, NULL);
 }

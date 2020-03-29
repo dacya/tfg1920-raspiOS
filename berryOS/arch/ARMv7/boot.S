@@ -1,7 +1,13 @@
+.equ IRQ_STACK, 0x4000
+.equ SUPERVISOR_STACK, 0x8000
+
+.equ IRQ_MODE, 0x12
+.equ SUPERVISOR_MODE, 0x13
+
 .section ".text.boot"
 
 // Make _start global.
-.globl _start
+.global _start
 /* 
                 Entry point for the kernel.
   r15 -> should begin execution at 0x8000(32K). [r15 is PC register]
@@ -55,11 +61,11 @@ _start:
     /* INITIALIZE CORE MODE STACKS AND REGISTERS */
     //We start execution in Supervisor (SVC) mode
     //change to IRQ mode
-    cps #0x12 //change to IRQ mode
-    mov sp, #0x4000 
+    cps #IRQ_MODE //change to IRQ mode
+    mov sp, #IRQ_STACK
     //we change again to svc mode
-    cps #0x13 
-    mov sp, #0x8000 
+    cps #SUPERVISOR_MODE 
+    mov sp, #SUPERVISOR_STACK 
     /* INITIALIZE EXCEPTION VECTORS */
 
     bl str_vector_table
