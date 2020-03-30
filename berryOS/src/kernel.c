@@ -7,6 +7,7 @@
 #include <io/gpu.h>
 #include <io/gpio.h>
 #include <proc/pcb.h>
+#include <console/console.h>
 
 extern void io_halt();
 
@@ -74,6 +75,8 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
     
     printLn("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
     
+    start_console();
+
     print_processes();
     //TEST PROCESS SECTION
     create_kernel_thread(&saluda, "Proc1", 5);

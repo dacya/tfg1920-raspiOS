@@ -10,7 +10,7 @@ IMPLEMENT_LIST(VIEW_OR_GROUP);
 
 void new_view_group(VIEW_GROUP* vg, int width, int height, int x, int y, void(*layout)(void*)) {
     INITIALIZE_LIST(vg->children, VIEW_OR_GROUP);
-
+    
     vg->layout = layout;
 
     VIEW* v = &vg->view;
