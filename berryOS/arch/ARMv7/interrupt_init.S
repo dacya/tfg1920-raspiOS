@@ -100,7 +100,7 @@ data_abort_s_handler:
 
 //Simple version with no nested interrupts support
 .extern __stack_memory
-.extern __reap_pointer
+.extern __process_lr
 .extern __scheduler_finished
 irq_s_handler:
     //srsdb sp!, #IRQ_MODE //we stores the spsr and lr at the address contained in sp of the mode irq
@@ -124,9 +124,11 @@ irq_s_handler:
     bne normal_irq_execution
         pop {r0} //we recover the correct value of r0
         push {r0, lr} //we store r0 with lr into irq stack
-        ldr r0, =__reap_pointer
-        ldr r0, [r0] //we load where does the reap function start
-        mov lr, r0 //we make sure lr contains a pointer to reap
+        ldr r0, =__process_lr
+        /* we load where we will return from the function
+           where the process was interrupted */
+        ldr r0, [r0] 
+        push {r0} //we make sure lr contains a pointer to that region of memory
 
         ldr r0, =__stack_memory
         str sp, [r0]
@@ -135,10 +137,10 @@ irq_s_handler:
         msr cpsr_cxsf, r0 //we change cpsr to the corresponding value of cpsr of the new process
         /* we load the correct value of r0 and we return to where our new
            process were interrupted */
-           //we change execution mode so does the stack
-        
+           //we change execution mode so does the stack and lr
         ldr r0, =__stack_memory
         ldr r0, [r0]
+        ldmfd r0!, {lr}
         ldmfd r0, {r0, pc}
 
 normal_irq_execution:

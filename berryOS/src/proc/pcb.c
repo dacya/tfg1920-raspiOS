@@ -8,14 +8,22 @@ static uint32_t pids = 1;
 #define NEW_PID pids++;
 /**
  * Used by the scheduler and irq s handler
- * DO NOT USE
+ * USE OF THIS VARIABLE MAY CAUSE UNEXPECTED BEHAVIOR
+ * IN THE SCHEDULER WICH MAY CAUSE A FATAL ERROR
 */
 uint32_t __scheduler_finished;
 
+/**
+ * Used by the scheduler and irq s handler
+ * USE OF THIS VARIABLE MAY CAUSE UNEXPECTED BEHAVIOR
+ * IN THE SCHEDULER WICH MAY CAUSE A FATAL ERROR
+*/
+uint32_t* __process_lr;
 
 extern uint8_t __end;
 extern void switch_process_context(process_control_block_t * old, process_control_block_t * new);
-extern void load_init_process(process_control_block_t* init_pcb);
+extern void load_process(process_control_block_t* init_pcb);
+extern void yield_to_next_process(process_control_block_t* next_process);
 extern void pointer_test(void* a, void* b);
 
 
@@ -64,6 +72,9 @@ void pointer_test_in_c(void){
  * process available inside the run queue
 */
 static void reap(void){
+    uart_puts("Process:");
+    uart_putln(current_process->proc_name);
+    uart_putln("Cleaning all resources from old current process pcb");
     DISABLE_INTERRUPTS();
     process_control_block_t * new_thread, * old_thread;
 
@@ -75,20 +86,16 @@ static void reap(void){
     old_thread = current_process;
     current_process = new_thread;
 
-    // Free the resources used by the old process.  Technically, we are using dangling pointers here, but since interrupts are disabled and we only have one core, it
-    // should still be fine
+    //remove_pcb_immediate(&run_queue, old_thread);
+
+    uart_putln(new_thread->proc_name);
+
     free_page(old_thread->stack_page);
     kfree(old_thread);
-    
 
     // Context Switch
-    switch_process_context(old_thread, new_thread);
+    yield_to_next_process(new_thread);
 }
-/**
- * used by the scheduler
- * DO NOT TOUCH, IT WILL RESULT IN UNEXPECTED BEHAVIOR
-*/
-uint32_t* __reap_pointer = (uint32_t*)reap;
 
 void process_init(void){
     process_control_block_t * main_pcb;
@@ -124,7 +131,8 @@ void process_init(void){
     new_proc_state->r11 = 0x64;
     new_proc_state->r12 = 0x60;
 
-    new_proc_state->lr = (uint32_t*)init_function;
+    new_proc_state->pc = (uint32_t*)init_function;
+    new_proc_state->lr = (uint32_t*)reap;
     new_proc_state->cpsr = 0x13; // Sets the thread up to run in supervisor mode with irqs only
 
     append_pcb_list(&run_queue, main_pcb);
@@ -148,7 +156,7 @@ void schedule(void){
 
     if(current_process == NULL){
         current_process = init_process;
-        load_init_process(init_process);
+        load_process(init_process);
         remove_pcb_immediate(&run_queue, init_process);
         uart_putln("INIT loaded!");
         ENABLE_INTERRUPTS();
@@ -202,8 +210,13 @@ void create_kernel_thread(kthread_function_f thread_func, char * name, int name_
     new_proc_state->r11 = 0x164;
     new_proc_state->r12 = 0x160;
 
-    new_proc_state->lr = (uint32_t*)thread_func;     // lr is used as return address in switch_process_context
-    new_proc_state->cpsr = 0x13;         // Sets the thread up to run in supervisor mode with irqs only
+    //We store where the new thread will start execution
+    new_proc_state->pc = (uint32_t*)thread_func;
+    /* This is the pointer where the new thread will return form it's "main function",
+       it will clear all its resources */
+    new_proc_state->lr = (uint32_t*)reap;
+    //Sets the thread up to run in supervisor mode with irqs only
+    new_proc_state->cpsr = 0x13;
 
     // add the thread to the lists
     //append_pcb_list(&all_proc_list, pcb);

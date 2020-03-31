@@ -10,7 +10,6 @@
 
 extern void io_halt();
 
-
 void saluda(void){
     int a = 2;
     int i = 0;
@@ -18,10 +17,15 @@ void saluda(void){
         if(i == 100000000){
             uart_puts("I'm the CREATED function process --> a = ");
             uart_putln(itoa(a));
-            i = 0;
+            break;
         }
+        /* if(i == 300000000){
+            uart_putln("Exiting from saluda");
+            break;
+        } */
        i++;
     }
+    uart_putln("really");
 }
 
 void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {   
