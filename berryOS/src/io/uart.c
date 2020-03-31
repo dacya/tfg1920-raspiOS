@@ -95,7 +95,7 @@ void uart_putc(unsigned char c) {
    *(UART0_DR) = c;
 }
 
-unsigned char uart_getc() {
+char uart_recv() {
     // Wait for UART to have received something.
     while ( *(UART0_FR) & (1 << 4) ) { }
     return *(UART0_DR);

@@ -7,6 +7,7 @@
 #include <io/gpu.h>
 #include <io/gpio.h>
 #include <proc/pcb.h>
+#include <console/console.h>
 
 extern void io_halt();
 
@@ -47,27 +48,40 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
     /* HDMI */
     gpu_init();
     print(">> GPU init: ");
-    enrichedPrintLn(" [OK]", &GREEN, NULL);
+    enrichedPrintLn("[OK]", &GREEN, NULL);
 
     /* INTERRUPTS */
     print(">> Interrupts init: ");
     interrupts_init();
-    enrichedPrintLn(" [OK]", &GREEN, NULL);
+    enrichedPrintLn("[OK]", &GREEN, NULL);
     
     /* LOCAL TIMER */
-    print("\t>> Register timer handler and clearer: ");
+    print(" - Register timer handler and clearer: ");
     register_irq_handler(ARM_TIMER, local_timer_handler, local_timer_clearer);
-    enrichedPrintLn(" [OK]", &GREEN, NULL);
+    enrichedPrintLn("[OK]", &GREEN, NULL);
 
     print(">> Local timer init: ");
     local_timer_init(VIRTUAL_SYS, 1000);
-    enrichedPrintLn(" [OK]", &GREEN, NULL);
+    enrichedPrintLn("[OK]", &GREEN, NULL);
 
     /* Processes */
     print(">> Processes init: ");
     process_init();
-    enrichedPrintLn(" [OK]", &GREEN, NULL);
+    enrichedPrintLn("[OK]", &GREEN, NULL);
 
+    printLn("");
+    printLn("");
+    for (size_t i = 0; i < 28; i++) {
+        print(itoa(i));
+        print(" ");
+    }
+    printLn("");
+    
+    printLn("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+    
+    start_console();
+
+    print_processes();
     //TEST PROCESS SECTION
     create_kernel_thread(&saluda, "Proc1", 5);
 

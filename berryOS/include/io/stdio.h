@@ -7,5 +7,7 @@ void print(char* text);
 void printLn(char* text);
 void enrichedPrint(char* text, color_24* txtColor, color_24* bgColor);
 void enrichedPrintLn(char* text, color_24* txtColor, color_24* bgColor);
+void readLn(char* out, int max);
+char readChar();
 
 #endif /* _STDIO_H */

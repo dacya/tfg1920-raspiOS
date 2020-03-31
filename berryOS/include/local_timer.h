@@ -1,3 +1,10 @@
+/*
+* This is a simple library to ease the use of arm local timers
+* 
+* Alejandro Cancelo Correia
+*
+* April, 1, 2020
+*/
 #ifndef _LOCAL_TIMER_H
 #define _LOCAL_TIMER_H
 

@@ -10,7 +10,7 @@ IMPLEMENT_LIST(VIEW_OR_GROUP);
 
 void new_view_group(VIEW_GROUP* vg, int width, int height, int x, int y, void(*layout)(void*)) {
     INITIALIZE_LIST(vg->children, VIEW_OR_GROUP);
-
+    
     vg->layout = layout;
 
     VIEW* v = &vg->view;
@@ -135,10 +135,10 @@ VIEW_OR_GROUP* getViewByIndex(VIEW_GROUP* vg, int index) {
     if (index < vg->children.size) {
         VIEW_OR_GROUP* node = start_iterate_VIEW_OR_GROUP_list(&vg->children);
         int i = -1;
-        do {
+        while (has_next_VIEW_OR_GROUP_list(&vg->children, node) && i < index) {
             node = next_VIEW_OR_GROUP_list(node);
             i++;
-        } while (i < index);
+        }
         return node;
     }
 

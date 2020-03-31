@@ -1,5 +1,4 @@
 /**
- * This library contains the pcb structure.
  * 
  * Used jsandler tutorial as example
  * https://jsandler18.github.io/tutorial/process.html
@@ -7,6 +6,12 @@
  * Raúl Sánchez Montaño
  * 
  * Feb, 9, 2020
+ * 
+ * Fixed logic problems with jsandler tutorial and changed the
+ * pcb struc.
+ * 
+ * Alejandro Cancelo Correia
+ * March, 31, 2020
 */
 
 #ifndef PCB_H

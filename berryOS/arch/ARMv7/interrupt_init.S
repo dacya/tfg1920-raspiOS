@@ -1,3 +1,10 @@
+/**
+* This code define the correct exception vector as specified inside 
+* the architectural manual of ARMv7 architecture.
+*
+* Alejandro Cancelo Correia
+* Nov, 25, 2019
+ */
 .equ VECTOR_TABLE_INIT, 0x00000000
 .equ IRQ_MODE, 0x12
 .equ FIQ_MODE, 0x11

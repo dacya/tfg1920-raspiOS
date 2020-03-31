@@ -14,10 +14,24 @@ void enrichedPrint(char* text, color_24* txtColor, color_24* bgColor) {
 
 void printLn(char* text) {
     uart_putln(text);
-    console_putLn(text, NULL, NULL);
+    console_putStr(text, NULL, NULL);
+    console_putLn("", NULL, NULL);
 }
 
 void enrichedPrintLn(char* text, color_24* txtColor, color_24* bgColor) {
     uart_putln(text);
-    console_putLn(text, txtColor, bgColor);
+    console_putStr(text, txtColor, bgColor);
+    console_putLn("", NULL, NULL);
+}
+
+void readLn(char* out, int max) {
+    int size = 0;
+    char c;
+    while ((c = uart_recv()) != '\n' && size < max) {
+        out[size++] = c;
+    }
+}
+
+char readChar() {
+    return uart_recv();
 }

@@ -1,3 +1,11 @@
+/**
+* This code belongs to pcb.h and pcb.c and are a fundamental piece to the
+* correct execution of that module. Edit with care.
+*
+* Alejandro Cancelo Correia
+* March, 31, 2020
+*/
+
 .equ IRQ_MODE, 0x12
 .equ SUPERVISOR_MODE, 0x13
 
@@ -243,55 +251,3 @@ yield_to_next_process:
     str r9, [r8, #0x8]
     mov r9, r7
     ldmfd r8, {r7, r8, pc}
-
-
-
-/*    
-    push {lr}
-    push {sp}
-    mrs r12, cpsr
-    push {r0-r12}
-//----------------------------
-    str sp, [r0] 
-
-    FIRST EXECUTION TRACE
-    process_control_block_t from old{
-        proc_saved_state_t* changes it to irq_sp
-        ... 
-        leaves the rest as it was
-    }
-/
-    ldr sp, [r1]
-
-    FIRST EXECUTION TRACE
-    process_control_block_t from new{
-        proc_saved_state_t* will be loaded into sp
-        ...
-        leaves the rest as it was
-    }
-/
-
-    FIRST EXECUTION TRACE
-    Because of the create_kernel_thread, sp will be pointing to
-    the correct value in new process stack
-/
-    pop {r0-r12}
-
-    FIRST EXECUTION TRACE
-    it will load from r0 to cpsr from proc_saved_state_t structure into
-    r0 to r12 registers
-/
-//  change the current cpsr to a new mode of execution 
-    msr cpsr_c, r12
-
-    FIRST EXECUTION TRACE
-    it will load from sp and lr from proc_saved_state_t structure into
-    lr and pc registers (reap_function and function_process)
-/
-    pop {lr, pc}
-
-
-    IT WILL NEVER RETURN TO IRQ_S_HANDLER.
-    potencial error for clearing interrupts
-/
-*/

@@ -32,6 +32,7 @@ void gpu_init(void) {
     console_putStr(" TenemOs", &RED, NULL);
     console_putLn("CONSOLA", &YELLOW, NULL);
     console_putLn("CON SCROLL", &GREEN, NULL);
+    console_putLn("", &GREEN, NULL);
 }
 
 void clear_screen() {
