@@ -15,7 +15,6 @@
 extern uint8_t __end; 
 static uint32_t num_pages;
 
-DEFINE_LIST(page);
 IMPLEMENT_LIST(page);
 
 static page_t * all_pages_array;
@@ -36,7 +35,7 @@ static void heap_init(uint32_t heap_start);
 static heap_segment_t * heap_segment_list_head;
 
 
-void mem_init(atag_t * atags){
+void mem_init(atag_t * atags) {
     uint32_t mem_size, page_array_len, kernel_pages, i;
     
     //get the total number of pages
@@ -47,7 +46,7 @@ void mem_init(atag_t * atags){
     page_array_len = sizeof(page_t) * num_pages;
     all_pages_array = (page_t *)&__end;
     bzero2(all_pages_array, page_array_len);
-    INITIALIZE_LIST(free_pages);
+    INITIALIZE_LIST(free_pages, page);
 
     // Iterate over all pages and mark them with the appropriate flags
     // Start with kernel pages
@@ -57,16 +56,15 @@ void mem_init(atag_t * atags){
         all_pages_array[i].flags.allocated = 1;
         all_pages_array[i].flags.kernel_page = 1;
     }
-
      // Reserve 1 MB for the kernel heap
-    for(; i < kernel_pages + (KERNEL_HEAP_SIZE / PAGE_SIZE); i++){
+    for (; i < kernel_pages + (KERNEL_HEAP_SIZE / PAGE_SIZE); i++) {
         all_pages_array[i].vaddr_mapped = i * PAGE_SIZE;    // Identity map the kernel pages
         all_pages_array[i].flags.allocated = 1;
         all_pages_array[i].flags.kernel_heap_page = 1;
     }
 
     // Map the rest of the pages as unallocated, and add them to the free list
-    for(; i < num_pages; i++){
+    for (; i < num_pages; i++) {
         all_pages_array[i].flags.allocated = 0;
         append_page_list(&free_pages, &all_pages_array[i]);
     }
@@ -76,7 +74,7 @@ void mem_init(atag_t * atags){
     heap_init(page_array_end);
 }
 
-static void heap_init(uint32_t heap_start){
+static void heap_init(uint32_t heap_start) {
     heap_segment_list_head = (heap_segment_t *) heap_start;
     bzero2(heap_segment_list_head, sizeof(heap_segment_t));
     heap_segment_list_head->segment_size = KERNEL_HEAP_SIZE;
@@ -85,12 +83,12 @@ static void heap_init(uint32_t heap_start){
 }
 
 
-void * alloc_page(void){
+void * alloc_page(void) {
     page_t * page;
     void * page_mem;
 
     if(size_page_list(&free_pages) == 0)
-        return 0;
+        return NULL;
     
     // Get a free page
     page = pop_page_list(&free_pages);
@@ -117,7 +115,7 @@ void free_page(void * ptr) {
     append_page_list(&free_pages, page);
 }
 
-void * kmalloc(uint32_t bytes){
+void * kmalloc(uint32_t bytes) {
     heap_segment_t * current, * best = NULL;
     int diff, best_diff = 0x7FFFFFFF;
     
@@ -146,7 +144,7 @@ void * kmalloc(uint32_t bytes){
     // If the best difference we could come up with was large, split up this segment into two.
     // Since our segment headers are rather large, the criterion for splitting the segment is that
     // when split, the segment not being requested should be twice a header size
-    if(best_diff > (int)(2 * sizeof(heap_segment_t))){
+    if (best_diff > (int)(2 * sizeof(heap_segment_t))) {
         bzero2(((void*) best) + bytes, sizeof(heap_segment_t));
         current = best->next;
 
@@ -160,38 +158,38 @@ void * kmalloc(uint32_t bytes){
     }
 
     best->is_allocated = 1;
-    return best + 1; //why + 1 instead of sizeof(heap_segment_t)?
+    return best + 1; 
 }
 
-void kfree(void * ptr){
+void kfree(void * ptr) {
     heap_segment_t * seg;
 
-    if(!ptr)
+    if (!ptr)
         return;
 
     seg = ptr - sizeof(heap_segment_t);
     seg->is_allocated = 0;
-    //uart_puts("    Borrando\n");
-    while(seg->prev != NULL && seg->prev->is_allocated == 0){
+    while (seg->prev != NULL && seg->prev->is_allocated == 0){
         seg->prev->segment_size += seg->segment_size;
         seg->prev->next = seg->next;
-        seg->next->prev = seg->prev;
+        if(seg->next != NULL)
+            seg->next->prev = seg->prev;
         seg = seg->prev;
     }
-
-    while(seg->next != NULL && seg->next->is_allocated == 0){
-        seg->next->next->prev = seg;
+    
+    while (seg->next != NULL && seg->next->is_allocated == 0) {
+        if (seg->next->next != NULL)
+            seg->next->next->prev = seg;
         seg->segment_size += seg->next->segment_size;
-        seg->next = seg->next->next;
-        
-    }    
+        seg->next = seg->next->next;   
+    }        
 }
 
-void print_data(void){
+void print_data(void) {
     heap_segment_t * seg = heap_segment_list_head;
     
-    while(seg->next != NULL){
-        if(seg->is_allocated == 1){
+    while (seg->next != NULL) {
+        if (seg->is_allocated == 1) {
             uart_puts("Cadena --> ");
             uint32_t aux = ((uint32_t)seg) + sizeof(heap_segment_t); 
             uart_puts((char *)aux);

@@ -1,6 +1,13 @@
 #include <interrupts.h>
 #include <stddef.h>
 #include <io/uart.h>
+#include <local_timer.h>
+#include <proc/pcb.h>
+//from local timer
+extern timer_selection_t core_timer_selected;
+extern unsigned int current_time_value;
+
+extern uint8_t __stack_memory;
 
 static interrupt_registers_t* interrupt_regs;
 
@@ -89,36 +96,32 @@ void unregister_irq_isr(irq_number_t irq_num)
     }
 }
 
-//register like arm timer interrupt
-void local_timer_handler(void) {
-    uint32_t value2;
-    uint32_t memory = *(volatile uint32_t*)CORE0_L_INT_SRC;
-    uart_puts("Receive a generic timer interrupt \r\n");
-    uart_puts("Value of core0 int source: ");
-    asm volatile("ldr %0, [%1]" : "=r"(value2) : "r"(memory));
-    value2 &= ~(0x8);
-    uart_hex_puts(value2);
-    uart_puts("\r\n");
+void print_irq_stack(void){
+    uint32_t* stack_memory = (uint32_t*)&__stack_memory;
+    uart_putln("\n--------------PRINT_IRQ_STACK----------------------");
+    uart_putln("stack_memory_tag is inside of:");
+    uart_hex_puts((uint32_t)stack_memory);
+    uint32_t* stack = (uint32_t*)(*stack_memory);
+    uart_putln("registers:");
+    for(unsigned int i = 0; i <= 13; i++ ){
+        uart_puts("stack_memory: ");
+        uart_hex_puts((uint32_t)(stack+i));
+        uart_puts("value inside:");
+        uart_hex_puts(*(stack+i));
+        uart_putln("");
+    }
+    uart_putln("--------------PRINT_IRQ_STACK END----------------------");
 }
 
-
-void local_timer_clearer(void) {
-    asm volatile("mrc p15, #0, r0, c14, c0, #0");//we obtain CNTFRQ
-    asm volatile("mcr p15, #0, r0, c14, c3, #0");//1 irq per second
-}
-
-//because we have a custom handler
+//TODO: FIX THE SECOND LOOP LOGIC
 void irq_c_handler(void) {
     if((*(volatile uint32_t*)CORE0_L_INT_SRC) & 0x8) {
         clearers[ARM_TIMER]();
         handlers[ARM_TIMER]();
-        //local_timer_handler();
     }
-    uart_puts("limpiesa\r\n");
-    //local_timer_clearer();
     ENABLE_INTERRUPTS();
     //the cpu reaches this function with the IRQ exceptions disabled
-    /*
+    /* 
     for(int i = 0; i < NUM_P_IRQS; i++){
         if(IRQ_P_IS_PENDING(interrupt_regs, i) && handlers[i] != 0){
             clearers[i]();
@@ -126,7 +129,7 @@ void irq_c_handler(void) {
             ENABLE_INTERRUPTS();
             return;
         }
-    }*/
+    } */
 }
 
 

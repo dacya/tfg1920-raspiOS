@@ -1,8 +1,13 @@
-// To keep this in the first portion of the binary.
+.equ IRQ_STACK, 0x4000
+.equ SUPERVISOR_STACK, 0x8000
+
+.equ IRQ_MODE, 0x12
+.equ SUPERVISOR_MODE, 0x13
+
 .section ".text.boot"
 
 // Make _start global.
-.globl _start
+.global _start
 /* 
                 Entry point for the kernel.
   r15 -> should begin execution at 0x8000(32K). [r15 is PC register]
@@ -33,7 +38,6 @@ _start:
     cmp r1, #0
     bne halt
 
-    // Clear out bss.
     ldr r4, =__bss_start
     ldr r9, =__bss_end
     mov r5, #0
@@ -43,10 +47,8 @@ _start:
     b       2f
 
 1:
-    // store multiple at r4.
     stmia r4!, {r5-r8}
 
-// If we are still below bss_end, loop.
 2:
     cmp r4, r9
     blo 1b
@@ -59,11 +61,11 @@ _start:
     /* INITIALIZE CORE MODE STACKS AND REGISTERS */
     //We start execution in Supervisor (SVC) mode
     //change to IRQ mode
-    cps #0x12 //change to IRQ mode
-    mov sp, #0x4000 
+    cps #IRQ_MODE //change to IRQ mode
+    mov sp, #IRQ_STACK
     //we change again to svc mode
-    cps #0x13 
-    mov sp, #0x8000 
+    cps #SUPERVISOR_MODE 
+    mov sp, #SUPERVISOR_STACK 
     /* INITIALIZE EXCEPTION VECTORS */
 
     bl str_vector_table
@@ -99,29 +101,3 @@ halt:
 io_halt:
     wfi
     bx lr
-
-
-.globl _local_timer_init
-/**
-     * THIS STEPS APPLIES IN A SYSTEM WHERE THERE IS NOT VIRTUALIZATION SUPPORT
-     * 
-     * 1. Look into CNTKCTL register if you need
-     * 2. Look into CNTP_CTL or CNTH_CTL or CNTV_CTL to enable or disable
-     *    the corresponding timer (bit 0)
-     * 3. You have to set the compare value for the corresponding timer
-     *    CNTP_CVAL, CNTH_CVAL, CNTV_CVAL if needed
-     * 4. Putting the corresponding TVAL register to a right value
-     * 5. Routing the IRQ and enabling IRQ of the corresponding core
-    */
-_local_timer_init:
-    // ENABLING TIMER
-    //mrc p15, #0, r0, c14, c3, #1 //we obtain CNTV_CTL register value
-    //orr r1, r1, #1 //we enable virtual timer
-    mov r0, #1
-    mcr p15, #0, r0, c14, c3, #1
-    // SETTING FREQUENCY TIMER
-    //we don't need this right now
-    // SETTING TVAL REGISTER (virtual)
-    mrc p15, #0, r0, c14, c0, #0 //we obtain CNTFRQ
-    mcr p15, #0, r0, c14, c3, #0 //1 irq per second
-    mov pc, lr

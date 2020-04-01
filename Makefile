@@ -1,13 +1,12 @@
 CC = compiler/bin/arm-none-eabi
 OBJCOPY = compiler/bin/arm-none-eabi-objcopy
-C_OPT = -mcpu=cortex-a7 -O2 -Wall -Wextra -fpic -ffreestanding -std=gnu99 -nostdlib -I berryOS/include 
+C_OPT = -mcpu=cortex-a7 -O2 -Wall -Wextra -fpic -ffreestanding -std=gnu99 -nostdlib -I berryOS/include -g
 L_OPT = -ffreestanding -O2 -nostdlib -mcpu=cortex-a7
 
 #-fpic position independent code
 SRC_DIR = berryOS/src
 SRC_ARCH = berryOS/arch
 BUILD_DIR = build
-
 
 run: build
 	@echo ""
@@ -34,6 +33,7 @@ C_FILES += $(wildcard $(SRC_DIR)/*/*.c)
 C_FILES += $(wildcard $(SRC_DIR)/*.c)
 
 ASM_FILES = $(wildcard $(SRC_ARCH)/ARMv7/*.S) #Remember to add the context.S when using processes
+ASM_FILES += $(wildcard $(SRC_DIR)/proc/*.S) 
 
 OBJ_FILES = $(C_FILES:$(SRC_DIR)/%.c=$(BUILD_DIR)/%_c.o)
 

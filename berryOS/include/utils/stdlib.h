@@ -14,6 +14,7 @@
 #define STDLIB_H
 
 #define MIN(x,y) ((x < y ? x : y))
+#define MAX(x,y) ((x < y ? y : x))
 
 void memcpy(void * dest, void * src, int size);
 
@@ -22,4 +23,7 @@ void bzero2(void * dest, int size);
 char * itoa(int i);
 
 int atoi(char * i);
+
+int strlen(char* string);
+
 #endif

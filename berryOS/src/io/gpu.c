@@ -3,33 +3,36 @@
 #include <utils/color.h>
 #include <ui/view.h>
 #include <io/gpio.h>
+#include <ui/view_group.h>
+#include <ui/layouts.h>
+#include <ui/views/status_bar.h>
+#include <ui/views/console_view.h>
+#include <ui/views/views_configuration.h>
 
 void gpu_init(void) {
     // Aparantly, this sometimes does not work, so try in a loop
     while(framebuffer_init() != 0);
 
-    // clear screen
     clear_screen();
 
-    gpu_puts("\n");
-    gpu_puts("\n");
-    gpu_puts("\n");
-    gpu_puts("\n");
-    gpu_puts("                  GANAMOS AMIGOS");
+    int width = fbinfo.width;
+    int height = fbinfo.height;
 
-    VIEW v = new_view(640, 20, 0, 0);
-    v.bgColor = GREY;
-    draw(v);
-
-    VIEW v2 = new_view(40, 40, 100, 100);
-    v2.bgColor = RED;
-    draw(v2);
-
-    VIEW anim = new_view(40, 20, 0, 200);
-    for (int i = 0; i < 640; i++) {
-        anim.x = i;
-        draw(anim);
-    }
+    int sb_height = height*WIDTH_PERCENTAGE/100;
+    init_status_bar(width, sb_height);
+    init_console(width, height - sb_height);
+    VIEW_GROUP main_ui;
+    new_view_group(&main_ui, width, height, 0, 0, vertical_linear_layout);
+    addViewGroup(&main_ui, &statusBarView);
+    addViewGroup(&main_ui, &consoleView);
+    drawGroup(&main_ui);
+    console_putLn("Hola", &GREEN, &WHITE);
+    console_putStr(" AMIGOS", &RED, NULL);
+    console_putLn("YA", &GREEN, &WHITE);
+    console_putStr(" TenemOs", &RED, NULL);
+    console_putLn("CONSOLA", &YELLOW, NULL);
+    console_putLn("CON SCROLL", &GREEN, NULL);
+    console_putLn("", &GREEN, NULL);
 }
 
 void clear_screen() {

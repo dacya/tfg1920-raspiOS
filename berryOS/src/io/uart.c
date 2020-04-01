@@ -95,7 +95,7 @@ void uart_putc(unsigned char c) {
    *(UART0_DR) = c;
 }
 
-unsigned char uart_getc() {
+char uart_recv() {
     // Wait for UART to have received something.
     while ( *(UART0_FR) & (1 << 4) ) { }
     return *(UART0_DR);
@@ -106,7 +106,14 @@ void uart_puts(const char* str) {
         uart_putc((unsigned char)str[i]);
 }
 
-void convert_to_str(uint32_t value, char *buff, int size) {
+void uart_putln(const char* str){
+    for (size_t i = 0; str[i] != '\0'; i++)
+        uart_putc((unsigned char)str[i]);
+    uart_putc('\r');
+    uart_putc('\n');
+}
+
+void convert_to_str(unsigned int value, char *buff, int size) {
     char reminder;
     while(value != 0 && size > 0){
         reminder = value & 0xF;

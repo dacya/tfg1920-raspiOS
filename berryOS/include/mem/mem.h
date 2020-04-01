@@ -18,7 +18,6 @@
 #define PAGE_SIZE 1024 * 4
 #define KERNEL_HEAP_SIZE (1024 * 1024)
 
-
 //This structs store metadata about the pages 
 typedef struct {
     uint8_t allocated: 1;      //this page is allocated
@@ -40,7 +39,8 @@ typedef struct heap_segment{
     uint32_t segment_size;  // Includes this header
 } heap_segment_t; //16 bytes of size
 
-
+DEFINE_LIST(page);
+DEFINE_HEADERS(page);
 
 /**
  * Initialize the memory, using the atags of the boot stage.
@@ -81,4 +81,7 @@ void * kmalloc(uint32_t bytes);
  */ 
  
 void kfree(void *ptr);
+
+void print_data(void);
+
 #endif

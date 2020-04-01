@@ -1,14 +1,33 @@
 #include <stddef.h>
 #include <stdint.h>
-
-#include <io/uart.h>
 #include <interrupts.h>
-#include <io/gpu.h>
 #include <local_timer.h>
+#include <io/stdio.h>
+#include <io/uart.h>
+#include <io/gpu.h>
 #include <io/gpio.h>
-
+#include <proc/pcb.h>
+#include <console/console.h>
 
 extern void io_halt();
+
+void saluda(void){
+    int a = 2;
+    int i = 0;
+    while(1){
+        if(i == 100000000){
+            uart_puts("I'm the CREATED function process --> a = ");
+            uart_putln(itoa(a));
+            break;
+        }
+        /* if(i == 300000000){
+            uart_putln("Exiting from saluda");
+            break;
+        } */
+       i++;
+    }
+    uart_putln("really");
+}
 
 void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {   
     (void) r0;
@@ -18,51 +37,54 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
     
     /* UART */
     uart_init();
-    uart_puts("Hello, World!\r\n\r\n");
-
-    /* INTERRUPTS */
-    uart_puts(">> Local timer init: ");
-    //local_timer_init();
-    uart_puts(" [OK] \r\n");
-    
-    uart_puts(">> Interrupts init: ");
-    interrupts_init();
-    uart_puts(" [OK] \r\n");
-    
-    uart_puts(">> Register timer handler and clearer: ");
-    register_irq_handler(ARM_TIMER, local_timer_handler, local_timer_clearer);
-    uart_puts(" [OK] \r\n");
+    uart_puts(">> Uart init");
+    uart_putln("[OK]");
 
     /* DYNAMIC MEMORY */
     uart_puts(">> Dynamic memory: ");
     mem_init(((atag_t *)atags));
-    uart_puts(" [OK] \r\n");
+    uart_putln(" [OK]");
 
-    
-    
     /* HDMI */
-    uart_puts(">> GPU init: ");
     gpu_init();
-    uart_puts(" [OK] \r\n");
+    print(">> GPU init: ");
+    enrichedPrintLn("[OK]", &GREEN, NULL);
 
-    pin_set_as_output(17);
+    /* Processes */
+    print(">> Processes init: ");
+    process_init();
+    enrichedPrintLn("[OK]", &GREEN, NULL);
 
-    while (1) {
-        //io_halt();
+    printLn("");
+    printLn("");
+    for (size_t i = 0; i < 28; i++) {
+        print(itoa(i));
+        print(" ");
     }
-}
-/*
-* INTERRUPTS *
-    uart_puts(">> Local timer init: ");
-    local_timer_init();
-    uart_puts(" [OK] \r\n");
+    printLn("");
     
-    uart_puts(">> Interrupts init: ");
-    interrupts_init();
-    uart_puts(" [OK] \r\n");
+    printLn("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
     
-    uart_puts(">> Register timer handler and clearer: ");
-    register_irq_handler(ARM_TIMER, local_timer_handler, local_timer_clearer);
-    uart_puts(" [OK] \r\n");
+    //start_console();
 
-*/
+    /* INTERRUPTS */
+    print(">> Interrupts init: ");
+    interrupts_init();
+    enrichedPrintLn("[OK]", &GREEN, NULL);
+
+    /* LOCAL TIMER */
+    print(" - Register timer handler and clearer: ");
+    register_irq_handler(ARM_TIMER, local_timer_handler, local_timer_clearer);
+    enrichedPrintLn("[OK]", &GREEN, NULL);
+
+    print(">> Local timer init: ");
+    local_timer_init(VIRTUAL_SYS, 1000);
+    enrichedPrintLn("[OK]", &GREEN, NULL);
+
+    print_processes();
+
+    //TEST PROCESS SECTION
+    //create_kernel_thread(&saluda, "Proc1", 5);
+
+    //print_processes();
+}
