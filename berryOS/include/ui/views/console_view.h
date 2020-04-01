@@ -13,5 +13,7 @@ void init_console(int width, int height);
 void console_putLn(char* str, color_24* textColor, color_24* bgColor);
 void console_putStr(char* str, color_24* textColor, color_24* bgColor);
 void put_char(char c);
+void del_char();
+void clear_input();
 
 #endif /* _CONSOLE_VIEW_H */

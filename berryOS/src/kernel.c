@@ -57,11 +57,11 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
     
     /* LOCAL TIMER */
     print(" - Register timer handler and clearer: ");
-    register_irq_handler(ARM_TIMER, local_timer_handler, local_timer_clearer);
+    //register_irq_handler(ARM_TIMER, local_timer_handler, local_timer_clearer);
     enrichedPrintLn("[OK]", &GREEN, NULL);
 
     print(">> Local timer init: ");
-    local_timer_init(VIRTUAL_SYS, 1000);
+    //local_timer_init(VIRTUAL_SYS, 1000);
     enrichedPrintLn("[OK]", &GREEN, NULL);
 
     /* Processes */
@@ -83,7 +83,7 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
 
     print_processes();
     //TEST PROCESS SECTION
-    create_kernel_thread(&saluda, "Proc1", 5);
+    //create_kernel_thread(&saluda, "Proc1", 5);
 
     //print_processes();
 }

@@ -78,7 +78,7 @@ void setText(VIEW* v, char* str) {
     if (v->text != NULL) {
         kfree(v->text);
     }
-    int ssize = strlen(str) + 1; // add 1 extre for the \0
+    int ssize = strlen(str) + 1; // add 1 extra for the \0
     v->text = kmalloc(sizeof(str) * ssize);
     memcpy(v->text, str, ssize);
 }

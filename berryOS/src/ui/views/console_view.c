@@ -30,19 +30,13 @@ void init_console(int width, int height) {
 
     new_view(&textInput, width, (height - 1) * CONSOLE_INPUT_HEIGHT / 100, 0, 0);
     textInput.bgColor = RED;
+    textInput.fontSize = CONSOLE_VIEW_FONT_SIZE;
     addView(&consoleView, &textInput);
     textInput.text = "> ";
 
     LINE_HEIGHT = display.view.fontSize * CHAR_MIN_SIZE + CHAR_MIN_SIZE;
     MAX_LINES = display.view.height / LINE_HEIGHT;
     MAX_CHAR = display.view.width / (display.view.fontSize * CHAR_MIN_SIZE);
-
-    put_char('h');
-    put_char('h');
-    put_char('h');
-    put_char('h');
-    put_char('h');
-
 }
 
 char* getOverFlow(char* str, int filled) {
@@ -142,13 +136,28 @@ void console_putStr(char* str, color_24* textColor, color_24* bgColor) {
 }
 
 void put_char(char c) {
-    int size = strlen(textInput.text) + 2; // add \0 and the new char
-    char* news = kmalloc(size);
-    news[size - 1] = '\0';
-    news[size - 2] = c;
+    int size = strlen(textInput.text);
+    char* news = kmalloc(size + 2); // add \0 and the new char
+    
+    memcpy(news, textInput.text, size);
+    news[size + 1] = '\0';
+    news[size] = c;
 
     kfree(textInput.text);
     textInput.text = news;
 
+    draw(&textInput);
+}
+
+void del_char() {
+    int size = strlen(textInput.text);
+    
+    textInput.text[size - 1] = '\0';
+
+    draw(&textInput);
+}
+
+void clear_input() {
+    setText(&textInput, "> ");
     draw(&textInput);
 }
