@@ -31,8 +31,9 @@ void init_console(int width, int height) {
     new_view(&textInput, width, (height - 1) * CONSOLE_INPUT_HEIGHT / 100, 0, 0);
     textInput.bgColor = RED;
     textInput.fontSize = CONSOLE_VIEW_FONT_SIZE;
-    addView(&consoleView, &textInput);
     textInput.text = "> ";
+    textInput.textOverflow = 1;
+    addView(&consoleView, &textInput);
 
     LINE_HEIGHT = display.view.fontSize * CHAR_MIN_SIZE + CHAR_MIN_SIZE;
     MAX_LINES = display.view.height / LINE_HEIGHT;
