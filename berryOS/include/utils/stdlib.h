@@ -26,4 +26,6 @@ int atoi(char * i);
 
 int strlen(char* string);
 
+int streq(char* str1, char* str2);
+
 #endif

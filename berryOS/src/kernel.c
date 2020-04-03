@@ -8,6 +8,7 @@
 #include <io/gpio.h>
 #include <proc/pcb.h>
 #include <console/console.h>
+#include <console/command.h>
 
 extern void io_halt();
 
@@ -48,6 +49,8 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
 
     /* HDMI */
     gpu_init();
+    print(">> Dynamic memory: ");
+    enrichedPrintLn("[OK]", &GREEN, NULL);
     print(">> GPU init: ");
     enrichedPrintLn("[OK]", &GREEN, NULL);
 
@@ -55,18 +58,16 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
     print(">> Processes init: ");
     process_init();
     enrichedPrintLn("[OK]", &GREEN, NULL);
+    
+    /* Console */
+    print(">> Console init: ");
+    start_console();
+    enrichedPrintLn("[OK]", &GREEN, NULL);
 
-    printLn("");
-    printLn("");
-    for (size_t i = 0; i < 28; i++) {
-        print(itoa(i));
-        print(" ");
-    }
-    printLn("");
-    
-    printLn("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-    
-    //start_console();
+    /* Commands */
+    print(" - Commands init: ");
+    init_commands();
+    enrichedPrintLn("[OK]", &GREEN, NULL);
 
     /* INTERRUPTS */
     print(">> Interrupts init: ");

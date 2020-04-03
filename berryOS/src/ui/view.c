@@ -12,7 +12,7 @@ void new_view(VIEW* v, int width, int height, int x, int y) {
     v->textColor = WHITE;
     v->fontSize = 1;
     v->padding = 1;
-
+    v->textOverflow = 0;
     v->text = NULL;
     v->textAlign = LEFT;
     v->textLines = 1;
@@ -30,7 +30,11 @@ void putChar(VIEW* v, char c, int posX, int offsetx, int offsety) {
     int charSize = CHAR_MIN_SIZE * v->fontSize;
     int charsPerLine = v->width / charSize;
     int x = posX % charsPerLine;
-    int y = MIN(posX / charsPerLine, v->textLines);
+    int y;
+    if (v->textOverflow)
+        y = 0;
+    else
+        y = MIN(posX / charsPerLine, v->textLines);
     offsetx = offsetx + v->x;
     offsety = offsety + v->y;
 
@@ -44,7 +48,7 @@ void putChar(VIEW* v, char c, int posX, int offsetx, int offsety) {
         }
     }
 }
-
+#include <io/uart.h>
 void draw(VIEW* v) {
     int width = v->x + v->width;
     int height = v->y + v->height;
@@ -60,7 +64,10 @@ void draw(VIEW* v) {
         char c;
         while ((c = v->text[ssize++]) != '\0');
         ssize--;
-        while ((c = v->text[i]) != '\0') {
+        int init = 0;
+        if (v->textOverflow)
+            init = MAX(ssize - v->width / (CHAR_MIN_SIZE * v->fontSize), 0);
+        while ((c = v->text[i + init]) != '\0') {
             int offset;
             if (v->textAlign == LEFT)
                 offset = v->padding;
