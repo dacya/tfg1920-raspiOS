@@ -22,12 +22,15 @@ typedef struct i_node {
 typedef struct dir_entry {
     uint32_t inode_num;
     char filename[MAXFILENAMESIZE];
-    uint8_t fn_size: 5;
+    uint8_t fn_size;
 } dir_entry_t;
 
-#define MAXFILESPERDIR PAGE_SIZE/sizeof(dir_entry_t)
+#define MAXFILESPERDIR (PAGE_SIZE/sizeof(dir_entry_t))
 
 typedef struct dir {
+    char real_name[MAXFILENAMESIZE]; //This is not exactly like ext2, but makes it easier some operations
+    uint8_t real_name_size;
+    uint32_t num_childs;
     dir_entry_t child[MAXFILESPERDIR]; //child[0] --> itself(.) | child[1] --> father(..)
 } dir_t;
  
