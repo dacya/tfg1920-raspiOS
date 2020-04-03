@@ -18,7 +18,8 @@ void saluda(void){
         if(i == 100000000){
             uart_puts("I'm the CREATED function process --> a = ");
             uart_putln(itoa(a));
-            break;
+           // break;
+           i = 0;
         }
         /* if(i == 300000000){
             uart_putln("Exiting from saluda");
@@ -84,7 +85,7 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
     print_processes();
 
     //TEST PROCESS SECTION
-    //create_kernel_thread(&saluda, "Proc1", 5);
+    create_kernel_thread(&saluda, "Proc1", 5);
 
     //print_processes();
 }
