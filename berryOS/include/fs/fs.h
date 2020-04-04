@@ -1,3 +1,14 @@
+/**
+ * 
+ * This library contains all needed strutures and methods for
+ * filesystem management
+ * 
+ * Raúl Sánchez Montaño
+ * 
+ * Apr 1, 2020
+ */
+
+
 #ifndef FS_H
 #define FS_H
 
@@ -40,6 +51,15 @@ typedef struct dir {
  * structures. 
  */
 void fs_init(void);
+
+void createFile(char* file, int fnsize);
+
+int getFileSize(char* filename);
+
+char* read(char* filename, uint32_t bytes);
+
+int write(char* filename, char* text);
+
 
 
 #endif

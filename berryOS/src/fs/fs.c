@@ -1,3 +1,11 @@
+/**
+ *
+ * Raúl Sánchez Montaño
+ * 
+ * Apr 1, 2020
+ */
+
+
 #include <fs/fs.h>
 #include <mem/mem.h>
 #include <utils/stdlib.h>
@@ -19,7 +27,8 @@ int minInodeFree;
 
 static uint32_t getFreeInode(){
     i_node_t* pointer;
-    for(int i = minInodeFree + 1; i < NUM_INODES; i++){
+    uint32_t i;
+    for(i = minInodeFree + 1; i < NUM_INODES; i++){
         pointer = get_inode(1);
         if(pointer->free == 0){
             int aux = minInodeFree;
@@ -31,7 +40,7 @@ static uint32_t getFreeInode(){
 }
 
 void fs_init(void){
-    int i;
+    uint32_t i;
     i_node_t* iter;
     
     for(i = 0; i < NUM_PAGES_INODE_TABLE; i++){ // We reserve the num of pages needed
@@ -50,7 +59,7 @@ void fs_init(void){
     iter->num_pages = 1;
     iter->size = 2;
     iter->pages[0] = alloc_page();
-    root_dir = iter->pages[0];
+    root_dir = (dir_t*)iter->pages[0];
     
     memcpy(root_dir->real_name, "root\0", 5);
     root_dir->real_name_size = 5;    
@@ -63,8 +72,6 @@ void fs_init(void){
     memcpy(root_dir->child[1].filename, "..\0", 3);
     root_dir->child[1].fn_size = 3;
     root_dir->child[1].inode_num = 0;
-    iter->pages[0] = root_dir;
-    
     
     curr_dir = root_dir; //Root is the current directory
 
@@ -93,5 +100,82 @@ void createFile(char* file, int fnsize){
     curr_dir->child[curr_dir->num_childs++].filename[MIN(MAXFILENAMESIZE - 1, fnsize)] = '\0';
     curr_dir->child[curr_dir->num_childs - 1].fn_size = MIN(MAXFILENAMESIZE - 1, fnsize);
     curr_dir->child[curr_dir->num_childs - 1].inode_num = new;
+}
+
+
+static uint32_t fileExists(char* file){  //0 if file doesn't exist in the current directory, number of child if exists
+    uint32_t i = 2;
+    while(i < curr_dir->num_childs){
+        if (streq(file,curr_dir->child[i].filename))
+            return i;
+        i++;
+    }
+    return 0;
+}
+
+int write(char* filename, char* text){
+    int i;
+    if ((i = fileExists(filename)) == 0)
+        return 0;
+    
+    i_node_t* inFile = get_inode(curr_dir->child[i].inode_num);
+    char* file = ((char*)inFile->pages[inFile->size/PAGE_SIZE]) + (inFile->size % PAGE_SIZE);
+    i = 0;
+    while(*text != '\0'){
+        if((i + inFile->size) % PAGE_SIZE == 0){
+            void* aux;
+            if(inFile->num_pages == MAXPAGESPERFILE || (aux = alloc_page()) == NULL){
+                inFile->size += i;
+                return i;
+            }
+            inFile->pages[inFile->num_pages++] = aux;
+            file = aux;    
+        }
+        *file = *text;
+        i++;
+        text++;
+        file++;
+    }
+    inFile->size += i;
+    return i;
+}
+
+char* read(char* filename, uint32_t bytes){
+    uint32_t i;
+    if ((i = fileExists(filename)) == 0)
+        return NULL;
+    
+    i_node_t* inFile = get_inode(curr_dir->child[i].inode_num);
+    bytes = MIN(bytes, inFile->size);
+    char* sol;
+
+    if ((sol = kmalloc(bytes)) == NULL)
+        return NULL;
+
+    int j = 0;
+    char* file = (char *)inFile->pages[j++];
+    char* aux = sol;
+    i = 0;
+    while(i < bytes){
+        if(i % PAGE_SIZE == 0){
+            file = (char *)inFile->pages[j++];
+        }
+        *aux = *file;
+        i++;
+        aux++;
+        file++;
+    }
+    return sol;
+
+}
+
+int getFileSize(char* filename){
+    int i;
+    if ((i = fileExists(filename)) == 0)
+        return 0;
+    
+    i_node_t* inFile = get_inode(curr_dir->child[i].inode_num);
+    
+    return inFile->size;
 }
 
