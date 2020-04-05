@@ -92,6 +92,9 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
     //print_processes();
 } */
 
+extern uint8_t __end; 
+
+
 void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {   
     (void) r0;
     (void) r1;
@@ -122,8 +125,7 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
         char buf[20];
         char text[100];
         int num = 0;
-        uart_putln(itoa((int)kmalloc(4)));
-        uart_putln(itoa((int)kmalloc(4)));
+        
         uart_puts("¿Que quieres hacer?\n > 1 --> Crear archivo\n > 2 --> Escribir archivo\n > 3 --> Leer archivo\n > 4 --> Borrar archivo\n > ");
         
         c = uart_recv();
@@ -188,7 +190,19 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
             kfree(aux);
         }
         else if (c == '4'){
+            uart_puts("Inserte nombre > ");
+             
             
+            while((c = uart_recv()) != '\r')  {
+                uart_putc(c);
+                buf[i++] = c;
+            }
+            buf[i++] = '\0';
+            uart_putc('\n');
+
+            deleteFile(buf);
+
+            printCurrDir();
         }
 
     }

@@ -36,7 +36,7 @@ static heap_segment_t * heap_segment_list_head;
 
 
 void mem_init(atag_t * atags) {
-    uint32_t mem_size, page_array_len, kernel_pages, i;
+    uint32_t mem_size, page_array_len, page_array_end, kernel_pages, i;
     
     //get the total number of pages
     mem_size = get_mem_size(atags);
@@ -48,9 +48,13 @@ void mem_init(atag_t * atags) {
     bzero2(all_pages_array, page_array_len);
     INITIALIZE_LIST(free_pages, page);
 
+    //Calculate last metadata's section page
+    page_array_end = (uint32_t)all_pages_array + page_array_len;
+    page_array_end += (page_array_end % PAGE_SIZE ? (PAGE_SIZE -(page_array_end % PAGE_SIZE)) : 0);
+
     // Iterate over all pages and mark them with the appropriate flags
     // Start with kernel pages
-    kernel_pages = ((uint32_t)&__end) / PAGE_SIZE;
+    kernel_pages = page_array_end / PAGE_SIZE;
     for (i = 0; i < kernel_pages; i++) {
         all_pages_array[i].vaddr_mapped = i * PAGE_SIZE;    // Identity map the kernel pages
         all_pages_array[i].flags.allocated = 1;
@@ -70,7 +74,7 @@ void mem_init(atag_t * atags) {
     }
 
     //Initialize the heap
-    uint32_t page_array_end = ((uint32_t)&__end) + page_array_len;
+    
     heap_init(page_array_end);
 }
 
@@ -140,7 +144,6 @@ void * kmalloc(uint32_t bytes) {
     //There is no free memory left.
     if(best == NULL)
         return NULL;
-    uart_puts("llego");
     // If the best difference we could come up with was large, split up this segment into two.
     // Since our segment headers are rather large, the criterion for splitting the segment is that
     // when split, the segment not being requested should be twice a header size

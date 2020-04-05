@@ -24,16 +24,16 @@ static i_node_t* get_inode(uint32_t num){
 dir_t* root_dir;
 dir_t* curr_dir;
 int freeInodes;
-int minInodeFree;
+uint32_t minFreeInode;
 
 static uint32_t getFreeInode(){
     i_node_t* pointer;
     uint32_t i;
-    for(i = minInodeFree + 1; i < NUM_INODES; i++){
-        pointer = get_inode(1);
+    for(i = minFreeInode; i < NUM_INODES; i++){
+        pointer = get_inode(i);
         if(pointer->free == 0){
-            int aux = minInodeFree;
-            minInodeFree = i;
+            uint32_t aux = minFreeInode;
+            minFreeInode = i + 1;
             return aux;
         }
     }
@@ -87,7 +87,7 @@ void fs_init(void){
     curr_dir = root_dir; //Root is the current directory
 
     freeInodes = NUM_INODES - 1; //Num of free inodes
-    minInodeFree = 1;
+    minFreeInode = 1;
 }
 
 void createFile(char* file, int fnsize){
@@ -127,9 +127,9 @@ int write(char* filename, char* text){
     char* file = ((char*)inFile->pages[inFile->size/PAGE_SIZE]) + (inFile->size % PAGE_SIZE);
     
     i = 0;
-    uart_hex_puts((uint32_t)file);
     while(*text != '\0'){
-        if((i + inFile->size) % PAGE_SIZE == 0){
+        if((i + inFile->size) % PAGE_SIZE == 0 && (i + inFile->size) != 0){
+            uart_putln("No me mires");
             void* aux;
             if(inFile->num_pages == MAXPAGESPERFILE || (aux = alloc_page()) == NULL){
                 inFile->size += i;
@@ -142,12 +142,14 @@ int write(char* filename, char* text){
         i++;
         text++;
         file++;
+        
     }
     inFile->size += i;
     return i;
 }
 
 char* read(char* filename, uint32_t bytes){
+    
     uint32_t i;
     if ((i = fileExists(filename)) == 0)
         return NULL;
@@ -155,8 +157,7 @@ char* read(char* filename, uint32_t bytes){
     i_node_t* inFile = get_inode(curr_dir->child[i].inode_num);
     bytes = MIN(bytes, inFile->size);
     char* sol;
-
-    if ((sol = kmalloc(bytes)) == NULL)
+    if ((sol = kmalloc(bytes + 1)) == NULL)
         return NULL;
 
     int j = 0;
@@ -165,7 +166,8 @@ char* read(char* filename, uint32_t bytes){
 
     i = 0;
     while(i < bytes){
-        if(i % PAGE_SIZE == 0){
+        if(i % PAGE_SIZE == 0 && i != 0){
+            uart_putln("No me mires");
             file = (char *)inFile->pages[j++];
         }
         *aux = *file;
@@ -173,6 +175,7 @@ char* read(char* filename, uint32_t bytes){
         aux++;
         file++;
     }
+    sol[bytes] = '\0';
     return sol;
 
 }
@@ -185,6 +188,32 @@ int getFileSize(char* filename){
     i_node_t* inFile = get_inode(curr_dir->child[i].inode_num);
     
     return inFile->size;
+}
+
+void deleteFile(char* filename){
+    uint32_t i;
+    if ((i = fileExists(filename)) == 0)
+        return;
+    
+    i_node_t* inFile = get_inode(curr_dir->child[i].inode_num);
+    
+    if(curr_dir->child[i].inode_num < minFreeInode)
+        minFreeInode = curr_dir->child[i].inode_num;
+    
+    bzero2(curr_dir->child[i].filename, curr_dir->child[i].fn_size);
+    curr_dir->child[i].fn_size = 0;
+    curr_dir->child[i].inode_num = 0;
+    curr_dir->num_childs--; 
+    
+    for(i = 0; i < inFile->num_pages; i++){
+        free_page(inFile->pages[i]);
+        uart_hex_puts((int)inFile->pages[i]);
+        inFile->pages[i] = 0;
+    }
+
+    inFile->free = 0;
+    inFile->size = 0;
+    inFile->type = 0;
 }
 
 void printCurrDir(){
