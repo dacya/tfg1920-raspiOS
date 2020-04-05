@@ -60,6 +60,7 @@ char* read(char* filename, uint32_t bytes);
 
 int write(char* filename, char* text);
 
+void printCurrDir();
 
 
 #endif

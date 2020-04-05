@@ -140,7 +140,7 @@ void * kmalloc(uint32_t bytes) {
     //There is no free memory left.
     if(best == NULL)
         return NULL;
-    
+    uart_puts("llego");
     // If the best difference we could come up with was large, split up this segment into two.
     // Since our segment headers are rather large, the criterion for splitting the segment is that
     // when split, the segment not being requested should be twice a header size

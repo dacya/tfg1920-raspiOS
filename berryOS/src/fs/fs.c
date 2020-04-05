@@ -9,6 +9,7 @@
 #include <fs/fs.h>
 #include <mem/mem.h>
 #include <utils/stdlib.h>
+#include <io/uart.h>
 
 #define NUM_PAGES_INODE_TABLE 2
 #define NUM_INODES ((PAGE_SIZE/sizeof(i_node_t))*NUM_PAGES_INODE_TABLE) //340
@@ -35,6 +36,16 @@ static uint32_t getFreeInode(){
             minInodeFree = i;
             return aux;
         }
+    }
+    return 0;
+}
+
+static uint32_t fileExists(char* file){  //0 if file doesn't exist in the current directory, number of child if exists
+    uint32_t i = 2;
+    while(i < curr_dir->num_childs){
+        if (streq(file,curr_dir->child[i].filename))
+            return i;
+        i++;
     }
     return 0;
 }
@@ -80,7 +91,7 @@ void fs_init(void){
 }
 
 void createFile(char* file, int fnsize){
-    if (freeInodes == 0 || curr_dir->num_childs == MAXFILESPERDIR)
+    if (freeInodes == 0 || curr_dir->num_childs == MAXFILESPERDIR || fileExists(file) != 0)
         return;
     void* aux = alloc_page();
     
@@ -96,22 +107,16 @@ void createFile(char* file, int fnsize){
     newPoint->size = 0;
     newPoint->type = 0;
     
-    memcpy(curr_dir->child[0].filename, file, MIN(MAXFILENAMESIZE, fnsize));
-    curr_dir->child[curr_dir->num_childs++].filename[MIN(MAXFILENAMESIZE - 1, fnsize)] = '\0';
-    curr_dir->child[curr_dir->num_childs - 1].fn_size = MIN(MAXFILENAMESIZE - 1, fnsize);
-    curr_dir->child[curr_dir->num_childs - 1].inode_num = new;
+    memcpy(curr_dir->child[curr_dir->num_childs].filename, file, MIN(MAXFILENAMESIZE, fnsize));
+    curr_dir->child[curr_dir->num_childs].filename[MIN(MAXFILENAMESIZE - 1, fnsize)] = '\0';
+    curr_dir->child[curr_dir->num_childs].fn_size = MIN(MAXFILENAMESIZE - 1, fnsize);
+    curr_dir->child[curr_dir->num_childs].inode_num = new;
+    curr_dir->num_childs++;
+    freeInodes--;
 }
 
 
-static uint32_t fileExists(char* file){  //0 if file doesn't exist in the current directory, number of child if exists
-    uint32_t i = 2;
-    while(i < curr_dir->num_childs){
-        if (streq(file,curr_dir->child[i].filename))
-            return i;
-        i++;
-    }
-    return 0;
-}
+
 
 int write(char* filename, char* text){
     int i;
@@ -120,7 +125,9 @@ int write(char* filename, char* text){
     
     i_node_t* inFile = get_inode(curr_dir->child[i].inode_num);
     char* file = ((char*)inFile->pages[inFile->size/PAGE_SIZE]) + (inFile->size % PAGE_SIZE);
+    
     i = 0;
+    uart_hex_puts((uint32_t)file);
     while(*text != '\0'){
         if((i + inFile->size) % PAGE_SIZE == 0){
             void* aux;
@@ -155,6 +162,7 @@ char* read(char* filename, uint32_t bytes){
     int j = 0;
     char* file = (char *)inFile->pages[j++];
     char* aux = sol;
+
     i = 0;
     while(i < bytes){
         if(i % PAGE_SIZE == 0){
@@ -177,5 +185,16 @@ int getFileSize(char* filename){
     i_node_t* inFile = get_inode(curr_dir->child[i].inode_num);
     
     return inFile->size;
+}
+
+void printCurrDir(){
+    uint32_t i = 0;
+    
+    while(i < curr_dir->num_childs){
+        uart_puts(curr_dir->child[i].filename);
+        uart_puts("--> in = ");
+        uart_putln(itoa(curr_dir->child[i].inode_num));
+        i++;
+    }
 }
 

@@ -10,6 +10,7 @@
 #include <console/console.h>
 #include <console/command.h>
 #include <fs/fs.h>
+#include <mem/mem.h>
 /* extern void io_halt();
 
 void saluda(void){
@@ -107,6 +108,8 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
     mem_init(((atag_t *)atags));
     uart_putln(" [OK]");
 
+    fs_init();
+
     delay(1000);
     uart_puts("Bienvenido a BerryOS\n");
     delay(1000);
@@ -119,11 +122,14 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
         char buf[20];
         char text[100];
         int num = 0;
+        uart_putln(itoa((int)kmalloc(4)));
+        uart_putln(itoa((int)kmalloc(4)));
         uart_puts("¿Que quieres hacer?\n > 1 --> Crear archivo\n > 2 --> Escribir archivo\n > 3 --> Leer archivo\n > 4 --> Borrar archivo\n > ");
         
         c = uart_recv();
         uart_putc(c);
         uart_putc('\n');
+        
         if(c == '1'){
     
             uart_puts("Inserte nombre > ");
@@ -137,6 +143,8 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
             uart_putc('\n');
 
             createFile(buf, i);
+
+            printCurrDir();
             
         }
         else if (c == '2'){
@@ -153,6 +161,7 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
                 uart_putc(c);
                 text[j++] = c;
             }
+            text[j++] = '\0';
             uart_putc('\n');
             write(buf, text);
         }
