@@ -200,20 +200,50 @@ void deleteFile(char* filename){
     if(curr_dir->child[i].inode_num < minFreeInode)
         minFreeInode = curr_dir->child[i].inode_num;
     
-    bzero2(curr_dir->child[i].filename, curr_dir->child[i].fn_size);
-    curr_dir->child[i].fn_size = 0;
-    curr_dir->child[i].inode_num = 0;
-    curr_dir->num_childs--; 
+
     
+    int j = i;
+
     for(i = 0; i < inFile->num_pages; i++){
         free_page(inFile->pages[i]);
-        uart_hex_puts((int)inFile->pages[i]);
         inFile->pages[i] = 0;
     }
-
     inFile->free = 0;
     inFile->size = 0;
     inFile->type = 0;
+    
+    bzero2(curr_dir->child[j].filename, curr_dir->child[j].fn_size);
+
+    int k = curr_dir->num_childs - 1;    
+
+    if(j == k){
+        curr_dir->child[j].fn_size = 0;
+        curr_dir->child[j].inode_num = 0;
+        curr_dir->num_childs--;
+        return;
+    }
+    else{
+        memcpy(curr_dir->child[j].filename, curr_dir->child[k].filename, curr_dir->child[k].fn_size);
+        curr_dir->child[j].fn_size = curr_dir->child[k].fn_size;
+        curr_dir->child[j].inode_num = curr_dir->child[k].inode_num;
+        
+        bzero2(curr_dir->child[k].filename, curr_dir->child[k].fn_size);
+        curr_dir->child[k].fn_size = 0;
+        curr_dir->child[k].inode_num = 0;
+        curr_dir->num_childs--;
+        return;
+        
+    }
+        
+    
+
+    
+
+     
+    
+    
+
+    
 }
 
 void printCurrDir(){
