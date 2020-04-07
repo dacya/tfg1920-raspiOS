@@ -99,6 +99,9 @@ void createFile(char* file, int fnsize){
         return;
 
     uint32_t new = getFreeInode();
+    if(new == 0)
+        return;
+
     i_node_t* newPoint = get_inode(new);
     
     newPoint->pages[0] = aux;
@@ -109,13 +112,46 @@ void createFile(char* file, int fnsize){
     
     memcpy(curr_dir->child[curr_dir->num_childs].filename, file, MIN(MAXFILENAMESIZE, fnsize));
     curr_dir->child[curr_dir->num_childs].filename[MIN(MAXFILENAMESIZE - 1, fnsize)] = '\0';
-    curr_dir->child[curr_dir->num_childs].fn_size = MIN(MAXFILENAMESIZE - 1, fnsize);
+    curr_dir->child[curr_dir->num_childs].fn_size = MIN(MAXFILENAMESIZE, fnsize);
     curr_dir->child[curr_dir->num_childs].inode_num = new;
     curr_dir->num_childs++;
     freeInodes--;
 }
 
+void createDir(char* file, int fnsize){
+    if (freeInodes == 0 || curr_dir->num_childs == MAXFILESPERDIR || fileExists(file) != 0)
+        return;
+    dir_t* aux = (dir_t*)alloc_page();
+    
+    if(aux == NULL)
+        return;
 
+    uint32_t new = getFreeInode();
+    if(new == 0)
+        return;
+    i_node_t* newPoint = get_inode(new);
+    
+    newPoint->pages[0] = aux;
+    newPoint->free = 1;
+    newPoint->num_pages = 1;
+    newPoint->type = 1;
+    
+
+    memcpy(aux->real_name, file, MIN(MAXFILENAMESIZE, fnsize));
+    aux->real_name[MIN(MAXFILENAMESIZE - 1, fnsize)] = '\0';
+    aux->real_name_size = MIN(MAXFILENAMESIZE, fnsize);    
+    aux->num_childs = 2;
+
+    memcpy(aux->child[0].filename, ".\0", 2);
+    aux->child[0].fn_size = 2;
+    root_dir->child[0].inode_num = new;
+    
+    memcpy(aux->child[1].filename, "..\0", 3);
+    root_dir->child[1].fn_size = 3;
+    root_dir->child[1].inode_num = curr_dir->child[0].inode_num;
+    
+    freeInodes--;
+}
 
 
 int write(char* filename, char* text){
@@ -199,7 +235,7 @@ void deleteFile(char* filename){
     
     if(curr_dir->child[i].inode_num < minFreeInode)
         minFreeInode = curr_dir->child[i].inode_num;
-    
+    freeInodes++;    
 
     
     int j = i;
@@ -234,15 +270,6 @@ void deleteFile(char* filename){
         return;
         
     }
-        
-    
-
-    
-
-     
-    
-    
-
     
 }
 
@@ -256,4 +283,25 @@ void printCurrDir(){
         i++;
     }
 }
+
+void printFs(uint32_t inode, uint32_t j){
+    i_node_t* inFile = get_inode(inode);
+    dir_t* dir = (dir_t*)inFile->pages[0];
+    uint32_t i,k;
+    
+    uart_putln(dir->real_name);
+    for(i = 2; i < dir->num_childs; i++){
+        for(k = 0; k < 3*(j+1);k++){
+        uart_putc(' ');
+        }
+        inFile = get_inode(dir->child[i].inode_num);
+        if(inFile->type == 0){
+            uart_putln(dir->child[i].filename);
+        }
+        else{
+            printFs(dir->child[i].inode_num, j + 1);
+        }
+    }
+    return;
+} 
 
