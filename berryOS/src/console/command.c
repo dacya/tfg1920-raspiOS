@@ -41,13 +41,17 @@ void unregcomm(COMMAND* command) {
 }
 
 void commatch(char* match, int argc, char** argv) {
+    int not_found = 1;
     comm_wrapper* commw = start_iterate_comm_wrapper_list(&commands_list);
     while (has_next_comm_wrapper_list(&commands_list, commw)) {
         commw = next_comm_wrapper_list(commw);
         if (streq(match, commw->comm->key)) {
             commw->comm->trigger(argc, argv);
+            not_found = 0;
         }
     }
+    if (not_found)
+        enrichedPrintLn("command not found", &RED, NULL);
 }
 
 void print_command(COMMAND* comm) {

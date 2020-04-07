@@ -58,15 +58,15 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
     print(">> Processes init: ");
     process_init();
     enrichedPrintLn("[OK]", &GREEN, NULL);
-    
-    /* Console */
-    print(">> Console init: ");
-    start_console();
-    enrichedPrintLn("[OK]", &GREEN, NULL);
 
     /* Commands */
     print(" - Commands init: ");
     init_commands();
+    enrichedPrintLn("[OK]", &GREEN, NULL);
+    
+    /* Console */
+    print(">> Console init: ");
+    start_console();
     enrichedPrintLn("[OK]", &GREEN, NULL);
 
     /* INTERRUPTS */
