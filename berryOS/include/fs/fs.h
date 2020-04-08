@@ -54,15 +54,19 @@ void fs_init(void);
 
 void createFile(char* file, int fnsize);
 
+void createDir(char* file, int fnsize);
+
 int getFileSize(char* filename);
 
 char* read(char* filename, uint32_t bytes);
 
 int write(char* filename, char* text);
 
-void deleteFile(char* filename);
+void delete(char* filename);
 
-void printCurrDir();
+void printFs();
+
+void changeDir(char* filename);
 
 
 #endif

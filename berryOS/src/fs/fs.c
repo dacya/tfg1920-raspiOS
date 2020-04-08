@@ -17,18 +17,26 @@
 
 i_node_t* i_node_list_pages[NUM_PAGES_INODE_TABLE];
 
-static i_node_t* get_inode(uint32_t num){
-    return (i_node_t*)(((int)i_node_list_pages[num / NUM_INODES_PER_PAGE]) + (num % NUM_INODES_PER_PAGE)*sizeof(i_node_t)); 
-}
-
 dir_t* root_dir;
 dir_t* curr_dir;
 int freeInodes;
 uint32_t minFreeInode;
 
+
+/* 
+----------------------------------------------------
+                Auxiliar functions
+----------------------------------------------------
+*/
+
+static i_node_t* get_inode(uint32_t num){
+    return (i_node_t*)(((int)i_node_list_pages[num / NUM_INODES_PER_PAGE]) + (num % NUM_INODES_PER_PAGE)*sizeof(i_node_t)); 
+}
+
 static uint32_t getFreeInode(){
     i_node_t* pointer;
     uint32_t i;
+    freeInodes--;
     for(i = minFreeInode; i < NUM_INODES; i++){
         pointer = get_inode(i);
         if(pointer->free == 0){
@@ -40,15 +48,32 @@ static uint32_t getFreeInode(){
     return 0;
 }
 
-static uint32_t fileExists(char* file){  //0 if file doesn't exist in the current directory, number of child if exists
-    uint32_t i = 2;
+static uint32_t fileExists(char* file, uint32_t first_child){  //0 if file doesn't exist in the current directory, number of child if exists
+    uint32_t i = first_child;
     while(i < curr_dir->num_childs){
+        uart_putln(curr_dir->child[i].filename);
         if (streq(file,curr_dir->child[i].filename))
             return i;
         i++;
     }
     return 0;
 }
+
+int getFileSize(char* filename){
+    int i;
+    if ((i = fileExists(filename, 2)) == 0)
+        return 0;
+    
+    i_node_t* inFile = get_inode(curr_dir->child[i].inode_num);
+    
+    return inFile->size;
+}
+
+/* 
+----------------------------------------------------
+            Initialization function
+----------------------------------------------------
+*/
 
 void fs_init(void){
     uint32_t i;
@@ -90,11 +115,18 @@ void fs_init(void){
     minFreeInode = 1;
 }
 
+
+/* 
+----------------------------------------------------
+                Management functions
+----------------------------------------------------
+*/
+
 void createFile(char* file, int fnsize){
-    if (freeInodes == 0 || curr_dir->num_childs == MAXFILESPERDIR || fileExists(file) != 0)
+    if (freeInodes == 0 || curr_dir->num_childs == MAXFILESPERDIR || fileExists(file, 0) != 0)
         return;
     void* aux = alloc_page();
-    
+    uart_putln("llego");
     if(aux == NULL)
         return;
 
@@ -112,14 +144,13 @@ void createFile(char* file, int fnsize){
     
     memcpy(curr_dir->child[curr_dir->num_childs].filename, file, MIN(MAXFILENAMESIZE, fnsize));
     curr_dir->child[curr_dir->num_childs].filename[MIN(MAXFILENAMESIZE - 1, fnsize)] = '\0';
-    curr_dir->child[curr_dir->num_childs].fn_size = MIN(MAXFILENAMESIZE, fnsize);
+    curr_dir->child[curr_dir->num_childs].fn_size = MIN(MAXFILENAMESIZE, fnsize + 1);
     curr_dir->child[curr_dir->num_childs].inode_num = new;
     curr_dir->num_childs++;
-    freeInodes--;
 }
 
 void createDir(char* file, int fnsize){
-    if (freeInodes == 0 || curr_dir->num_childs == MAXFILESPERDIR || fileExists(file) != 0)
+    if (freeInodes == 0 || curr_dir->num_childs == MAXFILESPERDIR || fileExists(file, 0) != 0)
         return;
     dir_t* aux = (dir_t*)alloc_page();
     
@@ -129,9 +160,9 @@ void createDir(char* file, int fnsize){
     uint32_t new = getFreeInode();
     if(new == 0)
         return;
+
     i_node_t* newPoint = get_inode(new);
-    
-    newPoint->pages[0] = aux;
+    newPoint->pages[0] = (page_t*)aux;
     newPoint->free = 1;
     newPoint->num_pages = 1;
     newPoint->type = 1;
@@ -139,27 +170,34 @@ void createDir(char* file, int fnsize){
 
     memcpy(aux->real_name, file, MIN(MAXFILENAMESIZE, fnsize));
     aux->real_name[MIN(MAXFILENAMESIZE - 1, fnsize)] = '\0';
-    aux->real_name_size = MIN(MAXFILENAMESIZE, fnsize);    
+    aux->real_name_size = MIN(MAXFILENAMESIZE, fnsize + 1);    
     aux->num_childs = 2;
 
     memcpy(aux->child[0].filename, ".\0", 2);
     aux->child[0].fn_size = 2;
-    root_dir->child[0].inode_num = new;
+    aux->child[0].inode_num = new;
     
     memcpy(aux->child[1].filename, "..\0", 3);
-    root_dir->child[1].fn_size = 3;
-    root_dir->child[1].inode_num = curr_dir->child[0].inode_num;
+    aux->child[1].fn_size = 3;
+    aux->child[1].inode_num = curr_dir->child[0].inode_num;
     
-    freeInodes--;
+    memcpy(curr_dir->child[curr_dir->num_childs].filename, aux->real_name, aux->real_name_size);
+    curr_dir->child[curr_dir->num_childs].fn_size = aux->real_name_size;
+    curr_dir->child[curr_dir->num_childs++].inode_num = new;
+
 }
 
 
 int write(char* filename, char* text){
     int i;
-    if ((i = fileExists(filename)) == 0)
+    if ((i = fileExists(filename, 2)) == 0)
         return 0;
     
     i_node_t* inFile = get_inode(curr_dir->child[i].inode_num);
+
+    if(inFile->type == 1)
+        return 0;
+
     char* file = ((char*)inFile->pages[inFile->size/PAGE_SIZE]) + (inFile->size % PAGE_SIZE);
     
     i = 0;
@@ -187,10 +225,14 @@ int write(char* filename, char* text){
 char* read(char* filename, uint32_t bytes){
     
     uint32_t i;
-    if ((i = fileExists(filename)) == 0)
+    if ((i = fileExists(filename, 2)) == 0)
         return NULL;
     
     i_node_t* inFile = get_inode(curr_dir->child[i].inode_num);
+    
+    if(inFile->type == 1)
+        return NULL;
+    
     bytes = MIN(bytes, inFile->size);
     char* sol;
     if ((sol = kmalloc(bytes + 1)) == NULL)
@@ -216,29 +258,32 @@ char* read(char* filename, uint32_t bytes){
 
 }
 
-int getFileSize(char* filename){
-    int i;
-    if ((i = fileExists(filename)) == 0)
-        return 0;
-    
-    i_node_t* inFile = get_inode(curr_dir->child[i].inode_num);
-    
-    return inFile->size;
-}
-
-void deleteFile(char* filename){
+void changeDir(char* filename){
     uint32_t i;
-    if ((i = fileExists(filename)) == 0)
+    if ((i = fileExists(filename, 0)) == 0)
         return;
     
     i_node_t* inFile = get_inode(curr_dir->child[i].inode_num);
     
-    if(curr_dir->child[i].inode_num < minFreeInode)
-        minFreeInode = curr_dir->child[i].inode_num;
-    freeInodes++;    
-
+    if(inFile->type == 0)
+        return;
     
-    int j = i;
+    curr_dir = (dir_t*)inFile->pages[0];
+    uart_putln(curr_dir->real_name);
+    return;
+}
+
+/* 
+----------------------------------------------------
+                Delete functions
+----------------------------------------------------
+*/
+static void deleteFile(uint32_t numChild, i_node_t* inFile){
+    uint32_t i;
+    
+    if(curr_dir->child[numChild].inode_num < minFreeInode)
+        minFreeInode = curr_dir->child[numChild].inode_num;
+    freeInodes++;    
 
     for(i = 0; i < inFile->num_pages; i++){
         free_page(inFile->pages[i]);
@@ -248,60 +293,95 @@ void deleteFile(char* filename){
     inFile->size = 0;
     inFile->type = 0;
     
-    bzero2(curr_dir->child[j].filename, curr_dir->child[j].fn_size);
+    bzero2(curr_dir->child[numChild].filename, curr_dir->child[numChild].fn_size);
+    curr_dir->child[numChild].fn_size = 0;
+    curr_dir->child[numChild].inode_num = 0;
+    curr_dir->num_childs--;
+    return;
+    
+}
 
-    int k = curr_dir->num_childs - 1;    
+static void deleteDir(i_node_t* inFile){
+    dir_t* dir = (dir_t*)inFile->pages[0];
+    i_node_t* aux;
 
-    if(j == k){
-        curr_dir->child[j].fn_size = 0;
-        curr_dir->child[j].inode_num = 0;
-        curr_dir->num_childs--;
-        return;
+    uint32_t i;
+    for(i = 2; i < dir->num_childs; i++){
+        aux = get_inode(dir->child[i].inode_num);
+        if(aux->type == 0){
+            deleteFile(i,aux);  //WE cant use it like that, change deleteFile implentation
+        }
+        else{
+            deleteDir(aux);
+        }
     }
+    if(dir->child[0].inode_num < minFreeInode)
+       minFreeInode = dir->child[0].inode_num;
+    freeInodes++;    
+    free_page(inFile->pages[0]);
+    inFile->pages[0] = 0;
+    inFile->free = 0;
+    inFile->size = 0;
+    inFile->type = 0;
+    dir->num_childs = 0;
+    bzero2(dir->real_name, dir->real_name_size);
+    dir->real_name_size = 0;
+    return;
+}
+
+void delete(char* filename){
+    uint32_t i;
+    if((i = fileExists(filename, 2)) == 0)
+        return;
+    
+    i_node_t* inFile = get_inode(curr_dir->child[i].inode_num);
+    if(inFile->type == 0)
+        deleteFile(i, inFile);
     else{
-        memcpy(curr_dir->child[j].filename, curr_dir->child[k].filename, curr_dir->child[k].fn_size);
-        curr_dir->child[j].fn_size = curr_dir->child[k].fn_size;
-        curr_dir->child[j].inode_num = curr_dir->child[k].inode_num;
+        deleteDir(inFile);
+    }
+
+    uint32_t k = curr_dir->num_childs - 1;    
+
+    if(i != k){
+        memcpy(curr_dir->child[i].filename, curr_dir->child[k].filename, curr_dir->child[k].fn_size);
+        curr_dir->child[i].fn_size = curr_dir->child[k].fn_size;
+        curr_dir->child[i].inode_num = curr_dir->child[k].inode_num;
         
         bzero2(curr_dir->child[k].filename, curr_dir->child[k].fn_size);
         curr_dir->child[k].fn_size = 0;
         curr_dir->child[k].inode_num = 0;
-        curr_dir->num_childs--;
-        return;
-        
     }
-    
+    return;
 }
 
-void printCurrDir(){
-    uint32_t i = 0;
-    
-    while(i < curr_dir->num_childs){
-        uart_puts(curr_dir->child[i].filename);
-        uart_puts("--> in = ");
-        uart_putln(itoa(curr_dir->child[i].inode_num));
-        i++;
-    }
-}
+/* 
+----------------------------------------------------
+                Print functions
+----------------------------------------------------
+*/
 
-void printFs(uint32_t inode, uint32_t j){
+static void recPrintFs(uint32_t inode, uint32_t j){
     i_node_t* inFile = get_inode(inode);
     dir_t* dir = (dir_t*)inFile->pages[0];
     uint32_t i,k;
-    
+    i_node_t* child; 
+
     uart_putln(dir->real_name);
     for(i = 2; i < dir->num_childs; i++){
-        for(k = 0; k < 3*(j+1);k++){
-        uart_putc(' ');
-        }
-        inFile = get_inode(dir->child[i].inode_num);
-        if(inFile->type == 0){
+        for(k = 0; k < 3*(j+1);k++)
+            uart_putc(' ');
+        child = get_inode(dir->child[i].inode_num);
+        if(child->type == 0){
             uart_putln(dir->child[i].filename);
         }
         else{
-            printFs(dir->child[i].inode_num, j + 1);
+            recPrintFs(dir->child[i].inode_num, j + 1);
         }
     }
     return;
-} 
+}
 
+void printFs(){
+    recPrintFs(0,0);
+}

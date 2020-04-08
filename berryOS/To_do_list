@@ -1,7 +1,7 @@
+1. Debuguear errores (borrado)
+2. allow paths in filenames
 
 
-
-a. allow paths in filenames
 b. add offset to file i-node for better read/write implementation??
 c. if b --> create open and close functions to manage offset
 
@@ -22,7 +22,7 @@ Fs --> bufffff (Mucho que mostrar, mejor idea --> mostrar jerarquía de carpetas
 -> ¿Meter offset en i-nodo es buena idea?
 -> ¿Implementación de read reservo yo el puntero, o se lo dejo al usuario?
     Dejárselo al usuario -> problema de seguridad
-    Resevarlo yo -> usuario puede olvidarse de liberarlo
+    Resevarlo yo -> usuario puede olvidarse de liberarlo  <-- This
 
 
 ---------------------------------------
@@ -32,3 +32,7 @@ fs.c
 fs.h
 stdlib.h
 mem.h
+
+
+
+git commit -m "Created directories. Must fix deleteFile implementation."

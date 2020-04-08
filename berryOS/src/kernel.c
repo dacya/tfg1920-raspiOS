@@ -126,7 +126,7 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
         char text[100];
         int num = 0;
         
-        uart_puts("¿Que quieres hacer?\n > 1 --> Crear archivo\n > 2 --> Escribir archivo\n > 3 --> Leer archivo\n > 4 --> Borrar archivo\n > ");
+        uart_puts("¿Que quieres hacer?\n > 1 --> Crear archivo\n > 2 --> Crear directorio \n > 3 --> Escribir archivo\n > 4 --> Leer archivo\n > 5 --> Borrar archivo/directorio\n > 6 --> Cambiar directorio\n > 7 --> Imprimir estructura\n > ");
         
         c = uart_recv();
         uart_putc(c);
@@ -146,10 +146,24 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
 
             createFile(buf, i);
 
-            printCurrDir();
+            printFs();
             
         }
         else if (c == '2'){
+            uart_puts("Inserte nombre > ");
+             
+            while((c = uart_recv()) != '\r')  {
+                uart_putc(c);
+                buf[i++] = c;
+            }
+            buf[i++] = '\0';
+            uart_putc('\n');
+
+            createDir(buf, i);
+
+            printFs();
+        }
+        else if (c == '3'){
             uart_puts("Inserte nombre > ");
              
             while((c = uart_recv()) != '\r')  {
@@ -167,7 +181,7 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
             uart_putc('\n');
             write(buf, text);
         }
-        else if (c == '3'){
+        else if (c == '4'){
             uart_puts("Inserte nombre > ");
             while((c = uart_recv()) != '\r')  {
                 uart_putc(c);
@@ -187,9 +201,9 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
 
             uart_puts("    Texto > ");
             uart_putln(aux);
-            kfree(aux);
+            kfree(aux);            
         }
-        else if (c == '4'){
+        else if(c == '5'){
             uart_puts("Inserte nombre > ");
              
             
@@ -200,9 +214,24 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
             buf[i++] = '\0';
             uart_putc('\n');
 
-            deleteFile(buf);
+            delete(buf);
 
-            printCurrDir();
+            printFs();
+        }
+        else if(c == '6'){
+            uart_puts("Inserte nombre > ");
+             
+        
+            while((c = uart_recv()) != '\r')  {
+                uart_putc(c);
+                buf[i++] = c;
+            }
+            buf[i++] = '\0';
+
+            changeDir(buf);
+        }
+        else if(c == '7'){
+            printFs();
         }
 
     }
