@@ -13,7 +13,6 @@ run: build
 	@echo "Running qemu..."
 	qemu-system-arm -m 256 -M raspi2 -serial stdio -kernel $(BUILD_DIR)/myos.elf
 
-
 #target for .c files
 $(BUILD_DIR)/%_c.o: $(SRC_DIR)/%.c 
 	@mkdir -p $(@D)
@@ -33,6 +32,7 @@ C_FILES += $(wildcard $(SRC_DIR)/*/*.c)
 C_FILES += $(wildcard $(SRC_DIR)/*.c)
 
 ASM_FILES = $(wildcard $(SRC_ARCH)/ARMv7/*.S) #Remember to add the context.S when using processes
+ASM_FILES += $(wildcard $(SRC_DIR)/proc/*/*.S) 
 ASM_FILES += $(wildcard $(SRC_DIR)/proc/*.S) 
 
 OBJ_FILES = $(C_FILES:$(SRC_DIR)/%.c=$(BUILD_DIR)/%_c.o)

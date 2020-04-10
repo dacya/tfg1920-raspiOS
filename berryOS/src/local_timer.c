@@ -146,8 +146,6 @@ void write_CNTX_TVAL(timer_selection_t local_timer_select, uint32_t value){
 
 //register like arm timer interrupt
 void local_timer_handler(void) {
-    uart_putln("timer interrupt detected!");
-    uart_putln("changing process");
     schedule();
 }
 

@@ -4,7 +4,8 @@
 *
 * Alejandro Cancelo Correia
 * Nov, 25, 2019
- */
+*/
+.equ IRQ_STACK, 0x4000
 .equ VECTOR_TABLE_INIT, 0x00000000
 .equ IRQ_MODE, 0x12
 .equ FIQ_MODE, 0x11
@@ -109,6 +110,7 @@ data_abort_s_handler:
 .extern __stack_memory
 .extern __process_lr
 .extern __scheduler_finished
+.extern print_irq_stack
 irq_s_handler:
     //srsdb sp!, #IRQ_MODE //we stores the spsr and lr at the address contained in sp of the mode irq
     /*
@@ -122,6 +124,8 @@ irq_s_handler:
     mov r12, #0x0
     str r12, [r0]
     bl irq_c_handler
+
+    bl print_irq_stack
     pop {r0-r12, lr}
 
     push {r0}
@@ -139,7 +143,8 @@ irq_s_handler:
 
         ldr r0, =__stack_memory
         str sp, [r0]
-
+        mov sp, #IRQ_STACK
+        
         mrs r0, spsr
         msr cpsr_cxsf, r0 //we change cpsr to the corresponding value of cpsr of the new process
         /* we load the correct value of r0 and we return to where our new

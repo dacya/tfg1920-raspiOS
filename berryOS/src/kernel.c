@@ -9,26 +9,49 @@
 #include <proc/pcb.h>
 #include <console/console.h>
 #include <console/command.h>
+#include <proc/locks/mutex.h>
 
 extern void io_halt();
 
-void saluda(void){
-    int a = 2;
-    int i = 0;
-    while(1){
-        if(i == 100000000){
-            uart_puts("I'm the CREATED function process --> a = ");
-            uart_putln(itoa(a));
-           // break;
-           i = 0;
+COMMAND lawebada;
+
+uint32_t critical_value = 0;
+//1 locked 0 unlocked
+int mutex = MUTEX_UNLOCK;
+
+void test1(void){
+    uint32_t j = 0;
+    uint32_t i = 0;
+    uart_putln("Executing test1");
+    take_lock(&mutex);
+    uart_putln("mutex took");
+    while (1) {
+        if(i == 1000000000){
+            uart_putln("I'm test1 -->");
+            i = 0;
         }
-        /* if(i == 300000000){
-            uart_putln("Exiting from saluda");
-            break;
-        } */
-       i++;
+        i++;    
     }
-    uart_putln("really");
+}
+
+void test2(void){
+    uint32_t j = 0;
+    uint32_t i = 0;
+    uart_putln("Executing test2");
+    take_lock(&mutex);
+    uart_putln("lock taked by test2");
+
+    while (1) {
+        if(i == 1000000000){
+            uart_putln("I'm test2 -->");
+            i = 0;
+        }
+        i++;    
+    }
+}
+
+void lawebada_handler(int argc, char** argv){
+    printLn("This command works");
 }
 
 void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {   
@@ -43,7 +66,7 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
     uart_putln("[OK]");
 
     /* DYNAMIC MEMORY */
-    uart_puts(">> Dynamic memory: ");
+    uart_puts(">> (uart)Dynamic memory: ");
     mem_init(((atag_t *)atags));
     uart_putln(" [OK]");
 
@@ -61,13 +84,14 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
     
     /* Console */
     print(">> Console init: ");
-    start_console();
+    //start_console();
     enrichedPrintLn("[OK]", &GREEN, NULL);
 
     /* Commands */
-    print(" - Commands init: ");
+    print("\t- Commands init: ");
     init_commands();
     enrichedPrintLn("[OK]", &GREEN, NULL);
+    
 
     /* INTERRUPTS */
     print(">> Interrupts init: ");
@@ -75,18 +99,26 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
     enrichedPrintLn("[OK]", &GREEN, NULL);
 
     /* LOCAL TIMER */
-    print(" - Register timer handler and clearer: ");
+    print("\t- Register timer handler and clearer: ");
     register_irq_handler(ARM_TIMER, local_timer_handler, local_timer_clearer);
     enrichedPrintLn("[OK]", &GREEN, NULL);
 
     print(">> Local timer init: ");
-    local_timer_init(VIRTUAL_SYS, 1000);
+    local_timer_init(VIRTUAL_SYS, 5000);
     enrichedPrintLn("[OK]", &GREEN, NULL);
+
+    //TEST PROCESS SECTION
+    create_kernel_thread(&test1, "Proc1", 5);
+    create_kernel_thread(&test2, "Kezo", 5);
+
+
+
+    lawebada.helpText = "I'm goin to end this whole man's career";
+    lawebada.key = "lawebada";
+    lawebada.trigger = lawebada_handler;
+
+    regcomm(&lawebada);
 
     print_processes();
 
-    //TEST PROCESS SECTION
-    create_kernel_thread(&saluda, "Proc1", 5);
-
-    //print_processes();
 }

@@ -3,7 +3,7 @@
 #include <utils/stdlib.h>
 #include <interrupts.h>
 #include <io/uart.h>
-
+#include <proc/locks/mutex.h>
 static uint32_t pids = 1;
 #define NEW_PID pids++;
 /**
@@ -38,13 +38,15 @@ pcb_list_t run_queue;
 
 static sched_control_t* scheduler_control;
 
+extern int mutex;
 static void init_function(void){
     int a = 1;
-    int i = 0;    
+    int i = 0;
+    
     while (1) {
-        if(i == 100000000){
-            uart_puts("I'm INIT --> a = ");
-            uart_putln(itoa(a));
+        //uart_putln("INIT");
+        if(i == 1000000000){
+            uart_putln("I'm INIT -->");
             i = 0;
         }
        i++;    
@@ -106,9 +108,6 @@ static void round_robin_sched_policy(void){
  * process available inside the run queue
 */
 static void reap(void){
-    uart_puts("Process:");
-    uart_putln(current_process->proc_name);
-    uart_putln("Cleaning all resources from old current process pcb");
     DISABLE_INTERRUPTS();
     process_control_block_t * new_thread, * old_thread;
 
@@ -121,8 +120,6 @@ static void reap(void){
     current_process = new_thread;
 
     //remove_pcb_immediate(&run_queue, old_thread);
-
-    uart_putln(new_thread->proc_name);
 
     free_page(old_thread->stack_page);
     kfree(old_thread);
@@ -178,9 +175,7 @@ void process_init(void){
 
     sched_control_t* main_scheduling;
 
-    uart_putln("allocating memory for main_scheduling");
     main_scheduling = kmalloc(sizeof(sched_control_t));
-    uart_putln("cleaning memory for main_scheduling");
     bzero2(main_scheduling, sizeof(sched_control_t));
 
     main_scheduling->using = RR;

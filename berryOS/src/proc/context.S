@@ -5,7 +5,7 @@
 * Alejandro Cancelo Correia
 * March, 31, 2020
 */
-
+.equ IRQ_STACK, 0x4000
 .equ IRQ_MODE, 0x12
 .equ SUPERVISOR_MODE, 0x13
 
@@ -229,6 +229,7 @@ yield_to_next_process:
     r7 < point E
     r8 
     r9 */
+    mov sp, #IRQ_STACK
     mov r7, r0 //direction to pcb
     ldr r8, [r0] //we load the stack pointer of process_pcb argument
     ldmfd r8!, {r1} //we load cpsr
