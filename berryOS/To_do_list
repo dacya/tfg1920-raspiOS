@@ -1,5 +1,4 @@
-1. Debuguear errores (borrado)
-2. allow paths in filenames
+1. allow paths in filenames
 
 
 b. add offset to file i-node for better read/write implementation??

@@ -29,10 +29,12 @@ uint32_t minFreeInode;
 ----------------------------------------------------
 */
 
+//Calculate the i-node position using the i-node number
 static i_node_t* get_inode(uint32_t num){
     return (i_node_t*)(((int)i_node_list_pages[num / NUM_INODES_PER_PAGE]) + (num % NUM_INODES_PER_PAGE)*sizeof(i_node_t)); 
 }
 
+//Returns the lowest i-node number. It uses the global variable "minFreeInode" for more efficiency.
 static uint32_t getFreeInode(){
     i_node_t* pointer;
     uint32_t i;
@@ -48,6 +50,8 @@ static uint32_t getFreeInode(){
     return 0;
 }
 
+//Return the file position in the father's child array, or 0 if not found.
+//first_child is used to discard . and .. when needed.
 static uint32_t fileExists(char* file, uint32_t first_child, dir_t* father){  //0 if file doesn't exist in the current directory, number of child if exists
     uint32_t i = first_child;
     while(i < father->num_childs){
@@ -58,13 +62,18 @@ static uint32_t fileExists(char* file, uint32_t first_child, dir_t* father){  //
     return 0;
 }
 
+int exists(char* file){
+    return fileExists(file, 0, curr_dir) != 0;
+}
+
 int getFileSize(char* filename){
     int i;
     if ((i = fileExists(filename, 2, curr_dir)) == 0)
-        return 0;
+        return -1;
     
     i_node_t* inFile = get_inode(curr_dir->child[i].inode_num);
-    
+    if(inFile->type == 1)
+        return -1;
     return inFile->size;
 }
 
@@ -189,26 +198,36 @@ void createDir(char* file, int fnsize){
 int write(char* filename, char* text){
     int i;
     if ((i = fileExists(filename, 2, curr_dir)) == 0)
-        return 0;
+        return -1;
     
     i_node_t* inFile = get_inode(curr_dir->child[i].inode_num);
 
     if(inFile->type == 1)
-        return 0;
+        return -1;
 
     char* file = ((char*)inFile->pages[inFile->size/PAGE_SIZE]) + (inFile->size % PAGE_SIZE);
-    
+    int actual_page = inFile->size/PAGE_SIZE;
     i = 0;
     while(*text != '\0'){
-        if((i + inFile->size) % PAGE_SIZE == 0 && (i + inFile->size) != 0){
-            uart_putln("No me mires");
-            void* aux;
-            if(inFile->num_pages == MAXPAGESPERFILE || (aux = alloc_page()) == NULL){
+        if((i + inFile->size) % PAGE_SIZE == 0 && (i + inFile->size) != 0){ //If we reach the endo of the page, we change file
+            
+            if(actual_page == MAXPAGESPERFILE - 1){ //If file already use all pages allowed, return the written bytes.
                 inFile->size += i;
                 return i;
             }
-            inFile->pages[inFile->num_pages++] = aux;
-            file = aux;    
+            else if(actual_page < inFile->num_pages - 1){ //If we still have unused pages allocated, we use them. 
+                file = (char*)inFile->pages[actual_page + 1];
+            }
+            else{ //We need to allocate a new page
+                void* aux;
+                if ((aux = alloc_page()) == NULL){ //If there are no free pages, return the written bytes.
+                    inFile->size += i;
+                    return i;
+                }
+                inFile->pages[inFile->num_pages++] = aux;
+                file = aux;
+            }
+                
         }
         *file = *text;
         i++;
@@ -242,10 +261,9 @@ char* read(char* filename, uint32_t bytes){
 
     i = 0;
     while(i < bytes){
-        if(i % PAGE_SIZE == 0 && i != 0){
-            uart_putln("No me mires");
+        if(i % PAGE_SIZE == 0 && i != 0)
             file = (char *)inFile->pages[j++];
-        }
+
         *aux = *file;
         i++;
         aux++;
@@ -267,7 +285,6 @@ void changeDir(char* filename){
         return;
     
     curr_dir = (dir_t*)inFile->pages[0];
-    uart_putln(curr_dir->real_name);
     return;
 }
 
@@ -276,6 +293,8 @@ void changeDir(char* filename){
                 Delete functions
 ----------------------------------------------------
 */
+
+//Delete file and free all pages used (memory pages, i-node structure and father reference to child)
 static void deleteFile(dir_t* father, i_node_t* inFile, uint32_t numChild){
     uint32_t i;
     
@@ -299,6 +318,7 @@ static void deleteFile(dir_t* father, i_node_t* inFile, uint32_t numChild){
     
 }
 
+//Delete recursively all the content in the directory, incluiding its own metadata
 static void deleteDirContent(i_node_t* inFile){
     dir_t* dir = (dir_t*)inFile->pages[0];
     i_node_t* aux;
@@ -336,7 +356,7 @@ void delete(char* filename){
     if(inFile->type == 0)
         deleteFile(curr_dir, inFile, i);
     else{
-        deleteDirContent(inFile);
+        deleteDirContent(inFile);   //We have deleted the dir information, but we still need to delete the father reference to the dir
         bzero2(curr_dir->child[i].filename, (int)curr_dir->child[i].fn_size);
         curr_dir->child[i].fn_size = 0;
         curr_dir->child[i].inode_num = 0;
@@ -345,7 +365,7 @@ void delete(char* filename){
 
     uint32_t k = curr_dir->num_childs;    
 
-    if(i != k){
+    if(i != k){ //If the file deleted is not the last, we exchange the deleted position with the last position
         memcpy(curr_dir->child[i].filename, curr_dir->child[k].filename, curr_dir->child[k].fn_size);
         curr_dir->child[i].fn_size = curr_dir->child[k].fn_size;
         curr_dir->child[i].inode_num = curr_dir->child[k].inode_num;
@@ -363,6 +383,8 @@ void delete(char* filename){
 ----------------------------------------------------
 */
 
+//This method print recursively from inode.
+//j is used to count the level for print spaces.
 static void recPrintFs(uint32_t inode, uint32_t j){
     i_node_t* inFile = get_inode(inode);
     dir_t* dir = (dir_t*)inFile->pages[0];

@@ -45,27 +45,98 @@ typedef struct dir {
     dir_entry_t child[MAXFILESPERDIR]; //child[0] --> itself(.) | child[1] --> father(..)
 } dir_t;
  
+/*
+ * File and directory names must be finished in '\0' character.
+ */
 
 /**
- * Initialize root directory and all needed
- * structures. 
+ * Initialize root directory and the i-node structure
  */
 void fs_init(void);
 
+/**
+ * Check if a file exists.  
+ * 
+ * @param file The name of the file to check.
+ * 
+ * @return Returns 1 if file exists, 0 if not.
+ */
+int exists(char* file);
+
+/**
+ * Create a file. This method takes no effect on the following cases:
+ *      -> There are no free inodes.
+ *      -> File already exists
+ *      -> Limit of files per directory reached
+ *      -> There are no free memory pages
+ * 
+ * @param file The name of the file we want to create.
+ * @param fnsize The filename's size
+ */
 void createFile(char* file, int fnsize);
 
+/**
+ * Create a directory. This method takes no effect on the following cases:
+ *      -> There are no free inodes.
+ *      -> File already exists
+ *      -> Limit of files per directory reached
+ *      -> There are no free memory pages
+ * 
+ * @param file The name of the direc we want to create.
+ * @param fnsize The filename's size
+ */
 void createDir(char* file, int fnsize);
 
+/**
+ * Obtain the size of a file.  
+ * 
+ * @param filename The filename whose size we want.
+ * 
+ * @return Returns the size of filename. Returns -1 if the file doesn't exist or is a directory.
+ */
 int getFileSize(char* filename);
 
+/**
+ * Read the content of a file. 
+ * 
+ * @param filename The name of the file we want to read.
+ * @param bytes Number of bytes to read.
+ * 
+ * @return Returns a pointer to char array, whose size is the minimum between bytes and the file's size.
+ *         Returns NULL if the file doesn't exist or is a directory.
+ *         The user must free this pointer.
+ */
 char* read(char* filename, uint32_t bytes);
 
+/**
+ * Concatenate text at the end of the file.  
+ * 
+ * @param filename The name of the file where we want to write.
+ * @param text The text to concatenate.
+ * 
+ * @return Returns the number of written bytes. Returns -1 if the file doesn't exist or is a directory.
+ */
 int write(char* filename, char* text);
 
+/**
+ * Delete a file or a directory. If the file is a directory,this method will recursively delete it's 
+ * content. If the file doesn't exist, this method takes no effect.
+ * 
+ * @param filename The name of the file we want to delete.
+ */
 void delete(char* filename);
 
+/**
+ * Print the whole filesystem recursively. 
+ */
 void printFs();
 
+/**
+ * Change the current directory. Root is the first current directory. If the file doesn't exits or is
+ * not a directory, this method takes no effect.
+ * 
+ * @param filename The name of the directory.
+ */
 void changeDir(char* filename);
 
 
