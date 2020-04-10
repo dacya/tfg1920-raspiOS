@@ -136,6 +136,20 @@ void console_putStr(char* str, color_24* textColor, color_24* bgColor) {
     }
 }
 
+void console_clear_screen() {
+    VIEW_GROUP* line;
+    while (display.children.size > 0) {
+        line = removeViewByIndex(&display, 0);
+        while (line->children.size > 0) {
+            VIEW* v = removeViewByIndex(line, 0);
+            destroyView(v);
+            kfree(v);
+        }
+        kfree(line);
+    }
+    drawGroup(&display);
+}
+
 void put_char(char c) {
     int size = strlen(textInput.text);
     char* news = kmalloc(size + 2); // add \0 and the new char
