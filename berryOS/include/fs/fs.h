@@ -39,14 +39,12 @@ typedef struct dir_entry {
 #define MAXFILESPERDIR (PAGE_SIZE/sizeof(dir_entry_t))
 
 typedef struct dir {
-    char real_name[MAXFILENAMESIZE]; //This is not exactly like ext2, but makes it easier some operations
-    uint8_t real_name_size;
-    uint32_t num_childs;
+    uint32_t num_childs; //This is not exactly like ext2, but makes it easier some operations 
     dir_entry_t child[MAXFILESPERDIR]; //child[0] --> itself(.) | child[1] --> father(..)
 } dir_t;
  
 /*
- * File and directory names must be finished in '\0' character.
+ * Path, directory and file names must be finished in '\0' character.
  */
 
 /**
@@ -57,74 +55,76 @@ void fs_init(void);
 /**
  * Check if a file exists.  
  * 
- * @param file The name of the file to check.
+ * @param path The name of the path to check.
  * 
- * @return Returns 1 if file exists, 0 if not.
+ * @return Returns 1 if path exists, 0 if not.
  */
-int exists(char* file);
+int exists(char* path);
 
 /**
  * Create a file. This method takes no effect on the following cases:
  *      -> There are no free inodes.
  *      -> File already exists
+ *      -> Path is not valid
  *      -> Limit of files per directory reached
  *      -> There are no free memory pages
  * 
- * @param file The name of the file we want to create.
+ * @param path The path where we want to create the file. The last part of the path is the filename.
  * @param fnsize The filename's size
  */
-void createFile(char* file, int fnsize);
+void createFile(char* path, int fnsize);
 
 /**
  * Create a directory. This method takes no effect on the following cases:
  *      -> There are no free inodes.
  *      -> File already exists
+ *      -> Path is not valid
  *      -> Limit of files per directory reached
  *      -> There are no free memory pages
  * 
- * @param file The name of the direc we want to create.
+ * @param path The path where we want to create the dir. The last part of the path is the dirname.
  * @param fnsize The filename's size
  */
-void createDir(char* file, int fnsize);
+void createDir(char* path, int fnsize);
 
 /**
  * Obtain the size of a file.  
  * 
- * @param filename The filename whose size we want.
+ * @param path The filename whose size we want.
  * 
- * @return Returns the size of filename. Returns -1 if the file doesn't exist or is a directory.
+ * @return Returns the size of filename. Returns -1 if the file doesn't exist, is a directory or the path is wrong.
  */
-int getFileSize(char* filename);
+int getFileSize(char* path);
 
 /**
  * Read the content of a file. 
  * 
- * @param filename The name of the file we want to read.
+ * @param path The name of the file we want to read.
  * @param bytes Number of bytes to read.
  * 
  * @return Returns a pointer to char array, whose size is the minimum between bytes and the file's size.
- *         Returns NULL if the file doesn't exist or is a directory.
+ *         Returns NULL if the file doesn't exist, is a directory or path is wrong.
  *         The user must free this pointer.
  */
-char* read(char* filename, uint32_t bytes);
+char* read(char* path, uint32_t bytes);
 
 /**
  * Concatenate text at the end of the file.  
  * 
- * @param filename The name of the file where we want to write.
+ * @param path The name of the file where we want to write.
  * @param text The text to concatenate.
  * 
- * @return Returns the number of written bytes. Returns -1 if the file doesn't exist or is a directory.
+ * @return Returns the number of written bytes. Returns -1 if the file doesn't exist, is a directory or path is wrong.
  */
-int write(char* filename, char* text);
+int write(char* path, char* text);
 
 /**
  * Delete a file or a directory. If the file is a directory,this method will recursively delete it's 
  * content. If the file doesn't exist, this method takes no effect.
  * 
- * @param filename The name of the file we want to delete.
+ * @param path The name of the file we want to delete.
  */
-void delete(char* filename);
+void delete(char* path);
 
 /**
  * Print the whole filesystem recursively. 
@@ -132,12 +132,12 @@ void delete(char* filename);
 void printFs();
 
 /**
- * Change the current directory. Root is the first current directory. If the file doesn't exits or is
- * not a directory, this method takes no effect.
+ * Change the current directory. Root is the first current directory. If the file doesn't exits, is
+ * not a directory or path is wrong, this method takes no effect.
  * 
- * @param filename The name of the directory.
+ * @param path The name of the directory.
  */
-void changeDir(char* filename);
+void changeDir(char* path);
 
 
 #endif
