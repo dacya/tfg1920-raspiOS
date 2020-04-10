@@ -12,8 +12,8 @@
 #include <io/uart.h>
 
 #define NUM_PAGES_INODE_TABLE 2
-#define NUM_INODES ((PAGE_SIZE/sizeof(i_node_t))*NUM_PAGES_INODE_TABLE) //340
-#define NUM_INODES_PER_PAGE (NUM_INODES/NUM_PAGES_INODE_TABLE)          //170
+#define NUM_INODES ((PAGE_SIZE/sizeof(i_node_t))*NUM_PAGES_INODE_TABLE) 
+#define NUM_INODES_PER_PAGE (NUM_INODES/NUM_PAGES_INODE_TABLE)          
 
 i_node_t* i_node_list_pages[NUM_PAGES_INODE_TABLE];
 
@@ -169,7 +169,7 @@ void createFile(char* path, int fnsize){
     if (curr_dir == NULL || freeInodes == 0 || fileExists(file, 0, curr_dir) != -1 || curr_dir->num_childs == MAXFILESPERDIR){
         kfree(file); return;
     }
-    kfree(file);
+    
     void* aux = alloc_page();
     if(aux == NULL)
         return;
@@ -190,6 +190,7 @@ void createFile(char* path, int fnsize){
     curr_dir->child[curr_dir->num_childs].fn_size = MIN(MAXFILENAMESIZE, fnsize + 1);
     curr_dir->child[curr_dir->num_childs].inode_num = new;
     curr_dir->num_childs++;
+    kfree(file);
 }
 
 void createDir(char* path, int fnsize){
