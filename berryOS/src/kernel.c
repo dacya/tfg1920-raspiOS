@@ -179,7 +179,8 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
             }
             text[j++] = '\0';
             uart_putc('\n');
-            write(buf, text);
+            
+            getFsInterface()->write(buf, text);
         }
         else if (c == '4'){
             uart_puts("Inserte nombre > ");
@@ -231,7 +232,7 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
             changeDir(buf);
         }
         else if(c == '7'){
-            printFs();
+            getFsInterface()->printFs();
         }
 
     }

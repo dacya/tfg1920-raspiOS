@@ -21,6 +21,18 @@
 #define MAXFILESIZE (MAXPAGESPERFILE*PAGE_SIZE)  //8 KiB
 #define MAXFILENAMESIZE 20 
 
+typedef struct filesystem_methods{
+    int (*write)(char* path, char* text);
+    char* (*read)(char* path, uint32_t bytes);
+    void (*delete)(char* path);
+    void (*createFile)(char* path, int fnsize);
+    void (*createDir)(char* path, int fnsize);
+    int (*exists)(char* path);
+    void (*printFs)(void);
+    int (*getFileSize)(char* path);
+    void (*changeDir)(char* path);
+} fs_interface;
+
 typedef struct i_node {
     uint32_t size; //In case of a dir, size means num of entries. In case of a file, size means filesize 
     uint8_t num_pages; //Num of pages used
@@ -51,6 +63,15 @@ typedef struct dir {
  * Initialize root directory and the i-node structure
  */
 void fs_init(void);
+
+/* *
+ * Returns an interface. The user can create his own methods and 
+ * initialize the interface with them in fs_init. These methods must:
+ *      -> Return the same type that the original methods
+ *      -> Have the same parameters
+ * 
+ */
+fs_interface* getFsInterface(void);
 
 /**
  * Check if a file exists.  
@@ -129,7 +150,7 @@ void delete(char* path);
 /**
  * Print the whole filesystem recursively. 
  */
-void printFs();
+void printFs(void);
 
 /**
  * Change the current directory. Root is the first current directory. If the file doesn't exits, is

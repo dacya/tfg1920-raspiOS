@@ -22,6 +22,7 @@ dir_t* current_glob;
 int freeInodes;
 uint32_t minFreeInode;
 
+fs_interface interface;
 
 /* 
 ----------------------------------------------------
@@ -119,6 +120,22 @@ int getFileSize(char* path){
 */
 
 void fs_init(void){
+    
+    /*We initialize the interface function.
+      User could create his own methods and 
+      initialize them. To obtain this interface
+      user must call getFsInterface method*/  
+    interface.write = write;
+    interface.read = read;
+    interface.delete = delete;
+    interface.createFile = createFile;
+    interface.createDir = createDir;
+    interface.exists = exists;
+    interface.printFs = printFs;
+    interface.getFileSize = getFileSize;
+    interface.changeDir = changeDir;
+
+
     uint32_t i;
     i_node_t* iter;
     
@@ -162,6 +179,10 @@ void fs_init(void){
                 Management functions
 ----------------------------------------------------
 */
+
+fs_interface* getFsInterface(void){
+    return &interface;
+}
 
 void createFile(char* path, int fnsize){
     char* file = kmalloc(MAXFILESIZE);
@@ -449,6 +470,6 @@ static void recPrintFs(uint32_t inode, uint32_t j){
     return;
 }
 
-void printFs(){
+void printFs(void){
     recPrintFs(0,0);
 }
