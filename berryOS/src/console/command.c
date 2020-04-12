@@ -9,12 +9,19 @@ IMPLEMENT_LIST(comm_wrapper);
 comm_wrapper_list_t commands_list;
 
 COMMAND shcomm;
+COMMAND* delayedList[20];
+int delayed = 0;
+int initialized = 0;
+
 
 void shcomm_trigger(int, char**);
 
 void init_commands() {
     INITIALIZE_LIST(commands_list, comm_wrapper);
-
+    initialized = 1;
+    for (int i = 0; i < delayed; i++) {
+        regcomm(delayedList[i]);
+    }
     // registering shcomm
     shcomm.key = "shcomm";
     shcomm.helpText = "Lists all registered commands.";
@@ -23,9 +30,15 @@ void init_commands() {
 }
 
 void regcomm(COMMAND* comm) {
-    comm_wrapper* newcomm = kmalloc(sizeof(comm_wrapper));
-    newcomm->comm = comm;
-    append_comm_wrapper_list(&commands_list, newcomm);
+    if (initialized) {
+        comm_wrapper* newcomm = kmalloc(sizeof(comm_wrapper));
+        newcomm->comm = comm;
+        append_comm_wrapper_list(&commands_list, newcomm);
+    } else {
+        if (delayed < 20) {
+            delayedList[delayed++] = comm;
+        }
+    }
 }
 
 void unregcomm(COMMAND* command) {
