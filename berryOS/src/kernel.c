@@ -11,7 +11,7 @@
 #include <console/command.h>
 #include <fs/fs.h>
 #include <mem/mem.h>
-/* extern void io_halt();
+extern void io_halt();
 
 void saluda(void){
     int a = 2;
@@ -26,7 +26,7 @@ void saluda(void){
         /* if(i == 300000000){
             uart_putln("Exiting from saluda");
             break;
-        } 
+        }*/ 
        i++;
     }
     uart_putln("really");
@@ -38,44 +38,50 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
     (void) atags;
     pin_set_function(17, OUTPUT);
     
-    /* UART 
+    /* UART */ 
     uart_init();
     uart_puts(">> Uart init");
     uart_putln("[OK]");
 
-    /* DYNAMIC MEMORY 
+    /* DYNAMIC MEMORY */
     uart_puts(">> Dynamic memory: ");
     mem_init(((atag_t *)atags));
     uart_putln(" [OK]");
 
-    /* HDMI 
+    
+    /* HDMI */
     gpu_init();
     print(">> Dynamic memory: ");
     enrichedPrintLn("[OK]", &GREEN, NULL);
     print(">> GPU init: ");
     enrichedPrintLn("[OK]", &GREEN, NULL);
 
-    /* Processes 
+    /* Processes */
     print(">> Processes init: ");
     process_init();
     enrichedPrintLn("[OK]", &GREEN, NULL);
     
-    /* Console 
+    /* Console */
     print(">> Console init: ");
     start_console();
     enrichedPrintLn("[OK]", &GREEN, NULL);
 
-    /* Commands 
+    /* Filesystem */
+    print(">> Filesystem init: ");
+    fs_init();
+    enrichedPrintLn("[OK]", &GREEN, NULL);
+    
+    /* Commands */
     print(" - Commands init: ");
     init_commands();
     enrichedPrintLn("[OK]", &GREEN, NULL);
 
-    /* INTERRUPTS 
+    /* INTERRUPTS */
     print(">> Interrupts init: ");
     interrupts_init();
     enrichedPrintLn("[OK]", &GREEN, NULL);
 
-    /* LOCAL TIMER 
+    /* LOCAL TIMER */
     print(" - Register timer handler and clearer: ");
     register_irq_handler(ARM_TIMER, local_timer_handler, local_timer_clearer);
     enrichedPrintLn("[OK]", &GREEN, NULL);
@@ -90,9 +96,9 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
     create_kernel_thread(&saluda, "Proc1", 5);
 
     //print_processes();
-} */
+} 
 
-extern uint8_t __end; 
+/* extern uint8_t __end; 
 
 
 void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {   
@@ -101,12 +107,12 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
     (void) atags;
     pin_set_function(17, OUTPUT);
     
-    /* UART */
+    /* UART *
     uart_init();
     uart_puts(">> Uart init");
     uart_putln("[OK]");
 
-    /* DYNAMIC MEMORY */
+    /* DYNAMIC MEMORY *
     uart_puts(">> Dynamic memory: ");
     mem_init(((atag_t *)atags));
     uart_putln(" [OK]");
@@ -238,4 +244,4 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
     }
 
 
-}
+} */

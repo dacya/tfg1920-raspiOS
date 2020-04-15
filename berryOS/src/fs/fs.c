@@ -10,6 +10,9 @@
 #include <mem/mem.h>
 #include <utils/stdlib.h>
 #include <io/uart.h>
+#include <io/stdio.h>
+#include <console/command.h>
+
 
 #define NUM_PAGES_INODE_TABLE 2
 #define NUM_INODES ((PAGE_SIZE/sizeof(i_node_t))*NUM_PAGES_INODE_TABLE) 
@@ -118,6 +121,7 @@ int getFileSize(char* path){
             Initialization function
 ----------------------------------------------------
 */
+static void register_filesystem_commands();
 
 void fs_init(void){
     
@@ -135,7 +139,8 @@ void fs_init(void){
     interface.getFileSize = getFileSize;
     interface.changeDir = changeDir;
 
-
+    register_filesystem_commands();
+    
     uint32_t i;
     i_node_t* iter;
     
@@ -472,4 +477,78 @@ static void recPrintFs(uint32_t inode, uint32_t j){
 
 void printFs(void){
     recPrintFs(0,0);
+}
+
+/* 
+----------------------------------------------------
+                 Commands functions
+----------------------------------------------------
+*/
+
+COMMAND mkdir;
+COMMAND mkfile;
+COMMAND cd;
+COMMAND del;
+COMMAND lsall;
+COMMAND cat;
+COMMAND echo;
+
+void mkdir_function(int arg, char** argv){
+    createDir(argv[0], (int)argv[1]);
+    return;
+}
+void mkfile_function(int arg, char** argv){
+    createFile(argv[0], (int)argv[1]);
+    return;
+}
+void cd_function(int arg, char** argv){
+    changeDir(argv[0]);
+    return;
+}
+void del_function(int arg, char** argv){
+    delete(argv[0]);
+    return;
+}
+void lsall_function(int arg, char** argv){
+    printFs();
+    return;
+}
+void cat_function(int arg, char** argv){
+    read(argv[0], getFileSize(argv[0]));
+    return;
+}
+void echo_function(int arg, char** argv){
+    createDir(argv[1], (int)argv[0]);
+    return;
+}
+
+static void register_filesystem_commands(){
+    mkdir.helpText = "Create a directory";
+    mkdir.key = "mkdir";
+    mkdir.trigger = mkdir_function;
+    regcomm(&mkdir);
+    mkfile.helpText = "Create a file";
+    mkfile.key = "mkfile";
+    mkfile.trigger = mkfile_function;
+    regcomm(&mkfile);
+    cd.helpText = "Change the current directory";
+    cd.key = "cd";
+    cd.trigger = cd_function;
+    regcomm(&cd);
+    del.helpText = "Delete a file or a whole directory";
+    del.key = "del";
+    del.trigger = del_function;
+    regcomm(&del);
+    lsall.helpText = "List the whole filesystem";
+    lsall.key = "lsall";
+    lsall.trigger = lsall_function;
+    regcomm(&lsall);
+    cat.helpText = "Print a file's content";
+    cat.key = "cat";
+    cat.trigger = cat_function;
+    regcomm(&cat);
+    mkdir.helpText = "Concatenate some text at the end of the file";
+    mkdir.key = "echo";
+    mkdir.trigger = echo_function;
+    regcomm(&echo);
 }

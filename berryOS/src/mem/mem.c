@@ -11,6 +11,10 @@
 #include <utils/stdlib.h>
 #include <stdint.h>
 #include <stddef.h>
+#include <io/stdio.h>
+#include <console/command.h>
+
+
 
 extern uint8_t __end; 
 static uint32_t num_pages;
@@ -34,10 +38,12 @@ static void heap_init(uint32_t heap_start);
 
 static heap_segment_t * heap_segment_list_head;
 
+static void register_memory_commands();
 
 void mem_init(atag_t * atags) {
     uint32_t mem_size, page_array_len, page_array_end, kernel_pages, i;
     
+    register_memory_commands();
     //get the total number of pages
     mem_size = get_mem_size(atags);
     num_pages = mem_size / PAGE_SIZE;
@@ -190,7 +196,7 @@ void kfree(void * ptr) {
 
 void print_data(void) {
     heap_segment_t * seg = heap_segment_list_head;
-    
+    int mem_left = 0;
     while (seg->next != NULL) {
         if (seg->is_allocated == 1) {
             uart_puts("Cadena --> ");
@@ -201,6 +207,57 @@ void print_data(void) {
             uart_puts(itoa(aux));
             uart_putc('\n');    
         }
+        else{
+            mem_left += seg->segment_size;
+        }
         seg = seg->next;
     }
+
+}
+
+void print_heap_free_space(){
+    heap_segment_t * seg = heap_segment_list_head;
+    int mem_left = 0;
+    while (seg->next != NULL) {
+        if (seg->is_allocated == 0)
+            mem_left += seg->segment_size;
+        seg = seg->next;
+    }
+    uart_puts(itoa(mem_left));
+    uart_putln(" bytes left");
+}
+
+void print_free_pages(){
+    uart_puts(itoa(size_page_list(&free_pages)));
+    uart_putln(" pages left");
+}
+
+/* 
+----------------------------------------------------
+                 Commands functions
+----------------------------------------------------
+*/
+
+COMMAND prheap;
+COMMAND prmem;
+
+void prheap_function(int arg, char** argv){
+    print_heap_free_space();
+    return;
+}
+
+void prmem_function(int arg, char** argv){
+    print_free_pages();
+    return;
+}
+
+static void register_memory_commands(){
+    prheap.helpText = "Print the heap content and the space left";
+    prheap.key = "prheap";
+    prheap.trigger = prheap_function;
+    regcomm(&prheap);
+    prmem.helpText = "Print a bit map and memory pages information";
+    prmem.key = "prmem";
+    prmem.trigger = prmem_function;
+    regcomm(&prmem);
 }
