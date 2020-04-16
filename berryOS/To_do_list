@@ -1,0 +1,35 @@
+
+b. add offset to file i-node for better read/write implementation??
+c. if b --> create open and close functions to manage offset
+
+
+---------------------------------------
+      Comandos para presentación
+---------------------------------------
+
+Memoria --> Imprimir Heap (parc. hecho con print_memory) y mostrar estado de la memoria (nuum pag libres, etc.)
+Procesos --> Mostrar procesos existente (parc. hecho con print_processes)
+Fs --> bufffff (Mucho que mostrar, mejor idea --> mostrar jerarquía de carpetas)
+
+
+
+---------------------------------------
+              Preguntas
+---------------------------------------
+-> ¿Meter offset en i-nodo es buena idea?
+-> ¿Implementación de read reservo yo el puntero, o se lo dejo al usuario?
+    Dejárselo al usuario -> problema de seguridad
+    Resevarlo yo -> usuario puede olvidarse de liberarlo  <-- This
+
+
+---------------------------------------
+          Archivos modificados
+---------------------------------------
+fs.c
+fs.h
+stdlib.h
+mem.h
+
+
+
+git commit -m "Created directories. Must fix deleteFile implementation."

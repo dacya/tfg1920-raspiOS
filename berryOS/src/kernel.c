@@ -10,10 +10,10 @@
 #include <console/console.h>
 #include <console/command.h>
 #include <proc/locks/mutex.h>
+#include <fs/fs.h>
+#include <mem/mem.h>
 
 extern void io_halt();
-
-COMMAND lawebada;
 
 uint32_t critical_value = 0;
 //1 locked 0 unlocked
@@ -50,23 +50,13 @@ void test2(void){
     }
 }
 
-void lawebada_handler(int argc, char** argv){
-    printLn("This command works");
-}
-
 void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {   
     (void) r0;
     (void) r1;
     (void) atags;
     pin_set_function(17, OUTPUT);
     
-    lawebada.helpText = "I'm goin to end this whole man's career";
-    lawebada.key = "lawebada";
-    lawebada.trigger = lawebada_handler;
-
-    regcomm(&lawebada);
-
-    /* UART */
+    /* UART */ 
     uart_init();
     uart_puts(">> Uart init");
     uart_putln("[OK]");
@@ -98,6 +88,11 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
     start_console();
     enrichedPrintLn("[OK]", &GREEN, NULL);
 
+    /* Filesystem */
+    print(">> Filesystem init: ");
+    fs_init();
+    enrichedPrintLn("[OK]", &GREEN, NULL);
+    
     /* INTERRUPTS */
     print(">> Interrupts init: ");
     interrupts_init();
