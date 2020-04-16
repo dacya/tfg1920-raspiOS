@@ -229,7 +229,18 @@ void print_heap_free_space(){
 
 void print_free_pages(){
     uart_puts(itoa(size_page_list(&free_pages)));
-    uart_putln(" pages left");
+    uart_putln(" pages left. First 30 pages bitmap");
+
+    page_t* aux = all_pages_array;
+    char* bitmap = kmalloc(30);
+    int i;
+    
+    for(i = 0; i < 30;i++){
+        bitmap[i] = (char)(48 + aux->flags.allocated);
+        aux += sizeof(page_t);
+    }
+    uart_putln(bitmap);
+    return;    
 }
 
 /* 
