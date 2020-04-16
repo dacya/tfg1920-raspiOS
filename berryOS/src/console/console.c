@@ -53,6 +53,7 @@ void read_proc(void) {
             case CR:
                 comm[size] = '\0';
                 if (size > 0) {
+                    printLn("");
                     print("$ ");
                     enrichedPrintLn(comm, &GREEN, NULL);
                     char** argv;
