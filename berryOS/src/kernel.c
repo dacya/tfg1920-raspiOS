@@ -82,7 +82,7 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
     print("\t- Commands init: ");
     init_commands();
     enrichedPrintLn("[OK]", &GREEN, NULL);
-    
+
     /* Console */
     print(">> Console init: ");
     start_console();
@@ -108,9 +108,159 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
     enrichedPrintLn("[OK]", &GREEN, NULL);
 
     //TEST PROCESS SECTION
-    create_kernel_thread(&test1, "Proc1", 5);
+    /* create_kernel_thread(&test1, "Proc1", 5);
     create_kernel_thread(&test2, "Kezo", 5);
-
+ */
     print_processes();
+
+}
+
+extern uint8_t __end; 
+
+
+void kernel_main2(uint32_t r0, uint32_t r1, uint32_t atags) {   
+    (void) r0;
+    (void) r1;
+    (void) atags;
+    pin_set_function(17, OUTPUT);
+    
+    /* UART */
+    uart_init();
+    uart_puts(">> Uart init");
+    uart_putln("[OK]");
+
+    /* DYNAMIC MEMORY */
+    uart_puts(">> Dynamic memory: ");
+    mem_init(((atag_t *)atags));
+    uart_putln(" [OK]");
+
+    fs_init();
+
+    delay(1000);
+    uart_puts("Bienvenido a BerryOS\n");
+    delay(1000);
+    
+    while (1) {
+        
+        char c;
+        unsigned int i = 0;
+        unsigned int j = 0;
+        char buf[20];
+        char text[100];
+        int num = 0;
+        
+        uart_puts("¿Que quieres hacer?\n > 1 --> Crear archivo\n > 2 --> Crear directorio \n > 3 --> Escribir archivo\n > 4 --> Leer archivo\n > 5 --> Borrar archivo/directorio\n > 6 --> Cambiar directorio\n > 7 --> Imprimir estructura\n > ");
+        
+        c = uart_recv();
+        uart_putln("PETOOOOOOOOOOOOOOO");
+        uart_putc(c);
+        uart_putc('\n');
+        
+        if(c == '1'){
+    
+            uart_puts("Inserte nombre > ");
+             
+            
+            while((c = uart_recv()) != '\r')  {
+                uart_putc(c);
+                buf[i++] = c;
+            }
+            buf[i++] = '\0';
+            uart_putc('\n');
+
+            createFile(buf);
+
+            printFs();
+            
+        }
+        else if (c == '2'){
+            uart_puts("Inserte nombre > ");
+             
+            while((c = uart_recv()) != '\r')  {
+                uart_putc(c);
+                buf[i++] = c;
+            }
+            buf[i++] = '\0';
+            uart_putc('\n');
+
+            createDir(buf);
+
+            printFs();
+        }
+        else if (c == '3'){
+            uart_puts("Inserte nombre > ");
+             
+            while((c = uart_recv()) != '\r')  {
+                uart_putc(c);
+                buf[i++] = c;
+            }
+            buf[i++] = '\0';
+            uart_putc('\n');
+            uart_puts("Inserte texto > ");
+            while((c = uart_recv()) != '\r')  {
+                uart_putc(c);
+                text[j++] = c;
+            }
+            text[j++] = '\0';
+            uart_putc('\n');
+            
+            getFsInterface()->write(buf, text);
+        }
+        else if (c == '4'){
+            uart_puts("Inserte nombre > ");
+            while((c = uart_recv()) != '\r')  {
+                uart_putc(c);
+                buf[i++] = c;
+            }
+            buf[i++] = '\0';
+            uart_putc('\n');
+
+            uart_puts("Inserte bytes > ");
+            while((c = uart_recv()) != '\r')  {
+                num = num*10 + (c - '0');
+                uart_putc(c);
+            }
+            uart_putc('\n');
+
+            char* aux = read(buf, num);;
+
+            uart_puts("    Texto > ");
+            uart_putln(aux);
+            kfree(aux);            
+        }
+        else if(c == '5'){
+            uart_puts("Inserte nombre > ");
+             
+            
+            while((c = uart_recv()) != '\r')  {
+                uart_putc(c);
+                buf[i++] = c;
+            }
+            buf[i++] = '\0';
+            uart_putc('\n');
+
+            delete(buf);
+
+            printFs();
+        }
+        else if(c == '6'){
+            uart_puts("Inserte nombre > ");
+             
+        
+            while((c = uart_recv()) != '\r')  {
+                uart_putc(c);
+                buf[i++] = c;
+            }
+            buf[i++] = '\0';
+
+            changeDir(buf);
+        }
+        else if(c == '7'){
+            getFsInterface()->printFs();
+        }
+        
+
+    }
+
 
 }

@@ -25,8 +25,8 @@ typedef struct filesystem_methods{
     int (*write)(char* path, char* text);
     char* (*read)(char* path, uint32_t bytes);
     void (*delete)(char* path);
-    void (*createFile)(char* path, int fnsize);
-    void (*createDir)(char* path, int fnsize);
+    void (*createFile)(char* path);
+    void (*createDir)(char* path);
     int (*exists)(char* path);
     void (*printFs)(void);
     int (*getFileSize)(char* path);
@@ -91,9 +91,8 @@ int exists(char* path);
  *      -> There are no free memory pages
  * 
  * @param path The path where we want to create the file. The last part of the path is the filename.
- * @param fnsize The filename's size
  */
-void createFile(char* path, int fnsize);
+void createFile(char* path);
 
 /**
  * Create a directory. This method takes no effect on the following cases:
@@ -104,9 +103,8 @@ void createFile(char* path, int fnsize);
  *      -> There are no free memory pages
  * 
  * @param path The path where we want to create the dir. The last part of the path is the dirname.
- * @param fnsize The filename's size
  */
-void createDir(char* path, int fnsize);
+void createDir(char* path);
 
 /**
  * Obtain the size of a file.  

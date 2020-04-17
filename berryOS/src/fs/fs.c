@@ -12,7 +12,7 @@
 #include <io/uart.h>
 #include <io/stdio.h>
 #include <console/command.h>
-
+#include <utils/unused.h>
 
 #define NUM_PAGES_INODE_TABLE 2
 #define NUM_INODES ((PAGE_SIZE/sizeof(i_node_t))*NUM_PAGES_INODE_TABLE) 
@@ -68,7 +68,7 @@ static int fileExists(char* file, uint32_t first_child, dir_t* father){  //0 if 
     return -1;
 }
 
-static dir_t* calculatePath(char* path, char* filename){
+static dir_t* calculatePath(char* path, char* filename, int* fnsize){
     filename[MAXFILENAMESIZE - 1] = '\0';
     dir_t* father = current_glob;
     if(*path == '~'){
@@ -76,7 +76,7 @@ static dir_t* calculatePath(char* path, char* filename){
         path++;
     }
     int j = 0;
-    while(*path != '\0'){
+    while(*path != '\0' && j < MAXFILENAMESIZE){
         if(*path == '/'){
             int k;
             filename[j] = '\0';
@@ -90,13 +90,17 @@ static dir_t* calculatePath(char* path, char* filename){
             filename[j++] = *path;
         path++;
     }
+    if(j == MAXFILENAMESIZE)
+        j--;
     filename[j] = '\0';
+    if(fnsize != NULL)
+        *fnsize = j + 1;
     return father;
 }
 
 int exists(char* path){
     char* file = kmalloc(MAXFILESIZE);
-    dir_t* curr_dir = calculatePath(path, file);
+    dir_t* curr_dir = calculatePath(path, file, NULL);
     int aux = fileExists(file, 0, curr_dir) != -1;
     kfree(file); 
     return aux;
@@ -105,7 +109,7 @@ int exists(char* path){
 int getFileSize(char* path){
     int i;
     char* file = kmalloc(MAXFILESIZE);
-    dir_t* curr_dir = calculatePath(path, file);
+    dir_t* curr_dir = calculatePath(path, file, NULL);
     if (curr_dir == NULL || (i = fileExists(file, 2, curr_dir)) == -1){
         kfree(file); return -1;
     }
@@ -189,21 +193,19 @@ fs_interface* getFsInterface(void){
     return &interface;
 }
 
-void createFile(char* path, int fnsize){
+void createFile(char* path){
+    int fnsize;
     char* file = kmalloc(MAXFILESIZE);
-    dir_t* curr_dir = calculatePath(path, file);
+    dir_t* curr_dir = calculatePath(path, file, &fnsize);
     if (curr_dir == NULL || freeInodes == 0 || fileExists(file, 0, curr_dir) != -1 || curr_dir->num_childs == MAXFILESPERDIR){
         kfree(file); return;
     }
-    
     void* aux = alloc_page();
     if(aux == NULL)
         return;
-
     uint32_t new = getFreeInode();
     if(new == 0)
         return;
-
     i_node_t* newPoint = get_inode(new);
     newPoint->pages[0] = aux;
     newPoint->free = 1;
@@ -216,12 +218,13 @@ void createFile(char* path, int fnsize){
     curr_dir->child[curr_dir->num_childs].fn_size = MIN(MAXFILENAMESIZE, fnsize + 1);
     curr_dir->child[curr_dir->num_childs].inode_num = new;
     curr_dir->num_childs++;
-    kfree(file);
+    kfree(file);    
 }
 
-void createDir(char* path, int fnsize){
+void createDir(char* path){
+    int fnsize;
     char* file = kmalloc(MAXFILESIZE);
-    dir_t* curr_dir = calculatePath(path, file);
+    dir_t* curr_dir = calculatePath(path, file, &fnsize);
     if (curr_dir == NULL || freeInodes == 0 || curr_dir->num_childs == MAXFILESPERDIR || fileExists(file, 0, curr_dir) != -1){
         kfree(file); return;
     }
@@ -260,7 +263,7 @@ void createDir(char* path, int fnsize){
 int write(char* path, char* text){
     int i;
     char* file = kmalloc(MAXFILESIZE);
-    dir_t* curr_dir = calculatePath(path, file);
+    dir_t* curr_dir = calculatePath(path, file, NULL);
     if (curr_dir == NULL || (i = fileExists(file, 2, curr_dir)) == -1){
         kfree(file); return -1;
     }
@@ -307,7 +310,7 @@ int write(char* path, char* text){
 char* read(char* path, uint32_t bytes){  
     int i;
     char* file = kmalloc(MAXFILESIZE);
-    dir_t* curr_dir = calculatePath(path, file);
+    dir_t* curr_dir = calculatePath(path, file, NULL);
     if (curr_dir == NULL || (i = fileExists(file, 2, curr_dir)) == -1){
         kfree(file); return NULL;
     }
@@ -344,7 +347,7 @@ char* read(char* path, uint32_t bytes){
 void changeDir(char* path){
     int i;
     char* file = kmalloc(MAXFILESIZE);
-    dir_t* curr_dir = calculatePath(path, file);
+    dir_t* curr_dir = calculatePath(path, file, NULL);
     if (curr_dir == NULL || (i = fileExists(file, 0, curr_dir)) == -1){
         kfree(file); return;
     }
@@ -418,7 +421,7 @@ static void deleteDirContent(i_node_t* inFile){
 void delete(char* path){
     int i;
     char* file = kmalloc(MAXFILESIZE);
-    dir_t* curr_dir = calculatePath(path, file);
+    dir_t* curr_dir = calculatePath(path, file, NULL);
     if(curr_dir == NULL || (i = fileExists(file, 2, curr_dir)) == -1){
         kfree(file); return;
     }
@@ -465,9 +468,10 @@ static void recPrintFs(uint32_t inode, uint32_t j){
 
     for(i = 2; i < dir->num_childs; i++){
         for(k = 0; k < 3*j;k++)
-            uart_putc(' ');
+            print(" ");
         child = get_inode(dir->child[i].inode_num);
-        uart_putln(dir->child[i].filename);
+        print(dir->child[i].filename);
+        print("\n\0");
         if(child->type == 1)
             recPrintFs(dir->child[i].inode_num, j + 1);
         
@@ -493,32 +497,47 @@ COMMAND lsall;
 COMMAND cat;
 COMMAND echo;
 
-void mkdir_function(int arg, char** argv){
-    createDir(argv[0], (int)argv[1]);
+void mkdir_function(int argc, char** argv){
+    MARK_UNUSED(argc);
+    createDir(argv[0]);
     return;
 }
-void mkfile_function(int arg, char** argv){
-    createFile(argv[0], (int)argv[1]);
+void mkfile_function(int argc, char** argv){
+    MARK_UNUSED(argc);
+    createFile(argv[0]);
     return;
 }
-void cd_function(int arg, char** argv){
+void cd_function(int argc, char** argv){
+    MARK_UNUSED(argc);
     changeDir(argv[0]);
     return;
 }
-void del_function(int arg, char** argv){
+void del_function(int argc, char** argv){
+    MARK_UNUSED(argc);
     delete(argv[0]);
     return;
 }
-void lsall_function(int arg, char** argv){
+void lsall_function(int argc, char** argv){
+    MARK_UNUSED(argc);
+    MARK_UNUSED(argv);
     printFs();
+    
     return;
 }
-void cat_function(int arg, char** argv){
-    read(argv[0], getFileSize(argv[0]));
+void cat_function(int argc, char** argv){
+    MARK_UNUSED(argc);
+    char* aux = read(argv[0], getFileSize(argv[0]));
+    if(aux == NULL)
+        print("File not found\n\0");
+    else
+        print(aux);
     return;
 }
-void echo_function(int arg, char** argv){
-    createDir(argv[1], (int)argv[0]);
+void echo_function(int argc, char** argv){
+    MARK_UNUSED(argc);
+    uart_putln(argv[0]);
+    uart_putln(argv[1]);
+    write(argv[1], argv[0]);
     return;
 }
 
@@ -547,8 +566,8 @@ static void register_filesystem_commands(){
     cat.key = "cat";
     cat.trigger = cat_function;
     regcomm(&cat);
-    mkdir.helpText = "Concatenate some text at the end of the file";
-    mkdir.key = "echo";
-    mkdir.trigger = echo_function;
+    echo.helpText = "Concatenate some text at the end of the file";
+    echo.key = "echo";
+    echo.trigger = echo_function;
     regcomm(&echo);
 }
