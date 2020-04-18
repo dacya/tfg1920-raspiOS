@@ -14,6 +14,33 @@ int MAX_CONSOLE_LINE_INPUT_SIZE = 20;
 const char EOL = '\n';
 const char CR = '\r';
 
+int parse_args(char* str, char*** argv) {
+    int argc = 1, new = 1, i = 0;
+    char c;
+    while ((c = str[i]) != '\0') {  // count all words to save mem
+        if (c == ' ') {
+            argc++;
+        }
+        i++;
+    }
+    *argv = kmalloc(argc * sizeof(char*));
+    argc = 0;
+    i = 0;
+    while ((c = str[i]) != '\0') {  // fill argv
+        if (new) {
+            (*argv)[argc] = &str[i];
+            argc++;
+            new = 0;
+        } else if (c == ' ') {
+            str[i] = '\0';
+            new = 1;
+        }
+        i++;
+    }
+    
+    return argc;
+}
+
 void read_proc(void) {
     char* comm = kmalloc(MAX_CONSOLE_LINE_INPUT_SIZE + 2);
     char c;
@@ -26,11 +53,16 @@ void read_proc(void) {
             case CR:
                 comm[size] = '\0';
                 if (size > 0) {
+                    printLn("");
                     print("$ ");
                     enrichedPrintLn(comm, &GREEN, NULL);
-                    commatch(comm, 0, NULL);
+                    char** argv;
+                    int argc = parse_args(comm, &argv);
+                    commatch(argv[0], argc - 1, argc < 2 ? NULL : &argv[1]);
+                    // commatch(comm, 0, NULL);
                     size = 0;
                     clear_input();
+                    kfree(argv);
                 } else {
                     printLn("$ ");
                 }
@@ -74,7 +106,7 @@ void start_console() {
     cls.key = "cls";
     cls.trigger = comm_clear_screen;
     regcomm(&cls);
-
+ 
     create_kernel_thread(read_proc, "uart_console_input", 19);
-    //read_proc();
+    // read_proc();
 }

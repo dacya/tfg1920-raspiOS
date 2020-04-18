@@ -9,12 +9,19 @@ IMPLEMENT_LIST(comm_wrapper);
 comm_wrapper_list_t commands_list;
 
 COMMAND shcomm;
+COMMAND* delayedList[20];
+int delayed = 0;
+int initialized = 0;
+
 
 void shcomm_trigger(int, char**);
 
 void init_commands() {
     INITIALIZE_LIST(commands_list, comm_wrapper);
-
+    initialized = 1;
+    for (int i = 0; i < delayed; i++) {
+        regcomm(delayedList[i]);
+    }
     // registering shcomm
     shcomm.key = "shcomm";
     shcomm.helpText = "Lists all registered commands.";
@@ -23,9 +30,15 @@ void init_commands() {
 }
 
 void regcomm(COMMAND* comm) {
-    comm_wrapper* newcomm = kmalloc(sizeof(comm_wrapper));
-    newcomm->comm = comm;
-    append_comm_wrapper_list(&commands_list, newcomm);
+    if (initialized) {
+        comm_wrapper* newcomm = kmalloc(sizeof(comm_wrapper));
+        newcomm->comm = comm;
+        append_comm_wrapper_list(&commands_list, newcomm);
+    } else {
+        if (delayed < 20) {
+            delayedList[delayed++] = comm;
+        }
+    }
 }
 
 void unregcomm(COMMAND* command) {
@@ -63,10 +76,26 @@ void print_command(COMMAND* comm) {
 void shcomm_trigger(int argc, char** argv) {
     MARK_UNUSED(argc);
     MARK_UNUSED(argv);
-    enrichedPrintLn("Available commands", &YELLOW, NULL);
+    int size = size_comm_wrapper_list(&commands_list);
     comm_wrapper* comm = start_iterate_comm_wrapper_list(&commands_list);
-    while (has_next_comm_wrapper_list(&commands_list, comm)) {
-        comm = next_comm_wrapper_list(comm);
-        print_command(comm->comm);
+    enrichedPrintLn("Available commands", &YELLOW, NULL);
+    for (int i = 0; i < size;) {
+        for (int j = 0; j < 3 && i < size; j++) {
+            comm = next_comm_wrapper_list(comm);
+            print_command(comm->comm);
+            i++;
+        }
+        if (i < size) {
+            printLn("");
+            enrichedPrint(" Any key ", &BLACK, &GREEN);
+            print(" to print more or ");
+            enrichedPrint(" Q ", NULL, &RED);
+            printLn("to exit ");
+            char c = readChar();
+            if (c == 'q' || c == 'Q') {
+                printLn("Bye.");
+                break;
+            }
+        }
     }
 }

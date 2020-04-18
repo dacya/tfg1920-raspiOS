@@ -72,6 +72,12 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
     (void) atags;
     pin_set_function(17, OUTPUT);
     
+    lawebada.helpText = "I'm goin to end this whole man's career";
+    lawebada.key = "lawebada";
+    lawebada.trigger = lawebada_handler;
+
+    regcomm(&lawebada);
+
     /* UART */
     uart_init();
     uart_puts(">> Uart init");
@@ -125,14 +131,6 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
     //create_kernel_thread(&pointer_test, "nested call test", 16);
     create_kernel_thread(&test1, "Proc1", 5);
     //create_kernel_thread(&test2, "Kezo", 5);
-
-
-
-    lawebada.helpText = "I'm goin to end this whole man's career";
-    lawebada.key = "lawebada";
-    lawebada.trigger = lawebada_handler;
-
-    regcomm(&lawebada);
 
     print_processes();
 
