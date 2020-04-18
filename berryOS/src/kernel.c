@@ -19,21 +19,31 @@ uint32_t critical_value = 0;
 //1 locked 0 unlocked
 int mutex = MUTEX_UNLOCK;
 
+void test1_subroutine(void){
+    uart_putln("Entered into the subroutine");
+    uart_putln("Entered into the subroutine");
+    uart_putln("Entered into the subroutine");
+    uart_putln("Entered into the subroutine");
+    while(1);
+}
+
 void test1(void){
     uint32_t j = 0;
     uint32_t i = 0;
     uart_putln("Executing test1");
-    take_lock(&mutex);
-    uart_putln("mutex took");
-    while (1) {
-        if(i == 1000000000){
-            uart_putln("I'm test1 -->");
-            i = 0;
-        }
-        i++;    
-    }
-}
+    uart_putln("Executing test1");
+    uart_putln("Executing test1");
+    uart_putln("Executing test1");
+    uart_putln("Executing test1");
+    test1_subroutine();
+    uart_putln("DEAD test1");
+    uart_putln("DEAD test1");
+    uart_putln("DEAD test1");
+    uart_putln("DEAD test1");
+    uart_putln("DEAD test1");
 
+}
+/*
 void test2(void){
     uint32_t j = 0;
     uint32_t i = 0;
@@ -49,10 +59,12 @@ void test2(void){
         i++;    
     }
 }
-
+*/
 void lawebada_handler(int argc, char** argv){
     printLn("This command works");
 }
+
+extern void pointer_test(void);
 
 void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {   
     (void) r0;
@@ -103,12 +115,16 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
     enrichedPrintLn("[OK]", &GREEN, NULL);
 
     print(">> Local timer init: ");
-    local_timer_init(VIRTUAL_SYS, 5000);
+    #ifdef QUANTUM
+    #define QUANTUM 5000
+    #endif
+    local_timer_init(VIRTUAL_SYS, QUANTUM);
     enrichedPrintLn("[OK]", &GREEN, NULL);
 
     //TEST PROCESS SECTION
+    //create_kernel_thread(&pointer_test, "nested call test", 16);
     create_kernel_thread(&test1, "Proc1", 5);
-    create_kernel_thread(&test2, "Kezo", 5);
+    //create_kernel_thread(&test2, "Kezo", 5);
 
 
 

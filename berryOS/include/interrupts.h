@@ -207,5 +207,5 @@ __inline__ void DISABLE_INTERRUPTS(void) {
 
 void local_timer_handler(void);
 void local_timer_clearer(void);
-
+void print_irq_stack(void);
 #endif

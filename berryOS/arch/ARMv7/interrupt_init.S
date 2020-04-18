@@ -124,8 +124,6 @@ irq_s_handler:
     mov r12, #0x0
     str r12, [r0]
     bl irq_c_handler
-
-    bl print_irq_stack
     pop {r0-r12, lr}
 
     push {r0}

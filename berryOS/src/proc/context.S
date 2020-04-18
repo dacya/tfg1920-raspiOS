@@ -14,10 +14,32 @@
 .extern __stack_memory
 .extern __scheduler_finished
 .extern __process_lr
+.extern uart_putln
+
+pointer_test_subroutine:
+    push {lr}
+    ldr r0, =text2
+    bl uart_putln
+    ldr r0, =text2
+    bl uart_putln
+    pop {lr}
+    b .
 
 .global pointer_test
 /* r0 pointer r1 pointer */
 pointer_test:
+    push {lr}
+    ldr r0, =text
+    bl uart_putln
+    ldr r0, =text
+    bl uart_putln
+    ldr r0, =text
+    bl uart_putln
+    ldr r0, =text
+    bl uart_putln
+
+    bl pointer_test_subroutine
+    pop {lr}
     mov pc, lr
 
 .global switch_process_context
@@ -58,6 +80,8 @@ switch_process_context:
     mov r7, r5
     mov r5, r4
     mov r4, r7
+
+    sub r3, r3, #0x4
 
     stmfd r0!, {r3-r6} //we store into first argument stack
     mrs r12, spsr //we obtain the corresponding value of CPSR for our old process
@@ -144,8 +168,7 @@ load_process:
     ...
     r12
     lr
-*/
-/*
+
     IRQ FROM __stack_memory + 0x38
     r0
     r1
@@ -252,3 +275,8 @@ yield_to_next_process:
     str r9, [r8, #0x8]
     mov r9, r7
     ldmfd r8, {r7, r8, pc}
+
+.data
+.balign 4
+text: .asciz "tu madre"
+text2: .asciz "yes"

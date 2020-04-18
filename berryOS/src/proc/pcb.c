@@ -39,6 +39,23 @@ pcb_list_t run_queue;
 static sched_control_t* scheduler_control;
 
 extern int mutex;
+
+void print_pcb_stack(process_control_block_t* to_print){
+    uint32_t* end_stack = to_print->stack_page + PAGE_SIZE;
+
+    uart_puts("pbc: ");
+    uart_puts(to_print->proc_name);
+    uart_putln(" ---------------------PRINT PCB STACK---------------------------");
+    for(uint32_t* i = to_print->stack_pointer_to_saved_state; i < end_stack; i++){
+        uart_puts("stack_memory: ");
+        uart_hex_puts((uint32_t)(i));
+        uart_puts("value inside:");
+        uart_hex_puts(*(i));
+        uart_putln("");
+    }
+    uart_putln("-------------------END PRINT PCB STACK---------------------------");
+}
+
 static void init_function(void){
     int a = 1;
     int i = 0;
@@ -75,20 +92,21 @@ static void round_robin_sched_policy(void){
     process_control_block_t* new_thread;
     process_control_block_t* old_thread;
 
+    
     //If run_queue is empty, the current process continue
     if(size_pcb_list(&run_queue) == 0){
-        ENABLE_INTERRUPTS();
         return;
     }
 
     if(current_process == NULL){
+        print_pcb_stack(init_process);
         current_process = init_process;
         load_process(init_process);
         remove_pcb_immediate(&run_queue, init_process);
         uart_putln("INIT loaded!");
-        ENABLE_INTERRUPTS();
         return;
     }
+
     //If is not empty, save the current process and pop the first process in the run_queue.
     //This replacement method works for RR and FIFO.
     new_thread = pop_pcb_list(&run_queue);

@@ -88,371 +88,694 @@ qemu-system-arm -m 256 -M raspi2 -serial stdio -kernel build/myos.elf
 >> Dynamic memory: [OK]
 >> GPU init: [OK]
 >> Processes init: [OK]
->> Console init: [OK]
 	- Commands init: [OK]
+>> Console init: [OK]
 >> Interrupts init: [OK]
 	- Register timer handler and clearer: [OK]
 >> Local timer init: [OK]
 
 Size -->3
 Proceso Init con PID 1
-Proceso Proc1 con PID 2
-Proceso Kezo con PID 3
+Proceso uart_console_input con PID 2
+Proceso Proc1 con PID 3
 Print end
 
-INIT loaded!
+pbc: Init ---------------------PRINT PCB STACK---------------------------
+stack_memory: 0x00210FC0
+value inside:0x00000013
 
---------------PRINT_IRQ_STACK----------------------
-stack_memory_tag is inside of:
-0x0000F268
-registers:
-stack_memory: 0x00003FC8
+stack_memory: 0x00210FC4
+value inside:0x0000ADE0
+
+stack_memory: 0x00210FC8
+value inside:0x0000AD14
+
+stack_memory: 0x00210FCC
+value inside:0x00000060
+
+stack_memory: 0x00210FD0
+value inside:0x00000064
+
+stack_memory: 0x00210FD4
+value inside:0x00000068
+
+stack_memory: 0x00210FD8
 value inside:0x00000090
 
-stack_memory: 0x00003FCC
+stack_memory: 0x00210FDC
 value inside:0x0000008C
 
-stack_memory: 0x00003FD0
+stack_memory: 0x00210FE0
 value inside:0x00000088
 
-stack_memory: 0x00003FD4
+stack_memory: 0x00210FE4
 value inside:0x00000084
 
-stack_memory: 0x00003FD8
+stack_memory: 0x00210FE8
 value inside:0x00000080
 
-stack_memory: 0x00003FDC
+stack_memory: 0x00210FEC
 value inside:0x0000007C
 
-stack_memory: 0x00003FE0
+stack_memory: 0x00210FF0
 value inside:0x00000078
 
-stack_memory: 0x00003FE4
+stack_memory: 0x00210FF4
 value inside:0x00000074
 
-stack_memory: 0x00003FE8
+stack_memory: 0x00210FF8
 value inside:0x00000070
 
-stack_memory: 0x00003FEC
+stack_memory: 0x00210FFC
 value inside:0x0000006C
 
-stack_memory: 0x00003FF0
-value inside:0x00000068
+-------------------END PRINT PCB STACK---------------------------
+INIT loaded!
+I'm INIT -->
+I'm INIT -->
+I'm INIT -->
+PRINT NEW THREAD PCB
+pbc: uart_console_input ---------------------PRINT PCB STACK---------------------------
+stack_memory: 0x00211FC0
+value inside:0x00000013
 
-stack_memory: 0x00003FF4
-value inside:0x00000064
+stack_memory: 0x00211FC4
+value inside:0x0000ADE0
 
-stack_memory: 0x00003FF8
+stack_memory: 0x00211FC8
+value inside:0x0000A564
+
+stack_memory: 0x00211FCC
+value inside:0x00000160
+
+stack_memory: 0x00211FD0
+value inside:0x00000164
+
+stack_memory: 0x00211FD4
+value inside:0x00000168
+
+stack_memory: 0x00211FD8
+value inside:0x00000190
+
+stack_memory: 0x00211FDC
+value inside:0x0000018C
+
+stack_memory: 0x00211FE0
+value inside:0x00000188
+
+stack_memory: 0x00211FE4
+value inside:0x00000184
+
+stack_memory: 0x00211FE8
+value inside:0x00000180
+
+stack_memory: 0x00211FEC
+value inside:0x0000017C
+
+stack_memory: 0x00211FF0
+value inside:0x00000178
+
+stack_memory: 0x00211FF4
+value inside:0x00000174
+
+stack_memory: 0x00211FF8
+value inside:0x00000170
+
+stack_memory: 0x00211FFC
+value inside:0x0000016C
+
+-------------------END PRINT PCB STACK---------------------------
+PRINT OLD THREAD PCB
+pbc: Init ---------------------PRINT PCB STACK---------------------------
+stack_memory: 0x00210FC0
+value inside:0x80000013
+
+stack_memory: 0x00210FC4
+value inside:0x0000AD40
+
+stack_memory: 0x00210FC8
+value inside:0x0000AD2C
+
+stack_memory: 0x00210FCC
 value inside:0x00000060
 
-stack_memory: 0x00003FFC
-value inside:0x0000AB90
+stack_memory: 0x00210FD0
+value inside:0x00000064
 
---------------PRINT_IRQ_STACK END----------------------
-I'm INIT -->
-I'm INIT -->
-I'm INIT -->
+stack_memory: 0x00210FD4
+value inside:0x00000068
 
---------------PRINT_IRQ_STACK----------------------
-stack_memory_tag is inside of:
-0x0000F268
-registers:
-stack_memory: 0x00003FC8
-value inside:0x00000190
-
-stack_memory: 0x00003FCC
-value inside:0x0000018C
-
-stack_memory: 0x00003FD0
-value inside:0x00000188
-
-stack_memory: 0x00003FD4
-value inside:0x00000184
-
-stack_memory: 0x00003FD8
-value inside:0x00000180
-
-stack_memory: 0x00003FDC
-value inside:0x0000017C
-
-stack_memory: 0x00003FE0
-value inside:0x00000178
-
-stack_memory: 0x00003FE4
-value inside:0x00000174
-
-stack_memory: 0x00003FE8
-value inside:0x00000170
-
-stack_memory: 0x00003FEC
-value inside:0x0000016C
-
-stack_memory: 0x00003FF0
-value inside:0x00000168
-
-stack_memory: 0x00003FF4
-value inside:0x00000164
-
-stack_memory: 0x00003FF8
-value inside:0x00000160
-
-stack_memory: 0x00003FFC
-value inside:0x0000BF0C
-
---------------PRINT_IRQ_STACK END----------------------
-Executing test1
->>trying to take the lock
->>lock taked
-mutex took
-I'm test1 -->
-I'm test1 -->
-I'm test1 -->
-
---------------PRINT_IRQ_STACK----------------------
-stack_memory_tag is inside of:
-0x0000F268
-registers:
-stack_memory: 0x00003FC8
-value inside:0x00000190
-
-stack_memory: 0x00003FCC
-value inside:0x0000018C
-
-stack_memory: 0x00003FD0
-value inside:0x00000188
-
-stack_memory: 0x00003FD4
-value inside:0x00000184
-
-stack_memory: 0x00003FD8
-value inside:0x00000180
-
-stack_memory: 0x00003FDC
-value inside:0x0000017C
-
-stack_memory: 0x00003FE0
-value inside:0x00000178
-
-stack_memory: 0x00003FE4
-value inside:0x00000174
-
-stack_memory: 0x00003FE8
-value inside:0x00000170
-
-stack_memory: 0x00003FEC
-value inside:0x0000016C
-
-stack_memory: 0x00003FF0
-value inside:0x00000168
-
-stack_memory: 0x00003FF4
-value inside:0x00000164
-
-stack_memory: 0x00003FF8
-value inside:0x00000160
-
-stack_memory: 0x00003FFC
-value inside:0x0000BF84
-
---------------PRINT_IRQ_STACK END----------------------
-Executing test2
->>trying to take the lock
-
---------------PRINT_IRQ_STACK----------------------
-stack_memory_tag is inside of:
-0x0000F268
-registers:
-stack_memory: 0x00003FC8
+stack_memory: 0x00210FD8
 value inside:0x0000000A
 
-stack_memory: 0x00003FCC
+stack_memory: 0x00210FDC
 value inside:0x0000008C
 
-stack_memory: 0x00003FD0
+stack_memory: 0x00210FE0
 value inside:0x3F201000
 
-stack_memory: 0x00003FD4
-value inside:0x046D716C
+stack_memory: 0x00210FE4
+value inside:0x0418ABF0
 
-stack_memory: 0x00003FD8
+stack_memory: 0x00210FE8
 value inside:0x3B9ACA00
 
-stack_memory: 0x00003FDC
-value inside:0x0000D50C
+stack_memory: 0x00210FEC
+value inside:0x0000D538
 
-stack_memory: 0x00003FE0
+stack_memory: 0x00210FF0
 value inside:0x00000078
 
-stack_memory: 0x00003FE4
+stack_memory: 0x00210FF4
 value inside:0x00000074
 
-stack_memory: 0x00003FE8
+stack_memory: 0x00210FF8
 value inside:0x00000070
 
-stack_memory: 0x00003FEC
+stack_memory: 0x00210FFC
 value inside:0x0000006C
 
-stack_memory: 0x00003FF0
-value inside:0x00000068
+-------------------END PRINT PCB STACK---------------------------
+PRINT NEW THREAD PCB
+pbc: Proc1 ---------------------PRINT PCB STACK---------------------------
+stack_memory: 0x00212FC0
+value inside:0x00000013
 
-stack_memory: 0x00003FF4
-value inside:0x00000064
+stack_memory: 0x00212FC4
+value inside:0x0000ADE0
 
-stack_memory: 0x00003FF8
-value inside:0x00000060
+stack_memory: 0x00212FC8
+value inside:0x0000C1B4
 
-stack_memory: 0x00003FFC
-value inside:0x0000ABAC
-
---------------PRINT_IRQ_STACK END----------------------
-I'm INIT -->
-I'm INIT -->
-I'm INIT -->
-
---------------PRINT_IRQ_STACK----------------------
-stack_memory_tag is inside of:
-0x0000F268
-registers:
-stack_memory: 0x00003FC8
-value inside:0x0000000A
-
-stack_memory: 0x00003FCC
-value inside:0x00000001
-
-stack_memory: 0x00003FD0
-value inside:0x3F201000
-
-stack_memory: 0x00003FD4
-value inside:0x06237FF3
-
-stack_memory: 0x00003FD8
-value inside:0x3B9ACA00
-
-stack_memory: 0x00003FDC
-value inside:0x0000D7AC
-
-stack_memory: 0x00003FE0
-value inside:0x00000178
-
-stack_memory: 0x00003FE4
-value inside:0x00000174
-
-stack_memory: 0x00003FE8
-value inside:0x00000170
-
-stack_memory: 0x00003FEC
-value inside:0x0000016C
-
-stack_memory: 0x00003FF0
-value inside:0x00000168
-
-stack_memory: 0x00003FF4
-value inside:0x00000164
-
-stack_memory: 0x00003FF8
+stack_memory: 0x00212FCC
 value inside:0x00000160
 
-stack_memory: 0x00003FFC
-value inside:0x0000BF58
+stack_memory: 0x00212FD0
+value inside:0x00000164
 
---------------PRINT_IRQ_STACK END----------------------
-I'm test1 -->
-I'm test1 -->
-I'm test1 -->
+stack_memory: 0x00212FD4
+value inside:0x00000168
 
---------------PRINT_IRQ_STACK----------------------
-stack_memory_tag is inside of:
-0x0000F268
-registers:
-stack_memory: 0x00003FC8
-value inside:0x0000F260
+stack_memory: 0x00212FD8
+value inside:0x00000190
 
-stack_memory: 0x00003FCC
-value inside:0x00000001
+stack_memory: 0x00212FDC
+value inside:0x0000018C
 
-stack_memory: 0x00003FD0
-value inside:0x00000001
+stack_memory: 0x00212FE0
+value inside:0x00000188
 
-stack_memory: 0x00003FD4
+stack_memory: 0x00212FE4
+value inside:0x00000184
+
+stack_memory: 0x00212FE8
+value inside:0x00000180
+
+stack_memory: 0x00212FEC
+value inside:0x0000017C
+
+stack_memory: 0x00212FF0
+value inside:0x00000178
+
+stack_memory: 0x00212FF4
+value inside:0x00000174
+
+stack_memory: 0x00212FF8
+value inside:0x00000170
+
+stack_memory: 0x00212FFC
+value inside:0x0000016C
+
+-------------------END PRINT PCB STACK---------------------------
+PRINT OLD THREAD PCB
+pbc: uart_console_input ---------------------PRINT PCB STACK---------------------------
+stack_memory: 0x00211FC0
+value inside:0x20000013
+
+stack_memory: 0x00211FC4
+value inside:0x0000A5B0
+
+stack_memory: 0x00211FC8
+value inside:0x00008A4C
+
+stack_memory: 0x00211FCC
+value inside:0x00000160
+
+stack_memory: 0x00211FD0
+value inside:0x0000D4B8
+
+stack_memory: 0x00211FD4
+value inside:0x00007FC4
+
+stack_memory: 0x00211FD8
+value inside:0x001116D0
+
+stack_memory: 0x00211FDC
+value inside:0x00000000
+
+stack_memory: 0x00211FE0
+value inside:0x3F201000
+
+stack_memory: 0x00211FE4
 value inside:0x00000090
 
-stack_memory: 0x00003FD8
-value inside:0x0000F260
+stack_memory: 0x00211FE8
+value inside:0x00000000
 
-stack_memory: 0x00003FDC
-value inside:0x0000181C
+stack_memory: 0x00211FEC
+value inside:0x001116D0
 
-stack_memory: 0x00003FE0
-value inside:0x00000178
+stack_memory: 0x00211FF0
+value inside:0x00000000
 
-stack_memory: 0x00003FE4
-value inside:0x00000174
+stack_memory: 0x00211FF4
+value inside:0x00000000
 
-stack_memory: 0x00003FE8
-value inside:0x00000170
+stack_memory: 0x00211FF8
+value inside:0x0000E010
 
-stack_memory: 0x00003FEC
-value inside:0x0000016C
+stack_memory: 0x00211FFC
+value inside:0x0000D4B8
 
-stack_memory: 0x00003FF0
-value inside:0x00000168
+-------------------END PRINT PCB STACK---------------------------
+Executing test1
+Executing test1
+Executing test1
+Executing test1
+Executing test1
+Entered into the subroutine
+Entered into the subroutine
+Entered into the subroutine
+Entered into the subroutine
+PRINT NEW THREAD PCB
+pbc: Init ---------------------PRINT PCB STACK---------------------------
+stack_memory: 0x00210FC0
+value inside:0x80000013
 
-stack_memory: 0x00003FF4
-value inside:0x00000164
+stack_memory: 0x00210FC4
+value inside:0x0000AD40
 
-stack_memory: 0x00003FF8
-value inside:0x00000160
+stack_memory: 0x00210FC8
+value inside:0x0000AD2C
 
-stack_memory: 0x00003FFC
-value inside:0x0000C3F8
-
---------------PRINT_IRQ_STACK END----------------------
-
---------------PRINT_IRQ_STACK----------------------
-stack_memory_tag is inside of:
-0x0000F268
-registers:
-stack_memory: 0x00003FC8
-value inside:0x0000000A
-
-stack_memory: 0x00003FCC
-value inside:0x0000008C
-
-stack_memory: 0x00003FD0
-value inside:0x3F201000
-
-stack_memory: 0x00003FD4
-value inside:0x0C00CD9A
-
-stack_memory: 0x00003FD8
-value inside:0x3B9ACA00
-
-stack_memory: 0x00003FDC
-value inside:0x0000D50C
-
-stack_memory: 0x00003FE0
-value inside:0x00000078
-
-stack_memory: 0x00003FE4
-value inside:0x00000074
-
-stack_memory: 0x00003FE8
-value inside:0x00000070
-
-stack_memory: 0x00003FEC
-value inside:0x0000006C
-
-stack_memory: 0x00003FF0
-value inside:0x00000068
-
-stack_memory: 0x00003FF4
-value inside:0x00000064
-
-stack_memory: 0x00003FF8
+stack_memory: 0x00210FCC
 value inside:0x00000060
 
-stack_memory: 0x00003FFC
-value inside:0x0000ABAC
+stack_memory: 0x00210FD0
+value inside:0x00000064
 
---------------PRINT_IRQ_STACK END----------------------
+stack_memory: 0x00210FD4
+value inside:0x00000068
+
+stack_memory: 0x00210FD8
+value inside:0x0000000A
+
+stack_memory: 0x00210FDC
+value inside:0x0000008C
+
+stack_memory: 0x00210FE0
+value inside:0x3F201000
+
+stack_memory: 0x00210FE4
+value inside:0x0418ABF0
+
+stack_memory: 0x00210FE8
+value inside:0x3B9ACA00
+
+stack_memory: 0x00210FEC
+value inside:0x0000D538
+
+stack_memory: 0x00210FF0
+value inside:0x00000078
+
+stack_memory: 0x00210FF4
+value inside:0x00000074
+
+stack_memory: 0x00210FF8
+value inside:0x00000070
+
+stack_memory: 0x00210FFC
+value inside:0x0000006C
+
+-------------------END PRINT PCB STACK---------------------------
+PRINT OLD THREAD PCB
+pbc: Proc1 ---------------------PRINT PCB STACK---------------------------
+stack_memory: 0x00212FC0
+value inside:0x60000013
+
+stack_memory: 0x00212FC4
+value inside:0x0000C1AC
+
+stack_memory: 0x00212FC8
+value inside:0x0000C1AC
+
+stack_memory: 0x00212FCC
+value inside:0x00000160
+
+stack_memory: 0x00212FD0
+value inside:0x00000164
+
+stack_memory: 0x00212FD4
+value inside:0x00000168
+
+stack_memory: 0x00212FD8
+value inside:0x0000000A
+
+stack_memory: 0x00212FDC
+value inside:0x0000018C
+
+stack_memory: 0x00212FE0
+value inside:0x3F201000
+
+stack_memory: 0x00212FE4
+value inside:0x00000090
+
+stack_memory: 0x00212FE8
+value inside:0x0000D890
+
+stack_memory: 0x00212FEC
+value inside:0x0000D8AC
+
+stack_memory: 0x00212FF0
+value inside:0x00000178
+
+stack_memory: 0x00212FF4
+value inside:0x00000174
+
+stack_memory: 0x00212FF8
+value inside:0x00000170
+
+stack_memory: 0x00212FFC
+value inside:0x0000016C
+
+-------------------END PRINT PCB STACK---------------------------
+I'm INIT -->
+I'm INIT -->
+I'm INIT -->
+PRINT NEW THREAD PCB
+pbc: uart_console_input ---------------------PRINT PCB STACK---------------------------
+stack_memory: 0x00211FC0
+value inside:0x20000013
+
+stack_memory: 0x00211FC4
+value inside:0x0000A5B0
+
+stack_memory: 0x00211FC8
+value inside:0x00008A4C
+
+stack_memory: 0x00211FCC
+value inside:0x00000160
+
+stack_memory: 0x00211FD0
+value inside:0x0000D4B8
+
+stack_memory: 0x00211FD4
+value inside:0x00007FC4
+
+stack_memory: 0x00211FD8
+value inside:0x001116D0
+
+stack_memory: 0x00211FDC
+value inside:0x00000000
+
+stack_memory: 0x00211FE0
+value inside:0x3F201000
+
+stack_memory: 0x00211FE4
+value inside:0x00000090
+
+stack_memory: 0x00211FE8
+value inside:0x00000000
+
+stack_memory: 0x00211FEC
+value inside:0x001116D0
+
+stack_memory: 0x00211FF0
+value inside:0x00000000
+
+stack_memory: 0x00211FF4
+value inside:0x00000000
+
+stack_memory: 0x00211FF8
+value inside:0x0000E010
+
+stack_memory: 0x00211FFC
+value inside:0x0000D4B8
+
+-------------------END PRINT PCB STACK---------------------------
+PRINT OLD THREAD PCB
+pbc: Init ---------------------PRINT PCB STACK---------------------------
+stack_memory: 0x00210FC0
+value inside:0x80000013
+
+stack_memory: 0x00210FC4
+value inside:0x0000AD40
+
+stack_memory: 0x00210FC8
+value inside:0x0000AD2C
+
+stack_memory: 0x00210FCC
+value inside:0x00000060
+
+stack_memory: 0x00210FD0
+value inside:0x00000064
+
+stack_memory: 0x00210FD4
+value inside:0x00000068
+
+stack_memory: 0x00210FD8
+value inside:0x0000000A
+
+stack_memory: 0x00210FDC
+value inside:0x0000008C
+
+stack_memory: 0x00210FE0
+value inside:0x3F201000
+
+stack_memory: 0x00210FE4
+value inside:0x02F1BA67
+
+stack_memory: 0x00210FE8
+value inside:0x3B9ACA00
+
+stack_memory: 0x00210FEC
+value inside:0x0000D538
+
+stack_memory: 0x00210FF0
+value inside:0x00000078
+
+stack_memory: 0x00210FF4
+value inside:0x00000074
+
+stack_memory: 0x00210FF8
+value inside:0x00000070
+
+stack_memory: 0x00210FFC
+value inside:0x0000006C
+
+-------------------END PRINT PCB STACK---------------------------
+PRINT NEW THREAD PCB
+pbc: Proc1 ---------------------PRINT PCB STACK---------------------------
+stack_memory: 0x00212FC0
+value inside:0x60000013
+
+stack_memory: 0x00212FC4
+value inside:0x0000C1AC
+
+stack_memory: 0x00212FC8
+value inside:0x0000C1AC
+
+stack_memory: 0x00212FCC
+value inside:0x00000160
+
+stack_memory: 0x00212FD0
+value inside:0x00000164
+
+stack_memory: 0x00212FD4
+value inside:0x00000168
+
+stack_memory: 0x00212FD8
+value inside:0x0000000A
+
+stack_memory: 0x00212FDC
+value inside:0x0000018C
+
+stack_memory: 0x00212FE0
+value inside:0x3F201000
+
+stack_memory: 0x00212FE4
+value inside:0x00000090
+
+stack_memory: 0x00212FE8
+value inside:0x0000D890
+
+stack_memory: 0x00212FEC
+value inside:0x0000D8AC
+
+stack_memory: 0x00212FF0
+value inside:0x00000178
+
+stack_memory: 0x00212FF4
+value inside:0x00000174
+
+stack_memory: 0x00212FF8
+value inside:0x00000170
+
+stack_memory: 0x00212FFC
+value inside:0x0000016C
+
+-------------------END PRINT PCB STACK---------------------------
+PRINT OLD THREAD PCB
+pbc: uart_console_input ---------------------PRINT PCB STACK---------------------------
+stack_memory: 0x00211FC0
+value inside:0x20000013
+
+stack_memory: 0x00211FC4
+value inside:0x0000A5B0
+
+stack_memory: 0x00211FC8
+value inside:0x00008A4C
+
+stack_memory: 0x00211FCC
+value inside:0x00000160
+
+stack_memory: 0x00211FD0
+value inside:0x0000D4B8
+
+stack_memory: 0x00211FD4
+value inside:0x00007FC4
+
+stack_memory: 0x00211FD8
+value inside:0x001116D0
+
+stack_memory: 0x00211FDC
+value inside:0x00000000
+
+stack_memory: 0x00211FE0
+value inside:0x3F201000
+
+stack_memory: 0x00211FE4
+value inside:0x00000090
+
+stack_memory: 0x00211FE8
+value inside:0x00000000
+
+stack_memory: 0x00211FEC
+value inside:0x001116D0
+
+stack_memory: 0x00211FF0
+value inside:0x00000000
+
+stack_memory: 0x00211FF4
+value inside:0x00000000
+
+stack_memory: 0x00211FF8
+value inside:0x0000E010
+
+stack_memory: 0x00211FFC
+value inside:0x0000D4B8
+
+-------------------END PRINT PCB STACK---------------------------
+PRINT NEW THREAD PCB
+pbc: Init ---------------------PRINT PCB STACK---------------------------
+stack_memory: 0x00210FC0
+value inside:0x80000013
+
+stack_memory: 0x00210FC4
+value inside:0x0000AD40
+
+stack_memory: 0x00210FC8
+value inside:0x0000AD2C
+
+stack_memory: 0x00210FCC
+value inside:0x00000060
+
+stack_memory: 0x00210FD0
+value inside:0x00000064
+
+stack_memory: 0x00210FD4
+value inside:0x00000068
+
+stack_memory: 0x00210FD8
+value inside:0x0000000A
+
+stack_memory: 0x00210FDC
+value inside:0x0000008C
+
+stack_memory: 0x00210FE0
+value inside:0x3F201000
+
+stack_memory: 0x00210FE4
+value inside:0x02F1BA67
+
+stack_memory: 0x00210FE8
+value inside:0x3B9ACA00
+
+stack_memory: 0x00210FEC
+value inside:0x0000D538
+
+stack_memory: 0x00210FF0
+value inside:0x00000078
+
+stack_memory: 0x00210FF4
+value inside:0x00000074
+
+stack_memory: 0x00210FF8
+value inside:0x00000070
+
+stack_memory: 0x00210FFC
+value inside:0x0000006C
+
+-------------------END PRINT PCB STACK---------------------------
+PRINT OLD THREAD PCB
+pbc: Proc1 ---------------------PRINT PCB STACK---------------------------
+stack_memory: 0x00212FC0
+value inside:0x60000013
+
+stack_memory: 0x00212FC4
+value inside:0x0000C1AC
+
+stack_memory: 0x00212FC8
+value inside:0x0000C1AC
+
+stack_memory: 0x00212FCC
+value inside:0x00000160
+
+stack_memory: 0x00212FD0
+value inside:0x00000164
+
+stack_memory: 0x00212FD4
+value inside:0x00000168
+
+stack_memory: 0x00212FD8
+value inside:0x0000000A
+
+stack_memory: 0x00212FDC
+value inside:0x0000018C
+
+stack_memory: 0x00212FE0
+value inside:0x3F201000
+
+stack_memory: 0x00212FE4
+value inside:0x00000090
+
+stack_memory: 0x00212FE8
+value inside:0x0000D890
+
+stack_memory: 0x00212FEC
+value inside:0x0000D8AC
+
+stack_memory: 0x00212FF0
+value inside:0x00000178
+
+stack_memory: 0x00212FF4
+value inside:0x00000174
+
+stack_memory: 0x00212FF8
+value inside:0x00000170
+
+stack_memory: 0x00212FFC
+value inside:0x0000016C
+
+-------------------END PRINT PCB STACK---------------------------
 I'm INIT -->
