@@ -49,15 +49,16 @@ void read_proc(void) {
     do {
         c = readChar();
         switch (c) {
-            case EOL:
-            case CR:
+            case '\n': //changed: constant EOL
+            case '\r': //changed: constant CR 
                 comm[size] = '\0';
                 if (size > 0) {
-                    printLn("");
-                    print("$ ");
+                    printLn("elwenquesito"); //funca
+                    print("resultado ");
                     enrichedPrintLn(comm, &GREEN, NULL);
                     char** argv;
                     int argc = parse_args(comm, &argv);
+                    uart_hex_puts((uint32_t)comm);
                     commatch(argv[0], argc - 1, argc < 2 ? NULL : &argv[1]);
                     // commatch(comm, 0, NULL);
                     size = 0;
@@ -80,6 +81,9 @@ void read_proc(void) {
             default:
                 if (size < MAX_CONSOLE_LINE_INPUT_SIZE) {
                     comm[size++] = c;
+                    comm[size+ 1] = '\0';
+                    uart_hex_puts((uint32_t)comm);
+                    uart_putln(comm);
                     put_char(c);
                 } else {
                     if (flag_over) {

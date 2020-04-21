@@ -14,9 +14,11 @@
 .extern __stack_memory
 .extern __scheduler_finished
 .extern __process_lr
+.extern __process_sp
 .extern uart_putln
 
 pointer_test_subroutine:
+    mov r0, r0
     push {lr}
     ldr r0, =text2
     bl uart_putln
@@ -135,9 +137,12 @@ switch_process_context:
     //r3=INIT(r0), r4=INIT(r1), r5=INIT(r2), r6=INIT(r3), r7=INIT(r4), r8=INIT(r5), r9=INIT(r6), r10=INIT(r7), r11=INIT(r8), r12=INIT(r9)
     stmfd r2!, {r3-r12}
     str r0, [r1] //we update new process's stack pointer
-    ldr r0, =__scheduler_finished
+    ldr r2, =__scheduler_finished
     mov r1, #0x1
-    str r1, [r0]
+    str r1, [r2]
+
+    ldr r1, =__process_sp //we store the stack pointer to retrieve it later
+    str r0, [r1]
     /*
     IRQ STACK FROM __stack_memory WHEN FINISH THIS PART OF CODE
     r0(new process) < __stack_memory
@@ -211,9 +216,13 @@ load_process:
     //r9=PROCESS(r6), r10=PROCESS(r7), r11=PROCESS(r8), r12=PROCESS(r9)
     stmfd r2!, {r3-r12}
     str r0, [r1] //we update INIT process's stack pointer
-    ldr r0, =__scheduler_finished
+    ldr r2, =__scheduler_finished
     mov r1, #0x1
-    str r1, [r0]
+    str r1, [r2]
+
+    ldr r1, =__process_sp//we store the stack pointer to retrieve it later
+    str r0, [r1]
+
     pop {r4-r7}
     mov pc, lr
 
@@ -270,6 +279,7 @@ yield_to_next_process:
     ldmfd r8!, {r0-r5}
     add r6, r8, #0x10
     str r6, [r7] //we update process's stack
+    mov sp, r6
     ldmfd r8!, {r6} // point E
     ldr r7, [r8, #0x8]
     str r9, [r8, #0x8]
@@ -278,5 +288,5 @@ yield_to_next_process:
 
 .data
 .balign 4
-text: .asciz "tu madre"
+text: .asciz "test_yes"
 text2: .asciz "yes"

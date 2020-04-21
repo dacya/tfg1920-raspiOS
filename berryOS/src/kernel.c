@@ -25,23 +25,23 @@ void test1_subroutine(void){
     uart_putln("Entered into the subroutine");
     uart_putln("Entered into the subroutine");
     while(1);
+    uart_putln("DEADDEAD test1");
 }
 
 void test1(void){
     uint32_t j = 0;
     uint32_t i = 0;
     uart_putln("Executing test1");
-    uart_putln("Executing test1");
-    uart_putln("Executing test1");
-    uart_putln("Executing test1");
-    uart_putln("Executing test1");
+    uart_putln("Executing test2");
+    uart_putln("Executing test3");
+    uart_putln("Executing test4");
+    uart_putln("Executing test5");
     test1_subroutine();
-    uart_putln("DEAD test1");
-    uart_putln("DEAD test1");
-    uart_putln("DEAD test1");
-    uart_putln("DEAD test1");
-    uart_putln("DEAD test1");
-
+    uart_putln("DEAD test3");
+    uart_putln("DEAD test3");
+    uart_putln("DEAD test3");
+    uart_putln("DEAD test3");
+    uart_putln("DEAD test3");
 }
 /*
 void test2(void){
@@ -122,7 +122,7 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
 
     print(">> Local timer init: ");
     #ifdef QUANTUM
-    #define QUANTUM 5000
+    #define QUANTUM 100
     #endif
     local_timer_init(VIRTUAL_SYS, QUANTUM);
     enrichedPrintLn("[OK]", &GREEN, NULL);

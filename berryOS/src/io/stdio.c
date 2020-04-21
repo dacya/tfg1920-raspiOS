@@ -3,6 +3,7 @@
 #include <io/uart.h>
 
 void print(char* text) {
+    uart_hex_puts((uint32_t)text);
     uart_puts(text);
     console_putStr(text, NULL, NULL);
 }

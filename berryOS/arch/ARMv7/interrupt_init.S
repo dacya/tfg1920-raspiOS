@@ -109,6 +109,7 @@ data_abort_s_handler:
 //Simple version with no nested interrupts support
 .extern __stack_memory
 .extern __process_lr
+.extern __process_sp
 .extern __scheduler_finished
 .extern print_irq_stack
 irq_s_handler:
@@ -148,6 +149,8 @@ irq_s_handler:
         /* we load the correct value of r0 and we return to where our new
            process were interrupted */
            //we change execution mode so does the stack and lr
+        ldr r0, =__process_sp //we update sp value
+        ldr sp, [r0]
         ldr r0, =__stack_memory
         ldr r0, [r0]
         ldmfd r0!, {lr}

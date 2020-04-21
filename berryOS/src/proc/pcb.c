@@ -19,6 +19,12 @@ uint32_t __scheduler_finished;
  * IN THE SCHEDULER WICH MAY CAUSE A FATAL ERROR
 */
 uint32_t* __process_lr;
+/**
+ * Used by the scheduler and irq s handler
+ * USE OF THIS VARIABLE MAY CAUSE UNEXPECTED BEHAVIOR
+ * IN THE SCHEDULER WICH MAY CAUSE A FATAL ERROR
+*/
+uint32_t* __process_sp;
 
 extern uint8_t __end;
 extern void switch_process_context(process_control_block_t * old, process_control_block_t * new);
