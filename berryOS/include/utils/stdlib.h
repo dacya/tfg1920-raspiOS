@@ -22,7 +22,7 @@ void bzero2(void * dest, int size);
 
 char * itoa(int i);
 
-int atoi(char * i);
+int positiveAtoi(char * i);
 
 int strlen(char* string);
 

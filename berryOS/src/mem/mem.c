@@ -11,6 +11,11 @@
 #include <utils/stdlib.h>
 #include <stdint.h>
 #include <stddef.h>
+#include <io/stdio.h>
+#include <console/command.h>
+#include <utils/unused.h>
+
+
 
 extern uint8_t __end; 
 static uint32_t num_pages;
@@ -34,17 +39,19 @@ static void heap_init(uint32_t heap_start);
 
 static heap_segment_t * heap_segment_list_head;
 
+static void register_memory_commands();
 
 void mem_init(atag_t * atags) {
     uint32_t mem_size, page_array_len, page_array_end, kernel_pages, i;
     
+    register_memory_commands();
     //get the total number of pages
     mem_size = get_mem_size(atags);
     num_pages = mem_size / PAGE_SIZE;
 
     // Allocate space for all those pages' metadata.  Start this block just after the kernel image is finished
     page_array_len = sizeof(page_t) * num_pages;
-    all_pages_array = (page_t *)&__end;
+    all_pages_array = (page_t *)((uint32_t)&__end + PAGE_SIZE);
     bzero2(all_pages_array, page_array_len);
     INITIALIZE_LIST(free_pages, page);
 
@@ -81,9 +88,10 @@ void mem_init(atag_t * atags) {
 static void heap_init(uint32_t heap_start) {
     heap_segment_list_head = (heap_segment_t *) heap_start;
     bzero2(heap_segment_list_head, sizeof(heap_segment_t));
-    heap_segment_list_head->segment_size = KERNEL_HEAP_SIZE;
+    heap_segment_list_head->segment_size = (uint32_t)KERNEL_HEAP_SIZE;
     heap_segment_list_head->next = NULL;
     heap_segment_list_head->prev = NULL;
+    heap_segment_list_head->is_allocated = 0;
 }
 
 
@@ -152,6 +160,7 @@ void * kmalloc(uint32_t bytes) {
         current = best->next;
 
         best->next = ((void*) best) + bytes;
+        best->next->is_allocated = 0;
         best->next->next = current;
         best->next->prev = best;
         best->next->segment_size = best->segment_size - bytes;
@@ -169,7 +178,7 @@ void kfree(void * ptr) {
 
     if (!ptr)
         return;
-
+    
     seg = ptr - sizeof(heap_segment_t);
     seg->is_allocated = 0;
     while (seg->prev != NULL && seg->prev->is_allocated == 0){
@@ -199,8 +208,77 @@ void print_data(void) {
             uart_puts("   is_allocated:");
             aux = seg->is_allocated;
             uart_puts(itoa(aux));
+            uart_puts("   size:");
+            aux = seg->segment_size;
+            uart_puts(itoa(aux));
             uart_putc('\n');    
         }
         seg = seg->next;
     }
+
+}
+
+void print_heap_free_space(){
+    heap_segment_t * seg = heap_segment_list_head;
+    int mem_left = 0;
+    
+    while (seg != NULL) {
+        if(seg->is_allocated == 0)
+            mem_left = mem_left + (int)seg->segment_size;    
+        seg = seg->next;
+    }
+    print(itoa(mem_left));
+    print(" bytes left");
+    //uart_putln("\n");
+   
+}
+
+void print_free_pages(){
+    uart_puts(itoa(size_page_list(&free_pages)));
+    uart_putln(" pages left. First 30 pages bitmap");
+
+    page_t* aux = all_pages_array;
+    char* bitmap = kmalloc(30);
+    int i;
+    
+    for(i = 0; i < 30;i++){
+        bitmap[i] = (char)(48 + aux->flags.allocated);
+        aux += sizeof(page_t);
+    }
+    uart_putln(bitmap);
+    return;    
+}
+
+/* 
+----------------------------------------------------
+                 Commands functions
+----------------------------------------------------
+*/
+
+COMMAND prheap;
+COMMAND prmem;
+
+void prheap_function(int argc, char** argv){
+    MARK_UNUSED(argc);
+    MARK_UNUSED(argv);
+    print_heap_free_space();
+    return;
+}
+
+void prmem_function(int argc, char** argv){
+    MARK_UNUSED(argc);
+    MARK_UNUSED(argv);
+    print_free_pages();
+    return;
+}
+
+static void register_memory_commands(){
+    prheap.helpText = "Print the heap content and the space left";
+    prheap.key = "prheap";
+    prheap.trigger = prheap_function;
+    regcomm(&prheap);
+    prmem.helpText = "Print a bit map and memory pages information";
+    prmem.key = "prmem";
+    prmem.trigger = prmem_function;
+    regcomm(&prmem);
 }
