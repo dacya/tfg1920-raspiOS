@@ -79,7 +79,7 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
     test.key = "test";
     test.trigger = test_command_handler;
 
-    regcomm(&test_command_handler);
+    regcomm(&test);
 
     /* UART */
     uart_init();
