@@ -68,7 +68,7 @@ static void init_function(void){
     
     while (1) {
         //uart_putln("INIT");
-        if(i == 1000000000){
+        if(i == 100000000){
             uart_putln("I'm INIT -->");
             i = 0;
         }

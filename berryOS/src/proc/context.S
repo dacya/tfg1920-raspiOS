@@ -68,7 +68,12 @@ switch_process_context:
      */
     push {r4-r12} //this is necessary to accomplish the arm calling standard
     push {r0}
-    ldr r0, [r0] //we load old process's stack pointer
+    //because the sp value doesn't update when the process is executing, we need
+    //to obtain it manually
+    cps #SUPERVISOR_MODE
+    mov r0, sp
+    cps #IRQ_MODE
+    //now we have the correct value to work with
     ldr r2, =__stack_memory
     ldr r2, [r2] // irq stack
     ldmfd r2!, {r3-r12} //load from r0 to r9 from irq stack
@@ -110,6 +115,7 @@ switch_process_context:
     */
 
 /* IN THIS PART OF CODE WE WILL LOAD PROCESS STATE OF THE SECOND ARGUMENT*/
+    //we assume that the sp value is correctly store in pcb once we reach this part of code
     ldr r0, [r1] // we load new process's stack pointer
     ldmfd r0!, {r3} //we load new process's spsr register 
     msr spsr_cxsf, r3 //we store new process's spsr register
@@ -183,7 +189,7 @@ load_process:
     lr
     x < r2
  */
-    push {r4-r7}
+    push {r4-r12}
     ldr r2, =__stack_memory
     ldr r2, [r2] // irq stack
     add r2, r2, #0x38
@@ -223,7 +229,7 @@ load_process:
     ldr r1, =__process_sp//we store the stack pointer to retrieve it later
     str r0, [r1]
 
-    pop {r4-r7}
+    pop {r4-r12}
     mov pc, lr
 
 

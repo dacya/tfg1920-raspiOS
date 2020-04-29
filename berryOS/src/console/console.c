@@ -53,8 +53,7 @@ void read_proc(void) {
             case '\r': //changed: constant CR 
                 comm[size] = '\0';
                 if (size > 0) {
-                    printLn("elwenquesito"); //funca
-                    print("resultado ");
+                    print("$ ");
                     enrichedPrintLn(comm, &GREEN, NULL);
                     char** argv;
                     int argc = parse_args(comm, &argv);

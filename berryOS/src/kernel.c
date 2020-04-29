@@ -13,19 +13,27 @@
 
 extern void io_halt();
 
-COMMAND lawebada;
+COMMAND test;
 
 uint32_t critical_value = 0;
 //1 locked 0 unlocked
 int mutex = MUTEX_UNLOCK;
 
 void test1_subroutine(void){
+    int i = 0;
     uart_putln("Entered into the subroutine");
     uart_putln("Entered into the subroutine");
     uart_putln("Entered into the subroutine");
     uart_putln("Entered into the subroutine");
-    while(1);
-    uart_putln("DEADDEAD test1");
+    uart_putln("test1: trying to take lock");
+    take_lock(&mutex);
+    while(1){
+        if(i == 100000000){
+            uart_putln("I'm test1 -->");
+            i = 0;
+        }
+        i++;
+    }
 }
 
 void test1(void){
@@ -37,31 +45,26 @@ void test1(void){
     uart_putln("Executing test4");
     uart_putln("Executing test5");
     test1_subroutine();
-    uart_putln("DEAD test3");
-    uart_putln("DEAD test3");
-    uart_putln("DEAD test3");
-    uart_putln("DEAD test3");
-    uart_putln("DEAD test3");
 }
-/*
+
 void test2(void){
     uint32_t j = 0;
     uint32_t i = 0;
-    uart_putln("Executing test2");
+    uart_putln("test2: Trying to take lock");
     take_lock(&mutex);
-    uart_putln("lock taked by test2");
+    uart_putln("test2: lock taked by test2");
 
     while (1) {
-        if(i == 1000000000){
+        if(i == 1000000){
             uart_putln("I'm test2 -->");
             i = 0;
         }
         i++;    
     }
 }
-*/
-void lawebada_handler(int argc, char** argv){
-    printLn("This command works");
+
+void test_command_handler(int argc, char** argv){
+    
 }
 
 extern void pointer_test(void);
@@ -72,11 +75,11 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
     (void) atags;
     pin_set_function(17, OUTPUT);
     
-    lawebada.helpText = "I'm goin to end this whole man's career";
-    lawebada.key = "lawebada";
-    lawebada.trigger = lawebada_handler;
+    test.helpText = "This is a test command";
+    test.key = "test";
+    test.trigger = test_command_handler;
 
-    regcomm(&lawebada);
+    regcomm(&test_command_handler);
 
     /* UART */
     uart_init();
@@ -130,7 +133,7 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
     //TEST PROCESS SECTION
     //create_kernel_thread(&pointer_test, "nested call test", 16);
     create_kernel_thread(&test1, "Proc1", 5);
-    //create_kernel_thread(&test2, "Kezo", 5);
+    create_kernel_thread(&test2, "Kezo", 5);
 
     print_processes();
 
