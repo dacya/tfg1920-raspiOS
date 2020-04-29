@@ -10,7 +10,7 @@
 
 #include <interrupts.h>
 
-#define QUANTUM 1
+#define QUANTUM 55
 
 /**
  * We can select the counter to trigger interrupts.

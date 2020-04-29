@@ -37,8 +37,6 @@ void test1_subroutine(void){
 }
 
 void test1(void){
-    uint32_t j = 0;
-    uint32_t i = 0;
     uart_putln("Executing test1");
     uart_putln("Executing test2");
     uart_putln("Executing test3");
@@ -48,7 +46,6 @@ void test1(void){
 }
 
 void test2(void){
-    uint32_t j = 0;
     uint32_t i = 0;
     uart_putln("test2: Trying to take lock");
     take_lock(&mutex);
@@ -63,8 +60,11 @@ void test2(void){
     }
 }
 
-void test_command_handler(int argc, char** argv){
-    
+void test_command_handler(int argc, char** argv) {
+    MARK_UNUSED(argc);
+    MARK_UNUSED(argv);
+    print("This is a test:");
+    enrichedPrintLn(" Test passed.", &GREEN, NULL);
 }
 
 extern void pointer_test(void);
@@ -124,9 +124,6 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags) {
     enrichedPrintLn("[OK]", &GREEN, NULL);
 
     print(">> Local timer init: ");
-    #ifdef QUANTUM
-    #define QUANTUM 100
-    #endif
     local_timer_init(VIRTUAL_SYS, QUANTUM);
     enrichedPrintLn("[OK]", &GREEN, NULL);
 

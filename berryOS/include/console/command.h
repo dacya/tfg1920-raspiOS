@@ -2,6 +2,7 @@
 #define _COMMAND_H
 
 #include <utils/list.h>
+#include <utils/unused.h>
 
 typedef struct COMMAND {
     char* key;
