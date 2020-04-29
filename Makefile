@@ -1,7 +1,8 @@
 CC = compiler/bin/arm-none-eabi
 OBJCOPY = compiler/bin/arm-none-eabi-objcopy
-C_OPT = -mcpu=cortex-a7 -O2 -Wall -Wextra -fpic -ffreestanding -std=gnu99 -nostdlib -I berryOS/include -g
-L_OPT = -ffreestanding -O2 -nostdlib -mcpu=cortex-a7
+C_OPT = -mcpu=cortex-a7 -O0 -Wall -Wextra -fpic -ffreestanding -std=gnu99 -nostdlib -I berryOS/include -g
+#-g preserves the program's identifiers and symbols
+L_OPT = -ffreestanding -nostdlib -mcpu=cortex-a7
 
 #-fpic position independent code
 SRC_DIR = berryOS/src
@@ -13,6 +14,10 @@ run: build
 	@echo "Running qemu..."
 	qemu-system-arm -m 256 -M raspi2 -serial stdio -kernel $(BUILD_DIR)/myos.elf
 
+debug: build
+	@echo ""
+	@echo "Debugging in qemu..."
+	qemu-system-arm -m 256 -M raspi2 -serial stdio -kernel $(BUILD_DIR)/myos.elf -S -gdb tcp::1234
 
 #target for .c files
 $(BUILD_DIR)/%_c.o: $(SRC_DIR)/%.c 
@@ -33,6 +38,7 @@ C_FILES += $(wildcard $(SRC_DIR)/*/*.c)
 C_FILES += $(wildcard $(SRC_DIR)/*.c)
 
 ASM_FILES = $(wildcard $(SRC_ARCH)/ARMv7/*.S) #Remember to add the context.S when using processes
+ASM_FILES += $(wildcard $(SRC_DIR)/proc/*/*.S) 
 ASM_FILES += $(wildcard $(SRC_DIR)/proc/*.S) 
 
 OBJ_FILES = $(C_FILES:$(SRC_DIR)/%.c=$(BUILD_DIR)/%_c.o)

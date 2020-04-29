@@ -21,6 +21,7 @@ typedef struct VIEW {
     char* text;
     TEXT_ALIGN textAlign;
     int textLines;
+    int textOverflow;
     int padding;
 } VIEW;
 

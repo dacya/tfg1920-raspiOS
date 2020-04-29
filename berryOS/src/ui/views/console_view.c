@@ -31,8 +31,9 @@ void init_console(int width, int height) {
     new_view(&textInput, width, (height - 1) * CONSOLE_INPUT_HEIGHT / 100, 0, 0);
     textInput.bgColor = RED;
     textInput.fontSize = CONSOLE_VIEW_FONT_SIZE;
-    addView(&consoleView, &textInput);
     textInput.text = "> ";
+    textInput.textOverflow = 1;
+    addView(&consoleView, &textInput);
 
     LINE_HEIGHT = display.view.fontSize * CHAR_MIN_SIZE + CHAR_MIN_SIZE;
     MAX_LINES = display.view.height / LINE_HEIGHT;
@@ -133,6 +134,20 @@ void console_putStr(char* str, color_24* textColor, color_24* bgColor) {
         console_putLn(oflow, textColor, bgColor);
         kfree(oflow);
     }
+}
+
+void console_clear_screen() {
+    VIEW_GROUP* line;
+    while (display.children.size > 0) {
+        line = removeViewByIndex(&display, 0);
+        while (line->children.size > 0) {
+            VIEW* v = removeViewByIndex(line, 0);
+            destroyView(v);
+            kfree(v);
+        }
+        kfree(line);
+    }
+    drawGroup(&display);
 }
 
 void put_char(char c) {

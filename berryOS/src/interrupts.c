@@ -155,6 +155,26 @@ void __attribute__ ((interrupt ("SWI"))) software_interrupt_c_handler(void) {
 void __attribute__ ((interrupt ("FIQ"))) fast_irq_c_handler(void) {
     uart_puts("FIQ Catched!\r\n");
 }
+
+
+int INTERRUPTS_ENABLED(void) {
+    int res;
+    __asm__ __volatile__("mrs %[res], CPSR": [res] "=r" (res)::);
+    return ((res >> 7) & 1) == 0;
+}
+
+void ENABLE_INTERRUPTS(void) {
+    if (!INTERRUPTS_ENABLED()) {
+        __asm__ __volatile__("cpsie i");
+    }
+}
+
+void DISABLE_INTERRUPTS(void) {
+    if (INTERRUPTS_ENABLED()) {
+        __asm__ __volatile__("cpsid i");
+    }
+}
+
 #if defined(__cplusplus)
 extern "C" /* Use C linkage for kernel_main. */
 #endif

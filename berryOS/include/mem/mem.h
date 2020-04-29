@@ -15,7 +15,7 @@
 #include <mem/atag.h>
 #include <utils/list.h>
 #include <stdint.h>
-#define PAGE_SIZE 1024 * 4
+#define PAGE_SIZE (1024 * 4)
 #define KERNEL_HEAP_SIZE (1024 * 1024)
 
 //This structs store metadata about the pages 

@@ -175,11 +175,11 @@ void unregister_irq_isr(irq_number_t irq_num);
  * -----------------------------------
  * @return True if enabled False if not
 */
-__inline__ int INTERRUPTS_ENABLED(void) {
+/* __inline__ */ int INTERRUPTS_ENABLED(void);/*  {
     int res;
     __asm__ __volatile__("mrs %[res], CPSR": [res] "=r" (res)::);
-    return ((res >> 7) & 1) == 0;
-}
+    return ((res >> 7) & 1) == 0; 
+}*/
 
 /**
  * Macro to enable interrupts in the hardware.
@@ -187,11 +187,11 @@ __inline__ int INTERRUPTS_ENABLED(void) {
  * -----------------------------------
  * @return void
 */
-__inline__ void ENABLE_INTERRUPTS(void) {
+/* __inline__ */ void ENABLE_INTERRUPTS(void);/*  {
     if (!INTERRUPTS_ENABLED()) {
         __asm__ __volatile__("cpsie i");
     }
-}
+}*/
 
 /**
  * Macro to disable interrupts in the hardware
@@ -199,13 +199,13 @@ __inline__ void ENABLE_INTERRUPTS(void) {
  * -----------------------------------
  * @return void
 */
-__inline__ void DISABLE_INTERRUPTS(void) {
+/* __inline__ */ void DISABLE_INTERRUPTS(void);/*  {
     if (INTERRUPTS_ENABLED()) {
         __asm__ __volatile__("cpsid i");
     }
-}
+}*/
 
 void local_timer_handler(void);
 void local_timer_clearer(void);
-
+void print_irq_stack(void);
 #endif

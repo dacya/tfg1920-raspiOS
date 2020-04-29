@@ -4,7 +4,8 @@
 *
 * Alejandro Cancelo Correia
 * Nov, 25, 2019
- */
+*/
+.equ IRQ_STACK, 0x4000
 .equ VECTOR_TABLE_INIT, 0x00000000
 .equ IRQ_MODE, 0x12
 .equ FIQ_MODE, 0x11
@@ -108,7 +109,9 @@ data_abort_s_handler:
 //Simple version with no nested interrupts support
 .extern __stack_memory
 .extern __process_lr
+.extern __process_sp
 .extern __scheduler_finished
+.extern print_irq_stack
 irq_s_handler:
     //srsdb sp!, #IRQ_MODE //we stores the spsr and lr at the address contained in sp of the mode irq
     /*
@@ -139,12 +142,15 @@ irq_s_handler:
 
         ldr r0, =__stack_memory
         str sp, [r0]
-
+        mov sp, #IRQ_STACK
+        
         mrs r0, spsr
         msr cpsr_cxsf, r0 //we change cpsr to the corresponding value of cpsr of the new process
         /* we load the correct value of r0 and we return to where our new
            process were interrupted */
            //we change execution mode so does the stack and lr
+        ldr r0, =__process_sp //we update sp value
+        ldr sp, [r0]
         ldr r0, =__stack_memory
         ldr r0, [r0]
         ldmfd r0!, {lr}

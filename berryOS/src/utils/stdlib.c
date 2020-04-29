@@ -12,6 +12,17 @@ int strlen(char* string) {
 	return i - 1;
 }
 
+int streq(char* str1, char* str2) {
+	while (*str1 == *str2) {
+		if (*str1 == '\0')
+			return 1;
+		str1++;
+		str2++;
+	}
+	return 0;
+}
+
+
 void memcpy(void * dest, void * src, int size){
 	char * d  = dest;
 	char * s = src;

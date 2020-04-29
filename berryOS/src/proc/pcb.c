@@ -3,7 +3,7 @@
 #include <utils/stdlib.h>
 #include <interrupts.h>
 #include <io/uart.h>
-
+#include <proc/locks/mutex.h>
 static uint32_t pids = 1;
 #define NEW_PID pids++;
 /**
@@ -19,6 +19,12 @@ uint32_t __scheduler_finished;
  * IN THE SCHEDULER WICH MAY CAUSE A FATAL ERROR
 */
 uint32_t* __process_lr;
+/**
+ * Used by the scheduler and irq s handler
+ * USE OF THIS VARIABLE MAY CAUSE UNEXPECTED BEHAVIOR
+ * IN THE SCHEDULER WICH MAY CAUSE A FATAL ERROR
+*/
+uint32_t* __process_sp;
 
 extern uint8_t __end;
 extern void switch_process_context(process_control_block_t * old, process_control_block_t * new);
@@ -36,13 +42,34 @@ process_control_block_t* init_process;
 pcb_list_t run_queue;
 //pcb_list_t all_proc_list;
 
+static sched_control_t* scheduler_control;
+
+extern int mutex;
+
+void print_pcb_stack(process_control_block_t* to_print){
+    uint32_t* end_stack = to_print->stack_page + PAGE_SIZE;
+
+    uart_puts("pbc: ");
+    uart_puts(to_print->proc_name);
+    uart_putln(" ---------------------PRINT PCB STACK---------------------------");
+    for(uint32_t* i = to_print->stack_pointer_to_saved_state; i < end_stack; i++){
+        uart_puts("stack_memory: ");
+        uart_hex_puts((uint32_t)(i));
+        uart_puts("value inside:");
+        uart_hex_puts(*(i));
+        uart_putln("");
+    }
+    uart_putln("-------------------END PRINT PCB STACK---------------------------");
+}
+
 static void init_function(void){
     int a = 1;
-    int i = 0;    
+    int i = 0;
+    
     while (1) {
+        //uart_putln("INIT");
         if(i == 100000000){
-            uart_puts("I'm INIT --> a = ");
-            uart_putln(itoa(a));
+            uart_putln("I'm INIT -->");
             i = 0;
         }
        i++;    
@@ -67,28 +94,56 @@ void pointer_test_in_c(void){
     uart_hex_puts((uint32_t)b);
 }
 
+static void round_robin_sched_policy(void){
+    process_control_block_t* new_thread;
+    process_control_block_t* old_thread;
+
+    
+    //If run_queue is empty, the current process continue
+    if(size_pcb_list(&run_queue) == 0){
+        return;
+    }
+
+    if(current_process == NULL){
+        print_pcb_stack(init_process);
+        current_process = init_process;
+        load_process(init_process);
+        remove_pcb_immediate(&run_queue, init_process);
+        uart_putln("INIT loaded!");
+        return;
+    }
+
+    //If is not empty, save the current process and pop the first process in the run_queue.
+    //This replacement method works for RR and FIFO.
+    new_thread = pop_pcb_list(&run_queue);
+    old_thread = current_process;
+    current_process = new_thread;
+
+    append_pcb_list(&run_queue, old_thread); 
+
+    //pointer_test_in_c();
+
+    //Switch the processes contexts
+    switch_process_context(old_thread, new_thread);
+}
+
 /**
  * Cleans all presence of a process and performs a context switch with the next
  * process available inside the run queue
 */
 static void reap(void){
-    uart_puts("Process:");
-    uart_putln(current_process->proc_name);
-    uart_putln("Cleaning all resources from old current process pcb");
     DISABLE_INTERRUPTS();
     process_control_block_t * new_thread, * old_thread;
 
     // If nothing on the run queue, there is nothing to do now. just loop
     while (size_pcb_list(&run_queue) == 0);
 
-    // Get the next thread to run.  For now we are using round-robin
+    // Get the next thread to run.  For now we are using FIFO
     new_thread = pop_pcb_list(&run_queue);
     old_thread = current_process;
     current_process = new_thread;
 
     //remove_pcb_immediate(&run_queue, old_thread);
-
-    uart_putln(new_thread->proc_name);
 
     free_page(old_thread->stack_page);
     kfree(old_thread);
@@ -141,40 +196,36 @@ void process_init(void){
     //append_pcb_list(&all_proc_list, main_pcb);
     init_process = main_pcb;
     current_process = NULL;
+
+    sched_control_t* main_scheduling;
+
+    main_scheduling = kmalloc(sizeof(sched_control_t));
+    bzero2(main_scheduling, sizeof(sched_control_t));
+
+    main_scheduling->using = RR;
+
+    for(int i = 0; i < MAX_SCHEDULERS; i++){
+        main_scheduling->schedulers[i].registered = 0;
+    }
+
+    main_scheduling->schedulers[RR].registered = 1;
+    main_scheduling->schedulers[RR].sched_function = &round_robin_sched_policy;
+    main_scheduling->by_default = &round_robin_sched_policy;
+
+    scheduler_control = main_scheduling;
 }
 
 void schedule(void){
     DISABLE_INTERRUPTS();
-    process_control_block_t* new_thread;
-    process_control_block_t* old_thread;
 
-    //If run_queue is empty, the current process continue
-    if(size_pcb_list(&run_queue) == 0){
+    if(!scheduler_control->schedulers[scheduler_control->using].registered){
+        scheduler_control->by_default();
         ENABLE_INTERRUPTS();
         return;
     }
 
-    if(current_process == NULL){
-        current_process = init_process;
-        load_process(init_process);
-        remove_pcb_immediate(&run_queue, init_process);
-        uart_putln("INIT loaded!");
-        ENABLE_INTERRUPTS();
-        return;
-    }
-    //If is not empty, save the current process and pop the first process in the run_queue.
-    //This replacement method works for RR and FIFO.
-    new_thread = pop_pcb_list(&run_queue);
-    old_thread = current_process;
-    current_process = new_thread;
+    scheduler_control->schedulers[scheduler_control->using].sched_function();
 
-    append_pcb_list(&run_queue, old_thread); 
-
-    //pointer_test_in_c();
-
-    //Switch the processes contexts
-    switch_process_context(old_thread, new_thread);
-    uart_putln("processes switched!");
     ENABLE_INTERRUPTS();
 }
 
@@ -221,6 +272,33 @@ void create_kernel_thread(kthread_function_f thread_func, char * name, int name_
     // add the thread to the lists
     //append_pcb_list(&all_proc_list, pcb);
     append_pcb_list(&run_queue, pcb);
+}
+
+
+int register_scheduler_policy(kscheduling_function_f sched_func, sched_type_t policy_type){
+
+    if(scheduler_control->schedulers[policy_type].registered){
+        return -1;
+    }
+
+    scheduler_control->schedulers[policy_type].registered = 1;
+    scheduler_control->schedulers[policy_type].sched_function = sched_func;
+
+    return 0;
+}
+
+void unregister_scheduler_policy(sched_type_t policy_type){
+    scheduler_control->schedulers[policy_type].registered = 0;
+}
+
+int change_scheduling_policy(sched_type_t policy_type){
+    if(!scheduler_control->schedulers[policy_type].registered){
+        return -1;
+    }
+
+    scheduler_control->using = policy_type;
+
+    return 0;
 }
 
 void print_processes(){

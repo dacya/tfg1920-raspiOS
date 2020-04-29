@@ -5,7 +5,7 @@
 * Alejandro Cancelo Correia
 * March, 31, 2020
 */
-
+.equ IRQ_STACK, 0x4000
 .equ IRQ_MODE, 0x12
 .equ SUPERVISOR_MODE, 0x13
 
@@ -14,10 +14,34 @@
 .extern __stack_memory
 .extern __scheduler_finished
 .extern __process_lr
+.extern __process_sp
+.extern uart_putln
+
+pointer_test_subroutine:
+    mov r0, r0
+    push {lr}
+    ldr r0, =text2
+    bl uart_putln
+    ldr r0, =text2
+    bl uart_putln
+    pop {lr}
+    b .
 
 .global pointer_test
 /* r0 pointer r1 pointer */
 pointer_test:
+    push {lr}
+    ldr r0, =text
+    bl uart_putln
+    ldr r0, =text
+    bl uart_putln
+    ldr r0, =text
+    bl uart_putln
+    ldr r0, =text
+    bl uart_putln
+
+    bl pointer_test_subroutine
+    pop {lr}
     mov pc, lr
 
 .global switch_process_context
@@ -44,7 +68,12 @@ switch_process_context:
      */
     push {r4-r12} //this is necessary to accomplish the arm calling standard
     push {r0}
-    ldr r0, [r0] //we load old process's stack pointer
+    //because the sp value doesn't update when the process is executing, we need
+    //to obtain it manually
+    cps #SUPERVISOR_MODE
+    mov r0, sp
+    cps #IRQ_MODE
+    //now we have the correct value to work with
     ldr r2, =__stack_memory
     ldr r2, [r2] // irq stack
     ldmfd r2!, {r3-r12} //load from r0 to r9 from irq stack
@@ -58,6 +87,8 @@ switch_process_context:
     mov r7, r5
     mov r5, r4
     mov r4, r7
+
+    sub r3, r3, #0x4
 
     stmfd r0!, {r3-r6} //we store into first argument stack
     mrs r12, spsr //we obtain the corresponding value of CPSR for our old process
@@ -84,6 +115,7 @@ switch_process_context:
     */
 
 /* IN THIS PART OF CODE WE WILL LOAD PROCESS STATE OF THE SECOND ARGUMENT*/
+    //we assume that the sp value is correctly store in pcb once we reach this part of code
     ldr r0, [r1] // we load new process's stack pointer
     ldmfd r0!, {r3} //we load new process's spsr register 
     msr spsr_cxsf, r3 //we store new process's spsr register
@@ -111,9 +143,12 @@ switch_process_context:
     //r3=INIT(r0), r4=INIT(r1), r5=INIT(r2), r6=INIT(r3), r7=INIT(r4), r8=INIT(r5), r9=INIT(r6), r10=INIT(r7), r11=INIT(r8), r12=INIT(r9)
     stmfd r2!, {r3-r12}
     str r0, [r1] //we update new process's stack pointer
-    ldr r0, =__scheduler_finished
+    ldr r2, =__scheduler_finished
     mov r1, #0x1
-    str r1, [r0]
+    str r1, [r2]
+
+    ldr r1, =__process_sp //we store the stack pointer to retrieve it later
+    str r0, [r1]
     /*
     IRQ STACK FROM __stack_memory WHEN FINISH THIS PART OF CODE
     r0(new process) < __stack_memory
@@ -144,8 +179,7 @@ load_process:
     ...
     r12
     lr
-*/
-/*
+
     IRQ FROM __stack_memory + 0x38
     r0
     r1
@@ -155,7 +189,7 @@ load_process:
     lr
     x < r2
  */
-    push {r4-r7}
+    push {r4-r12}
     ldr r2, =__stack_memory
     ldr r2, [r2] // irq stack
     add r2, r2, #0x38
@@ -188,10 +222,14 @@ load_process:
     //r9=PROCESS(r6), r10=PROCESS(r7), r11=PROCESS(r8), r12=PROCESS(r9)
     stmfd r2!, {r3-r12}
     str r0, [r1] //we update INIT process's stack pointer
-    ldr r0, =__scheduler_finished
+    ldr r2, =__scheduler_finished
     mov r1, #0x1
-    str r1, [r0]
-    pop {r4-r7}
+    str r1, [r2]
+
+    ldr r1, =__process_sp//we store the stack pointer to retrieve it later
+    str r0, [r1]
+
+    pop {r4-r12}
     mov pc, lr
 
 
@@ -229,6 +267,7 @@ yield_to_next_process:
     r7 < point E
     r8 
     r9 */
+    mov sp, #IRQ_STACK
     mov r7, r0 //direction to pcb
     ldr r8, [r0] //we load the stack pointer of process_pcb argument
     ldmfd r8!, {r1} //we load cpsr
@@ -246,8 +285,14 @@ yield_to_next_process:
     ldmfd r8!, {r0-r5}
     add r6, r8, #0x10
     str r6, [r7] //we update process's stack
+    mov sp, r6
     ldmfd r8!, {r6} // point E
     ldr r7, [r8, #0x8]
     str r9, [r8, #0x8]
     mov r9, r7
     ldmfd r8, {r7, r8, pc}
+
+.data
+.balign 4
+text: .asciz "test_yes"
+text2: .asciz "yes"
