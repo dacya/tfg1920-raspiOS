@@ -31,6 +31,7 @@ typedef struct filesystem_methods{
     void (*printFs)(void);
     int (*getFileSize)(char* path);
     void (*changeDir)(char* path);
+    void (*listDirectory)(char* path);
 } fs_interface;
 
 typedef struct i_node {
@@ -157,6 +158,15 @@ void printFs(void);
  * @param path The name of the directory.
  */
 void changeDir(char* path);
+
+
+/**
+ * List all the files contained in the directory. Files will be printed in white and directories
+ * will be printed in blue.
+ *   
+ * @param path The name of the directory.
+ */
+void listDirectory(char* path);
 
 
 #endif

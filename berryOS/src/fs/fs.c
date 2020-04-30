@@ -142,6 +142,7 @@ void fs_init(void){
     interface.printFs = printFs;
     interface.getFileSize = getFileSize;
     interface.changeDir = changeDir;
+    interface.listDirectory = listDirectory;
 
     register_filesystem_commands();
     
@@ -470,17 +471,44 @@ static void recPrintFs(uint32_t inode, uint32_t j){
         for(k = 0; k < 3*j;k++)
             print(" ");
         child = get_inode(dir->child[i].inode_num);
-        print(dir->child[i].filename);
-        print("\n\0");
-        if(child->type == 1)
+        if(child->type == 1){
+            enrichedPrintLn(dir->child[i].filename, &BLUE, NULL);
             recPrintFs(dir->child[i].inode_num, j + 1);
-        
+        }
+        else
+            printLn(dir->child[i].filename);
     }
     return;
 }
 
 void printFs(void){
     recPrintFs(0,0);
+}
+
+void listDirectory(char* path){
+    uart_putln("LLEGO");
+    int i;
+    char* file = kmalloc(MAXFILESIZE);
+    dir_t* curr_dir = calculatePath(path, file, NULL);
+    if(curr_dir == NULL || (i = fileExists(file, 0, curr_dir)) == -1){
+        kfree(file); return;
+    }
+    i_node_t* inFile = get_inode(curr_dir->child[i].inode_num);
+    if(inFile->type == 0){
+        kfree(file); return;
+    }
+
+    curr_dir = (dir_t*)inFile->pages[0];
+    for(i = 2; i < (int)curr_dir->num_childs; i++){
+        if(get_inode(curr_dir->child[i].inode_num)->type == 0)
+            print(curr_dir->child[i].filename);
+        else
+            enrichedPrint(curr_dir->child[i].filename, &BLUE, NULL);
+        print("  ");
+    }
+    printLn("");
+    kfree(file);
+    return;
 }
 
 /* 
@@ -494,6 +522,7 @@ COMMAND mkfile;
 COMMAND cd;
 COMMAND del;
 COMMAND lsall;
+COMMAND ls;
 COMMAND cat;
 COMMAND echo;
 
@@ -521,6 +550,13 @@ void lsall_function(int argc, char** argv){
     MARK_UNUSED(argc);
     MARK_UNUSED(argv);
     printFs();
+    return;
+}
+void ls_function(int argc, char** argv){
+    if(argc == 0)
+        listDirectory(current_glob->child[0].filename);
+    else
+        listDirectory(argv[0]);
     
     return;
 }
@@ -562,6 +598,10 @@ static void register_filesystem_commands(){
     lsall.key = "lsall";
     lsall.trigger = lsall_function;
     regcomm(&lsall);
+    ls.helpText = "List some path, or current directory if there are not parameters";
+    ls.key = "ls";
+    ls.trigger = ls_function;
+    regcomm(&ls);
     cat.helpText = "Print a file's content";
     cat.key = "cat";
     cat.trigger = cat_function;
