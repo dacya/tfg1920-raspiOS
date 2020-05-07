@@ -228,24 +228,25 @@ void print_heap_free_space(){
         seg = seg->next;
     }
     print(itoa(mem_left));
-    print(" bytes left");
+    printLn(" bytes left");
     //uart_putln("\n");
    
 }
 
 void print_free_pages(){
-    uart_puts(itoa(size_page_list(&free_pages)));
-    uart_putln(" pages left. First 30 pages bitmap");
+    print(itoa(size_page_list(&free_pages)));
+    printLn(" pages left. First 60 pages bitmap");
 
     page_t* aux = all_pages_array;
-    char* bitmap = kmalloc(30);
+    char* bitmap = kmalloc(60);
     int i;
     
-    for(i = 0; i < 30;i++){
+    for(i = 0; i < 60;i++){
         bitmap[i] = (char)(48 + aux->flags.allocated);
         aux += sizeof(page_t);
     }
-    uart_putln(bitmap);
+    printLn(bitmap);
+    kfree(bitmap);
     return;    
 }
 
@@ -273,11 +274,11 @@ void prmem_function(int argc, char** argv){
 }
 
 static void register_memory_commands(){
-    prheap.helpText = "Print the heap content and the space left";
+    prheap.helpText = "Print the heap space left";
     prheap.key = "prheap";
     prheap.trigger = prheap_function;
     regcomm(&prheap);
-    prmem.helpText = "Print a bit map and memory pages information";
+    prmem.helpText = "Print a bit map and memory pages left";
     prmem.key = "prmem";
     prmem.trigger = prmem_function;
     regcomm(&prmem);
