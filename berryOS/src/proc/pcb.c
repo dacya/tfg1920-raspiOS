@@ -352,15 +352,15 @@ static void console_print_processes(){
         
     while (has_next_pcb_list(&run_queue, aux)){
         aux = next_pcb_list(aux);
-        print("Proceso ");
+        print("Process ");
         print(aux->proc_name);
-        print(" con PID ");
+        print(" with PID ");
         printLn(itoa(aux->pid));
     }
 
-    print("Proceso ");
+    print("Process ");
     print(current_process->proc_name);
-    print(" con PID ");
+    print(" with PID ");
     printLn(itoa(current_process->pid));    
     
 }
