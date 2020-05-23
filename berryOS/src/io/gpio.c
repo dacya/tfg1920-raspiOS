@@ -28,10 +28,11 @@ void pin_set_function(unsigned int pin, pin_alt_funct fun_sel) {
             break;
     }
 
+    *reg_obj &= ~(0b111 << ((pin % 10) * 3));
     *reg_obj |= fun_sel << ((pin % 10) * 3);
 }
 
-void pin_set_as_output(unsigned int pin) {
+void pin_set_output(unsigned int pin) {
     if (pin > 53) {
         return ;
     }

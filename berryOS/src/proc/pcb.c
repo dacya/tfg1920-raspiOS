@@ -67,7 +67,6 @@ void print_pcb_stack(process_control_block_t* to_print){
 }
 
 static void init_function(void){
-    int a = 1;
     int i = 0;
     
     while (1) {

@@ -112,7 +112,7 @@ void pin_set_function(unsigned int pin, pin_alt_funct fun_sel);
  * @param pin 1 out of the 54 pins {0 - 53}
  * @return void
  */
-void pin_set_as_output(unsigned int pin);
+void pin_set_output(unsigned int pin);
 
 /**
  * Clears the output signaling in the give pin
