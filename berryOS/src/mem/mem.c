@@ -88,7 +88,7 @@ void mem_init(atag_t * atags) {
 static void heap_init(uint32_t heap_start) {
     heap_segment_list_head = (heap_segment_t *) heap_start;
     bzero2(heap_segment_list_head, sizeof(heap_segment_t));
-    heap_segment_list_head->segment_size = (uint32_t)KERNEL_HEAP_SIZE;
+    heap_segment_list_head->segment_size = ((uint32_t)KERNEL_HEAP_SIZE) - sizeof(heap_segment_t);
     heap_segment_list_head->next = NULL;
     heap_segment_list_head->prev = NULL;
     heap_segment_list_head->is_allocated = 0;
