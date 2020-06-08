@@ -104,7 +104,7 @@ static dir_t* calculatePath(char* path, char* filename, int* fnsize){
 }
 
 int exists(char* path){
-    char* file = kmalloc(MAXFILESIZE);
+    char* file = kmalloc(MAXFILENAMESIZE);
     dir_t* curr_dir = calculatePath(path, file, NULL);
     int aux = fileExists(file, 0, curr_dir) != -1;
     kfree(file); 
@@ -113,7 +113,7 @@ int exists(char* path){
 
 int getFileSize(char* path){
     int i;
-    char* file = kmalloc(MAXFILESIZE);
+    char* file = kmalloc(MAXFILENAMESIZE);
     dir_t* curr_dir = calculatePath(path, file, NULL);
     if (curr_dir == NULL || (i = fileExists(file, 2, curr_dir)) == -1){
         kfree(file); return -1;
@@ -201,7 +201,7 @@ fs_interface* getFsInterface(void){
 
 void createFile(char* path){
     int fnsize;
-    char* file = kmalloc(MAXFILESIZE);
+    char* file = kmalloc(MAXFILENAMESIZE);
     dir_t* curr_dir = calculatePath(path, file, &fnsize);
     if (curr_dir == NULL || freeInodes == 0 || fileExists(file, 0, curr_dir) != -1 || curr_dir->num_childs == MAXFILESPERDIR){
         kfree(file); return;
@@ -229,7 +229,7 @@ void createFile(char* path){
 
 void createDir(char* path){
     int fnsize;
-    char* file = kmalloc(MAXFILESIZE);
+    char* file = kmalloc(MAXFILENAMESIZE);
     dir_t* curr_dir = calculatePath(path, file, &fnsize);
     if (curr_dir == NULL || freeInodes == 0 || curr_dir->num_childs == MAXFILESPERDIR || fileExists(file, 0, curr_dir) != -1){
         kfree(file); return;
@@ -268,7 +268,7 @@ void createDir(char* path){
 
 int write(char* path, char* text){
     int i;
-    char* file = kmalloc(MAXFILESIZE);
+    char* file = kmalloc(MAXFILENAMESIZE);
     dir_t* curr_dir = calculatePath(path, file, NULL);
     if (curr_dir == NULL || (i = fileExists(file, 2, curr_dir)) == -1){
         kfree(file); return -1;
@@ -315,7 +315,7 @@ int write(char* path, char* text){
 
 char* read(char* path, uint32_t bytes){  
     int i;
-    char* file = kmalloc(MAXFILESIZE);
+    char* file = kmalloc(MAXFILENAMESIZE);
     dir_t* curr_dir = calculatePath(path, file, NULL);
     if (curr_dir == NULL || (i = fileExists(file, 2, curr_dir)) == -1){
         kfree(file); return NULL;
@@ -352,7 +352,7 @@ char* read(char* path, uint32_t bytes){
 
 void changeDir(char* path){
     int i;
-    char* file = kmalloc(MAXFILESIZE);
+    char* file = kmalloc(MAXFILENAMESIZE);
     dir_t* curr_dir = calculatePath(path, file, NULL);
     if (curr_dir == NULL || (i = fileExists(file, 0, curr_dir)) == -1){
         kfree(file); return;
@@ -426,7 +426,7 @@ static void deleteDirContent(i_node_t* inFile){
 
 void delete(char* path){
     int i;
-    char* file = kmalloc(MAXFILESIZE);
+    char* file = kmalloc(MAXFILENAMESIZE);
     dir_t* curr_dir = calculatePath(path, file, NULL);
     if(curr_dir == NULL || (i = fileExists(file, 2, curr_dir)) == -1){
         kfree(file); return;
@@ -493,7 +493,7 @@ void printFs(void){
 void listDirectory(char* path){
     uart_putln("LLEGO");
     int i;
-    char* file = kmalloc(MAXFILESIZE);
+    char* file = kmalloc(MAXFILENAMESIZE);
     dir_t* curr_dir = calculatePath(path, file, NULL);
     if(curr_dir == NULL || (i = fileExists(file, 0, curr_dir)) == -1){
         kfree(file); return;
