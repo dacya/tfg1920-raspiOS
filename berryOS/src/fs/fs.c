@@ -71,10 +71,15 @@ static int fileExists(char* file, uint32_t first_child, dir_t* father){  //0 if 
 static dir_t* calculatePath(char* path, char* filename, int* fnsize){
     filename[MAXFILENAMESIZE - 1] = '\0';
     dir_t* father = current_glob;
+    
     if(*path == '~'){
         father = root_dir;
         path++;
+        if(*path != '/')
+            return NULL;
     }
+    if(*path == '/')
+            path++;
     int j = 0;
     while(*path != '\0' && j < MAXFILENAMESIZE){
         if(*path == '/'){
@@ -564,9 +569,9 @@ void cat_function(int argc, char** argv){
     MARK_UNUSED(argc);
     char* aux = read(argv[0], getFileSize(argv[0]));
     if(aux == NULL)
-        print("File not found\n\0");
+        printLn("File not found\n\0");
     else
-        print(aux);
+        printLn(aux);
     return;
 }
 void echo_function(int argc, char** argv){
