@@ -77,9 +77,9 @@ static dir_t* calculatePath(char* path, char* filename, int* fnsize){
         path++;
         if(*path != '/')
             return NULL;
-    }
-    if(*path == '/')
+        else
             path++;
+    }
     int j = 0;
     while(*path != '\0' && j < MAXFILENAMESIZE){
         if(*path == '/'){
