@@ -10,7 +10,7 @@
 
 COMMAND cls;
 
-int MAX_CONSOLE_LINE_INPUT_SIZE = 20;
+int MAX_CONSOLE_LINE_INPUT_SIZE = 30;
 const char EOL = '\n';
 const char CR = '\r';
 
@@ -78,11 +78,9 @@ void read_proc(void) {
                 }
                 break;
             default:
-                if (size < MAX_CONSOLE_LINE_INPUT_SIZE) {
+                if (size < MAX_CONSOLE_LINE_INPUT_SIZE - 1) {
                     comm[size++] = c;
-                    comm[size+ 1] = '\0';
-                    uart_hex_puts((uint32_t)comm);
-                    uart_putln(comm);
+                    comm[size] = '\0';
                     put_char(c);
                 } else {
                     if (flag_over) {

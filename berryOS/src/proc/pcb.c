@@ -4,6 +4,10 @@
 #include <interrupts.h>
 #include <io/uart.h>
 #include <proc/locks/mutex.h>
+#include <console/command.h>
+#include <io/stdio.h>
+#include <utils/unused.h>
+
 static uint32_t pids = 1;
 #define NEW_PID pids++;
 /**
@@ -63,7 +67,6 @@ void print_pcb_stack(process_control_block_t* to_print){
 }
 
 static void init_function(void){
-    int a = 1;
     int i = 0;
     
     while (1) {
@@ -152,7 +155,10 @@ static void reap(void){
     yield_to_next_process(new_thread);
 }
 
+static void register_process_commands();
+
 void process_init(void){
+    register_process_commands();
     process_control_block_t * main_pcb;
     proc_saved_state_t* new_proc_state;
     INITIALIZE_LIST(run_queue, pcb);
@@ -324,4 +330,52 @@ void print_processes(){
     uart_putln("Print end");
     uart_putln("");
 
+}
+
+/* 
+----------------------------------------------------
+                 Commands functions
+----------------------------------------------------
+*/
+
+static void console_print_processes(){
+    
+    if(run_queue.size == 0){
+        printLn("Error");
+        return;
+    }
+    process_control_block_t* aux = &run_queue.ghost;
+    print("There are ");
+    print(itoa(run_queue.size + 1));
+    printLn(" processes.");
+        
+    while (has_next_pcb_list(&run_queue, aux)){
+        aux = next_pcb_list(aux);
+        print("Process ");
+        print(aux->proc_name);
+        print(" with PID ");
+        printLn(itoa(aux->pid));
+    }
+
+    print("Process ");
+    print(current_process->proc_name);
+    print(" with PID ");
+    printLn(itoa(current_process->pid));    
+    
+}
+
+COMMAND ps;
+
+void ps_function(int argc, char** argv){
+    MARK_UNUSED(argc);
+    MARK_UNUSED(argv);
+    console_print_processes();
+    return;
+}
+
+static void register_process_commands(){
+    ps.helpText = "Print all the system processes";
+    ps.key = "ps";
+    ps.trigger = ps_function;
+    regcomm(&ps);
 }
