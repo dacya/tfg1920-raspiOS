@@ -41,7 +41,7 @@ $ make build_hard
 Como ya se ha explicado, se puede usar QEMU para simular la Raspberry Pi 2. Para ello, se puede usar la siguiente regla:
 
 ```
-$ make build
+$ make run
 ```
 
 Para ejecutar el sistema en la placa física debe moverse el archivo generado en /build/kernel7.img a la tarjeta microSD sustituyendo así la imagen de Raspbian.
