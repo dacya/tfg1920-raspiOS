@@ -58,4 +58,4 @@ Para ejecutar el sistema en la placa física debe moverse el archivo generado en
 
 ## ✔️ | Licencia
 
-Este proyecto está bajo la licencia MIT - visitar [LICENSE.md](LICENSE.md) para más detalles.
+Este proyecto está bajo la licencia MIT - visitar [LICENSE](LICENSE) para más detalles.
