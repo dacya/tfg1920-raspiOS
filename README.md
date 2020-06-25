@@ -56,8 +56,6 @@ Para ejecutar el sistema en la placa física debe moverse el archivo generado en
 
 * **José Luis Risco Martín** - [@jlrisco](https://github.com/jlrisco)
 
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
-
 ## ✔️ | Licencia
 
 Este proyecto está bajo la licencia MIT - visitar [LICENSE.md](LICENSE.md) para más detalles.
